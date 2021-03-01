@@ -109,7 +109,7 @@ class Robot:
         rightMotor = self.BP.PORT_C
 
         updateTime = DeltaVal()
-        pos = np.array([0, 0, 0])
+        pos = np.array([0.0, 0.0, 0.0])
 
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
