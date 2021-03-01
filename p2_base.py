@@ -1,40 +1,63 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import argparse
-import numpy as np
 import time
+from argparse import ArgumentParser
+
+import numpy as np
+
 from Robot import Robot
 
+# get and parse arguments passed to main
+# Add as many args as you need ...
+parser = ArgumentParser()
+parser.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)", type=float, default=40.0)
 
-def main(args):
+robot = None
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+
+    if args.radioD < 0:
+        print('d must be a positive value')
+        exit(1)
+
+    ##################################################
+    ###################### start #####################
+    ##################################################
+
     try:
-        if args.radioD < 0:
-            print('d must be a positive value')
-            exit(1)
-
         # Instantiate Odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
-        print("X value at the beginning from main X= %.2f" %(robot.x.value))
+        print(f"X value at the beginning from main X={robot.x.value}")
 
         # 1. launch updateOdometry Process()
         robot.startOdometry()
 
+        robot.setSpeed(200, 0)
+        time.sleep(5)
+        robot.setSpeed(0, np.deg2rad(45))
+        time.sleep(4)
+        robot.setSpeed(200, 0)
+        time.sleep(5)
+        robot.setSpeed(0, 0)
+
         # 2. perform trajectory
-
-
-        # DUMMY CODE! delete when you have your own
-        robot.setSpeed(1,1)
-        print("Start : %s" % time.ctime())
+        # d = 400
+        # T = 200
+        # robot.setSpeed(T, T / d)
+        # time.sleep(np.pi * d / T)
+        #
+        # robot.setSpeed(T, -T / d)
+        # time.sleep(2 * np.pi * d / T)
+        #
+        # robot.setSpeed(T, T / d)
+        # time.sleep(np.pi * d / T)
+        #
+        # robot.setSpeed(0, 0)
         time.sleep(3)
-        print("X value from main tmp %d" % robot.x.value)
-        time.sleep(3)
-        print("End : %s" % time.ctime())
 
-        robot.lock_odometry.acquire()
-        print("Odom values at main at the END: %.2f, %.2f, %.2f " % (robot.x.value, robot.y.value, robot.th.value))
-        robot.lock_odometry.release()
+        # with robot.lock_odometry:
+        #     print(f"Odom values at main at the END: {robot.x.value:.2f}, {robot.y.value:.2f}, {robot.th.value:.2f}")
 
         # PART 1:
         # robot.setSpeed()
@@ -46,29 +69,11 @@ def main(args):
 
         # ...
 
-
-
+    finally:
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
-        robot.stopOdometry()
 
-
-    except KeyboardInterrupt:
-    # except the program gets interrupted by Ctrl+C on the keyboard.
-    # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
-        robot.stopOdometry()
-
-if __name__ == "__main__":
-
-    # get and parse arguments passed to main
-    # Add as many args as you need ...
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)",
-                        type=float, default=40.0)
-    args = parser.parse_args()
-
-    main(args)
-
-
-
+        # even if the program gets interrupted by Ctrl+C on the keyboard.
+        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
+        if robot is not None: robot.stopOdometry()

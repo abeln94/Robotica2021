@@ -114,6 +114,9 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# idea folder
+.idea/
+
 # Rope project settings
 .ropeproject
 
