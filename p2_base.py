@@ -20,17 +20,54 @@ def main(args):
 
         # 1. launch updateOdometry Process()
         robot.startOdometry()
+        
+        # giro
+        #robot.setSpeed(0,np.deg2rad(45))
+        #time.sleep(8)
+        #robot.setSpeed(0,0)
+        #input("next")
+        
+        # avance
+        #robot.setSpeed(200,0)
+        #time.sleep(2)
+        #robot.setSpeed(0,0)
+        #input("next")
 
         # 2. perform trajectory
+        T = 150 # mm/s
+        d = 200 # mm
+        #robot.setSpeed(T,T/d)
+        #time.sleep(np.pi*d/T)
+        #robot.setSpeed(T,-T/d)
+        #time.sleep(2*np.pi*d/T)
+        #robot.setSpeed(T,T/d)
+        #time.sleep(np.pi*d/T)
+        #robot.setSpeed(0,0)
+        
+        input("next")
+        
+        a = 100 # mm
+        r = 500 # mm
+        alpha = np.arctan2(d-a,r)
+        robot.setSpeed(T, -T/a)
+        time.sleep((np.pi/2-alpha)*a/T)
+        robot.setSpeed(T,0)
+        time.sleep(r/T)
+        robot.setSpeed(T,-T/d)
+        time.sleep((np.pi+2*alpha)*d/T)
+        robot.setSpeed(T,0)
+        time.sleep(r/T)
+        robot.setSpeed(T, -T/a)
+        time.sleep((np.pi/2-alpha)*a/T)
 
 
         # DUMMY CODE! delete when you have your own
-        robot.setSpeed(1,1)
-        print("Start : %s" % time.ctime())
-        time.sleep(3)
-        print("X value from main tmp %d" % robot.x.value)
-        time.sleep(3)
-        print("End : %s" % time.ctime())
+        #robot.setSpeed(1,1)
+        #print("Start : %s" % time.ctime())
+        #time.sleep(3)
+        #print("X value from main tmp %d" % robot.x.value)
+        #time.sleep(3)
+        #print("End : %s" % time.ctime())
 
         robot.lock_odometry.acquire()
         print("Odom values at main at the END: %.2f, %.2f, %.2f " % (robot.x.value, robot.y.value, robot.th.value))
