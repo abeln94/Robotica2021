@@ -36,7 +36,7 @@ if __name__ == "__main__":
         robot.setSpeed(200, 0)
         time.sleep(5)
         robot.setSpeed(0, np.deg2rad(45))
-        time.sleep(4)
+        time.sleep(3)
         robot.setSpeed(200, 0)
         time.sleep(5)
         robot.setSpeed(0, 0)
