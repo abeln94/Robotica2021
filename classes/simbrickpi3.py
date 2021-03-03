@@ -3,12 +3,15 @@ from enum import Enum, auto
 from multiprocessing import Manager
 from time import time
 
-from DeltaVal import DeltaVal
+from classes.DeltaVal import DeltaVal
 
 FRICTION = 1  # 0.975
 
 
 class BrickPi3:
+    """
+    Simulation of a real robot
+    """
     class SENSOR_TYPE(Enum):
         TOUCH = auto()
 

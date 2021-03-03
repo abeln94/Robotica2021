@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 import numpy as np
 
-from dibrobot import dibrobot
-from functions import hom, loc
-from simubot import simubot
+from functions.dibrobot import dibrobot
+from functions.functions import hom, loc
+from functions.simubot import simubot
 
 
 class Position:
@@ -118,4 +119,4 @@ class Position:
         toString
         """
         x, y, angle = loc(self.T)
-        return f"{self.referenceLabel}x{self.thisLabel} = [x={x:+.4f}, y={y:+.4f}, th={angle:+.4f} ({np.rad2deg(angle):+.4f}º)]"
+        return "{}x{} = [x={:+.4f}, y={:+.4f}, th={:+.4f} ({:+.4f}º)]".format(self.referenceLabel, self.thisLabel, x, y, angle, np.rad2deg(angle))
