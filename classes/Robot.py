@@ -4,8 +4,10 @@ from time import perf_counter, sleep
 
 import numpy as np
 
+import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
+from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
@@ -14,9 +16,6 @@ except ModuleNotFoundError:
 
 
 class Robot:
-    r = 28  # mm
-    L = 121  # mm
-
     def __init__(self, init_position=None):
         """
         Initialize basic robot params.
@@ -59,15 +58,14 @@ class Robot:
         print(f"Setting speed to {v:.2f} {w:.2f}")
 
         # compute the speed that should be set in each motor ...
-        wd = v / Robot.r + w * Robot.L / 2 / Robot.r
-        wi = v / Robot.r - w * Robot.L / 2 / Robot.r
+        wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
+        wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
         self.BP.set_motor_dps(self.BP.PORT_B, np.rad2deg(wi))
         self.BP.set_motor_dps(self.BP.PORT_C, np.rad2deg(wd))
 
     def readSpeed(self):
         """ To be filled"""
-
         return 0, 0
 
     def readOdometry(self):
@@ -106,34 +104,33 @@ class Robot:
             self.BP.offset_motor_encoder(leftMotor, dL)
             self.BP.offset_motor_encoder(rightMotor, dR)
 
-            ############## exact, long
-            # wL = np.deg2rad(dL) / dT
-            # wR = np.deg2rad(dR) / dT
-            # v = Robot.r * (wL + wR) / 2
-            # w = Robot.r * (wR - wL) / Robot.L
-            # [x, y, th] = simubot([v, w], np.array(self.readOdometry()), dT)
-            #
-            # with self.lock_odometry:
-            #     self.x.value = x
-            #     self.y.value = y
-            #     self.th.value = th
-            ############## /
+            if Cfg.exact:
+                # exact, long
+                wL = np.deg2rad(dL) / dT
+                wR = np.deg2rad(dR) / dT
+                v = Cfg.ROBOT_r * (wL + wR) / 2
+                w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
+                [x, y, th] = simubot([v, w], np.array(self.readOdometry()), dT)
 
-            ############## inexact, fast
-            sR = np.deg2rad(dR) * Robot.r
-            sL = np.deg2rad(dL) * Robot.r
+                with self.lock_odometry:
+                    self.x.value = x
+                    self.y.value = y
+                    self.th.value = th
+            else:
+                # inexact, fast
+                sR = np.deg2rad(dR) * Cfg.ROBOT_r
+                sL = np.deg2rad(dL) * Cfg.ROBOT_r
 
-            ds = (sL + sR) / 2
-            dth = np.arctan2((sR - sL), Robot.L)
-            th = self.th.value
-            dx = ds * np.cos(th + dth / 2)
-            dy = ds * np.sin(th + dth / 2)
+                ds = (sL + sR) / 2
+                dth = np.arctan2((sR - sL), Cfg.ROBOT_L)
+                th = self.th.value
+                dx = ds * np.cos(th + dth / 2)
+                dy = ds * np.sin(th + dth / 2)
 
-            with self.lock_odometry:
-                self.x.value += dx
-                self.y.value += dy
-                self.th.value = th + dth
-            ############## /
+                with self.lock_odometry:
+                    self.x.value += dx
+                    self.y.value += dy
+                    self.th.value = th + dth
 
             map.update(self.readOdometry())
 
@@ -142,9 +139,10 @@ class Robot:
 
             ######## UPDATE UNTIL HERE with your code ########
 
-            tEnd = perf_counter()
-            secs = self.P - (tEnd - tIni)
-            if secs > 0: sleep(secs)
+            if not Cfg.noWait:
+                tEnd = perf_counter()
+                secs = self.P - (tEnd - tIni)
+                if secs > 0: sleep(secs)
 
         # print("Stopping odometry ... X= %d" %(self.x.value))
         print(f"Stopping odometry ... X={self.x.value:.2f}, Y={self.y.value:.2f}, th={self.th.value:.2f} \n")
