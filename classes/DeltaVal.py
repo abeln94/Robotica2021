@@ -2,6 +2,9 @@ from multiprocessing import Value
 
 
 class DeltaVal:
+    """
+    For delta updates of a value (can be shared between processes)
+    """
     def __init__(self, val=0):
         self.val = Value('d', val)
 

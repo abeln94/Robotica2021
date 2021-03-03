@@ -1,9 +1,8 @@
-from __future__ import annotations
 import numpy as np
 
-from dibrobot import dibrobot
-from functions import hom, loc
-from simubot import simubot
+from functions.dibrobot import dibrobot
+from functions.functions import hom, loc
+from functions.simubot import simubot
 
 
 class Position:

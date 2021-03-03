@@ -7,7 +7,7 @@ def dibrobot(loc_eje, c, scale=1):
     Dibuja robot en location_eje con color (c) y tamano (p/g)
     """
     largo = 200 / 2 * scale
-    corto = 150 / 2 * scale
+    corto = 121 / 2 * scale
     descentre = -largo
 
     trasera_dcha = np.array([-largo, -corto, 1])

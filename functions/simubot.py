@@ -1,6 +1,6 @@
 import numpy as np
 
-from functions import loc, hom, norm_pi
+from functions.functions import loc, hom, norm_pi
 
 
 def simubot(vc, xWR, T):
