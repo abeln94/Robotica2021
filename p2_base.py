@@ -78,26 +78,43 @@ def do8(d, v):
 
 def doBicy(d, a, r, v):
     alpha = np.arctan2(d - a, r)
+    c = np.cos(alpha)
+    s = np.sin(alpha)
 
     # first quarter circle
     robot.setSpeed(v, -v / a)
-    time.sleep((np.pi / 2 - alpha) * a / v)
+    if Cfg.noOdometry:
+        time.sleep((np.pi / 2 - alpha) * a / v)
+    else:
+        waitUntil(x=c * a, y=-(1 - s) * a)
 
     # linear motion
     robot.setSpeed(v, 0)
-    time.sleep(r / v)
+    if Cfg.noOdometry:
+        time.sleep(r / v)
+    else:
+        waitUntil(x=c * a + s * r, y=-(1 - s) * a - c * r)
 
     # half circle
     robot.setSpeed(v, -v / d)
-    time.sleep((np.pi + 2 * alpha) * d / v)
+    if Cfg.noOdometry:
+        time.sleep((np.pi + 2 * alpha) * d / v)
+    else:
+        waitUntil(x=-c * a - s * r, y=-(1 - s) * a - c * r)
 
     # linear motion again
     robot.setSpeed(v, 0)
-    time.sleep(r / v)
+    if Cfg.noOdometry:
+        time.sleep(r / v)
+    else:
+        waitUntil(x=-c * a, y=-(1 - s) * a)
 
     # last quarter circle
     robot.setSpeed(v, -v / a)
-    time.sleep((np.pi / 2 - alpha) * a / v)
+    if Cfg.noOdometry:
+        time.sleep((np.pi / 2 - alpha) * a / v)
+    else:
+        waitUntil(x=0, y=0)
 
 
 def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 16):
