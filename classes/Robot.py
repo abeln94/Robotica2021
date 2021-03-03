@@ -55,7 +55,7 @@ class Robot:
         self.P = 0.25  # 0.1 - 0.5
 
     def setSpeed(self, v, w):
-        print(f"Setting speed to {v:.2f} {w:.2f}")
+        print("Setting speed to {:.2f} {:.2f}".format(v, w))
 
         # compute the speed that should be set in each motor ...
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
@@ -132,6 +132,7 @@ class Robot:
                     self.y.value += dy
                     self.th.value = th + dth
 
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
             map.update(self.readOdometry())
 
             # save LOG
@@ -144,8 +145,7 @@ class Robot:
                 secs = self.P - (tEnd - tIni)
                 if secs > 0: sleep(secs)
 
-        # print("Stopping odometry ... X= %d" %(self.x.value))
-        print(f"Stopping odometry ... X={self.x.value:.2f}, Y={self.y.value:.2f}, th={self.th.value:.2f} \n")
+        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
 
     def stopOdometry(self):
         """ Stop the odometry thread """
