@@ -8,6 +8,7 @@ from time import perf_counter, sleep
 import numpy as np
 
 import Cfg
+from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.simubot import simubot
 
@@ -95,6 +96,8 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
+        leftEncoder = DeltaVal(self.BP.get_motor_encoder(leftMotor))
+        rightEncoder = DeltaVal(self.BP.get_motor_encoder(rightMotor))
 
         if Cfg.log:
             logFile = open("./logs/" + Cfg.log, "w")
@@ -106,10 +109,8 @@ class Robot:
             tIni = perf_counter()
 
             # get values
-            dL = self.BP.get_motor_encoder(leftMotor)
-            dR = self.BP.get_motor_encoder(rightMotor)
-            self.BP.offset_motor_encoder(leftMotor, dL)
-            self.BP.offset_motor_encoder(rightMotor, dR)
+            dL = leftEncoder.update(self.BP.get_motor_encoder(leftMotor))
+            dR = rightEncoder.update(self.BP.get_motor_encoder(rightMotor))
 
             # compute updates
             if Cfg.exact:
@@ -131,6 +132,7 @@ class Robot:
                 dth = (sR - sL) / Cfg.ROBOT_L
                 x += ds * np.cos(th + dth / 2)
                 y += ds * np.sin(th + dth / 2)
+                th += dth
 
             # update
             with self.lock_odometry:

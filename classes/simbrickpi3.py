@@ -13,7 +13,7 @@ from enum import Enum, auto
 from multiprocessing import Manager
 from time import time
 
-from classes.DeltaVal import DeltaVal
+from classes.DeltaVal import SyncDeltaVal
 
 FRICTION = 1  # 0.975
 
@@ -32,7 +32,7 @@ class BrickPi3:
         self.encoders = m.dict()
         self.offsets = m.dict()
         self.dps = m.dict()
-        self.lastUpdate = DeltaVal()
+        self.lastUpdate = SyncDeltaVal()
 
     def reset_all(self):
         self.lastUpdate.reset()
