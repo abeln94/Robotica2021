@@ -61,6 +61,9 @@ class Robot:
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
+        self.BP.set_motor_dps(self.BP.PORT_B, 0)
+        self.BP.set_motor_dps(self.BP.PORT_C, 0)
+        self.internal_update()
         self.BP.set_motor_dps(self.BP.PORT_B, np.rad2deg(wi))
         self.BP.set_motor_dps(self.BP.PORT_C, np.rad2deg(wd))
 
@@ -75,6 +78,7 @@ class Robot:
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
+        return
         self.finished = False
         self.p = Thread(target=self.updateOdometry, args=())  # additional_params?))
         self.p.start()
@@ -85,9 +89,6 @@ class Robot:
         if not Cfg.noPlot:
             map = Map()
             map.update(self.readOdometry())
-
-        leftMotor = self.BP.PORT_B
-        rightMotor = self.BP.PORT_C
 
         if Cfg.exact:
             updateTime = DeltaVal()
@@ -100,43 +101,7 @@ class Robot:
             if Cfg.exact:
                 dT = updateTime.update(perf_counter())
 
-            # get values
-            dL = self.BP.get_motor_encoder(leftMotor)
-            dR = self.BP.get_motor_encoder(rightMotor)
-            self.BP.offset_motor_encoder(leftMotor, dL)
-            self.BP.offset_motor_encoder(rightMotor, dR)
-
-            if Cfg.exact:
-                # exact, long
-                wL = np.deg2rad(dL) / dT
-                wR = np.deg2rad(dR) / dT
-                v = Cfg.ROBOT_r * (wL + wR) / 2
-                w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
-                [x, y, th] = simubot([v, w], np.array(self.readOdometry()), dT)
-
-                with self.lock_odometry:
-                    self.x = x
-                    self.y = y
-                    self.th = th
-            else:
-                # inexact, fast
-                sR = np.deg2rad(dR) * Cfg.ROBOT_r
-                sL = np.deg2rad(dL) * Cfg.ROBOT_r
-
-                ds = (sL + sR) / 2
-                dth = (sR - sL) / Cfg.ROBOT_L
-                th = self.th
-                dx = ds * np.cos(th + dth / 2)
-                dy = ds * np.sin(th + dth / 2)
-
-                with self.lock_odometry:
-                    self.x += dx
-                    self.y += dy
-                    self.th += dth
-
-            # display
-            x, y, th = self.readOdometry()
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
+            self.internal_update()
 
             if not Cfg.noPlot:
                 map.update(self.readOdometry())
@@ -152,6 +117,48 @@ class Robot:
                 if secs > 0: sleep(secs)
 
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
+
+    def internal_update(self):
+        leftMotor = self.BP.PORT_B
+        rightMotor = self.BP.PORT_C
+
+        # get values
+        dL = self.BP.get_motor_encoder(leftMotor)
+        dR = self.BP.get_motor_encoder(rightMotor)
+        self.BP.offset_motor_encoder(leftMotor, dL)
+        self.BP.offset_motor_encoder(rightMotor, dR)
+
+        if Cfg.exact:
+            # exact, long
+            wL = np.deg2rad(dL) / dT
+            wR = np.deg2rad(dR) / dT
+            v = Cfg.ROBOT_r * (wL + wR) / 2
+            w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
+            [x, y, th] = simubot([v, w], np.array(self.readOdometry()), dT)
+
+            with self.lock_odometry:
+                self.x = x
+                self.y = y
+                self.th = th
+        else:
+            # inexact, fast
+            sR = np.deg2rad(dR) * Cfg.ROBOT_r
+            sL = np.deg2rad(dL) * Cfg.ROBOT_r
+
+            ds = (sL + sR) / 2
+            dth = (sR - sL) / Cfg.ROBOT_L
+            th = self.th
+            dx = ds * np.cos(th + dth / 2)
+            dy = ds * np.sin(th + dth / 2)
+
+            with self.lock_odometry:
+                self.x += dx
+                self.y += dy
+                self.th += dth
+
+        # display
+        x, y, th = self.readOdometry()
+        print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
 
     def stopOdometry(self):
         """ Stop the odometry thread """
