@@ -83,8 +83,9 @@ class Robot:
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self):  # , additional_params?):
 
-        map = Map()
-        map.update(self.readOdometry())
+        if not Cfg.noPlot:
+            map = Map()
+            map.update(self.readOdometry())
 
         leftMotor = self.BP.PORT_B
         rightMotor = self.BP.PORT_C
@@ -132,8 +133,12 @@ class Robot:
                     self.y.value += dy
                     self.th.value = th + dth
 
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
-            map.update(self.readOdometry())
+            # display
+            x, y, th = self.readOdometry()
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
+
+            if not Cfg.noPlot:
+                map.update(self.readOdometry())
 
             # save LOG
             # Need to decide when to store a log with the updated odometry ...
