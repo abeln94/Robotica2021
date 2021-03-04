@@ -26,7 +26,7 @@ def do180(d, v):
     # linear movement
     robot.setSpeed(v, 0)
     if Cfg.noOdometry:
-        time.sleep(v / d)
+        time.sleep(d / v)
     else:
         waitUntil(x=d, y=0)
 
@@ -40,7 +40,7 @@ def do180(d, v):
     # linear movement (back to origin)
     robot.setSpeed(v, 0)
     if Cfg.noOdometry:
-        time.sleep(v / d)
+        time.sleep(d / v)
     else:
         waitUntil(x=0, y=0)
 
