@@ -90,16 +90,18 @@ class Robot:
         leftMotor = self.BP.PORT_B
         rightMotor = self.BP.PORT_C
 
-        updateTime = DeltaVal()
+        if Cfg.exact:
+            updateTime = DeltaVal()
 
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
             tIni = perf_counter()
 
             # compute updates
-            dT = updateTime.update(perf_counter())
+            if Cfg.exact:
+                dT = updateTime.update(perf_counter())
 
-            # simulation
+            # get values
             dL = self.BP.get_motor_encoder(leftMotor)
             dR = self.BP.get_motor_encoder(rightMotor)
             self.BP.offset_motor_encoder(leftMotor, dL)
@@ -123,7 +125,7 @@ class Robot:
                 sL = np.deg2rad(dL) * Cfg.ROBOT_r
 
                 ds = (sL + sR) / 2
-                dth = np.arctan2((sR - sL), Cfg.ROBOT_L)
+                dth = (sR - sL) / Cfg.ROBOT_L
                 th = self.th.value
                 dx = ds * np.cos(th + dth / 2)
                 dy = ds * np.sin(th + dth / 2)
@@ -131,7 +133,7 @@ class Robot:
                 with self.lock_odometry:
                     self.x.value += dx
                     self.y.value += dy
-                    self.th.value = th + dth
+                    self.th.value += dth
 
             # display
             x, y, th = self.readOdometry()
