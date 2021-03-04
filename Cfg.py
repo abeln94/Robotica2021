@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 
+# robot python version 3.5.3
+
 # Note: all distances are measures in millimeters and angles in radians (unless stated otherwise)
 
 # Fixed parameters
@@ -17,11 +19,12 @@ __parser.add_argument("-r", "--distR", help="Distance 'r' to perform the Bicy-tr
 __parser.add_argument("-f", "--log", help="Log odometry into a file", default=False)
 
 __parser.add_argument("-nw", "--noWait", help="Disable odometry wait", action="store_true")
-__parser.add_argument("-no", "--noOdometry", help="Don't use odometry for movement ", action="store_true")
-__parser.add_argument("-e", "--exact", help="Use the exact method for odometry ", action="store_true")
-__parser.add_argument("-np", "--noPlot", help="Don't show a plot with the values", action="store_true")
+__parser.add_argument("-no", "--noOdometry", help="Don't use odometry for movement", action="store_true")
+__parser.add_argument("-e", "--exact", help="Use the exact method for odometry", action="store_true")
+__parser.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
 
 __args = __parser.parse_args()
 
+# update self
 for __key, __value in vars(__args).items():
     globals()[__key] = __value

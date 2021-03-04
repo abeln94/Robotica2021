@@ -7,6 +7,7 @@ class Map:
     """
     Shows a map of the robot position and its trail
     """
+
     def __init__(self):
         # init
         plt.ion()
@@ -15,8 +16,8 @@ class Map:
         plt.gca().set_aspect(True)
         plt.show(block=False)
 
-        self.xpos = []
-        self.ypos = []
+        self.xpos = [None]
+        self.ypos = [None]
         self.lims = [-500, 500]
 
     def update(self, loc):
@@ -28,8 +29,9 @@ class Map:
         dibrobot(loc, 'blue')
 
         # dib trail
-        self.xpos.append(loc[0])
-        self.ypos.append(loc[1])
+        if loc[0] != self.xpos[-1] or loc[1] != self.ypos[-1]:
+            self.xpos.append(loc[0])
+            self.ypos.append(loc[1])
         plt.plot(self.xpos, self.ypos, 'red')
 
         # update limits

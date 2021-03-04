@@ -1,3 +1,6 @@
+"""
+The Robot main class
+"""
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, RLock
 from time import perf_counter, sleep
@@ -5,7 +8,6 @@ from time import perf_counter, sleep
 import numpy as np
 
 import Cfg
-from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.simubot import simubot
 
@@ -31,7 +33,7 @@ class Robot:
         self.BP = brickpi3.BrickPi3()
 
         # Configure sensors, for example a touch sensor.
-        self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
+        # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder B and C (or all the motors you are using)
         self.BP.offset_motor_encoder(self.BP.PORT_B, self.BP.get_motor_encoder(self.BP.PORT_B))
@@ -75,34 +77,33 @@ class Robot:
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
-        self.p = Process(target=self.updateOdometry, args=())  # additional_params?))
+        self.p = Process(target=self.updateOdometry)
         self.p.start()
         print("PID: ", self.p.pid)
 
-    # You may want to pass additional shared variables besides the odometry values and stop flag
-    def updateOdometry(self):  # , additional_params?):
-
-        if not Cfg.noPlot:
-            map = Map()
-            map.update(self.readOdometry())
-
+    def updateOdometry(self):
+        """
+        The odometry update process
+        """
         leftMotor = self.BP.PORT_B
         rightMotor = self.BP.PORT_C
 
-        if Cfg.exact:
-            updateTime = DeltaVal()
+        # init map
+        if Cfg.plot:
+            map = Map()
+            map.update(self.readOdometry())
+
+        # init variables
+        x, y, th = self.readOdometry()
 
         if Cfg.log:
             logFile = open("./logs/" + Cfg.log, "w")
-            logFile.write("Timestamp; X; Y; Theta\n")
+            logFile.write("Timestamp, X, Y, Theta\n")
 
+        # loop
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
             tIni = perf_counter()
-
-            # compute updates
-            if Cfg.exact:
-                dT = updateTime.update(perf_counter())
 
             # get values
             dL = self.BP.get_motor_encoder(leftMotor)
@@ -110,18 +111,17 @@ class Robot:
             self.BP.offset_motor_encoder(leftMotor, dL)
             self.BP.offset_motor_encoder(rightMotor, dR)
 
+            # compute updates
             if Cfg.exact:
                 # exact, long
+                dT = 1  # any value will work
                 wL = np.deg2rad(dL) / dT
                 wR = np.deg2rad(dR) / dT
+
                 v = Cfg.ROBOT_r * (wL + wR) / 2
                 w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
-                [x, y, th] = simubot([v, w], np.array(self.readOdometry()), dT)
+                x, y, th = simubot([v, w], np.array([x, y, th]), dT)
 
-                with self.lock_odometry:
-                    self.x.value = x
-                    self.y.value = y
-                    self.th.value = th
             else:
                 # inexact, fast
                 sR = np.deg2rad(dR) * Cfg.ROBOT_r
@@ -129,34 +129,34 @@ class Robot:
 
                 ds = (sL + sR) / 2
                 dth = (sR - sL) / Cfg.ROBOT_L
-                th = self.th.value
-                dx = ds * np.cos(th + dth / 2)
-                dy = ds * np.sin(th + dth / 2)
+                x += ds * np.cos(th + dth / 2)
+                y += ds * np.sin(th + dth / 2)
 
-                with self.lock_odometry:
-                    self.x.value += dx
-                    self.y.value += dy
-                    self.th.value += dth
+            # update
+            with self.lock_odometry:
+                self.x.value = x
+                self.y.value = y
+                self.th.value = th
 
             # display
-            x, y, th = self.readOdometry()
             print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
 
-            if not Cfg.noPlot:
-                map.update(self.readOdometry())
+            if Cfg.plot:
+                map.update([x, y, th])
 
             # save LOG
             if Cfg.log:
-                logFile.write("{:.2f}; {:.2f}; {:.2f}; {:.2f}\n".format(tIni - perf_counter(), *self.readOdometry()))
+                logFile.write("{}, {}, {}, {}\n".format(tIni, x, y, th))
 
             ######## UPDATE UNTIL HERE with your code ########
 
+            # wait for next update
             if not Cfg.noWait:
                 tEnd = perf_counter()
                 secs = self.P - (tEnd - tIni)
                 if secs > 0: sleep(secs)
 
-        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
+        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
         if Cfg.log:
             logFile.close()
 

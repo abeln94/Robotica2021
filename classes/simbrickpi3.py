@@ -1,3 +1,13 @@
+"""
+Simulation of a real robot, this replaces the BrickPi3 module.
+Use as:
+
+try:
+    import brickpi3
+except ModuleNotFoundError:
+    import simbrickpi3 as brickpi3
+
+"""
 import random
 from enum import Enum, auto
 from multiprocessing import Manager
@@ -9,9 +19,6 @@ FRICTION = 1  # 0.975
 
 
 class BrickPi3:
-    """
-    Simulation of a real robot
-    """
     class SENSOR_TYPE(Enum):
         TOUCH = auto()
 
