@@ -34,8 +34,10 @@ class Robot:
         self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder B and C (or all the motors you are using)
-      Although this module is always available, not all functions are ##################################################
-        # Odometry
+        self.BP.offset_motor_encoder(self.BP.PORT_B, self.BP.get_motor_encoder(self.BP.PORT_B))
+        self.BP.offset_motor_encoder(self.BP.PORT_C, self.BP.get_motor_encoder(self.BP.PORT_C))
+
+        ##################################################        # Odometry
 
         self.p = None  # the odometry process
 
