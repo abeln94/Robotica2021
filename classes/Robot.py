@@ -90,17 +90,11 @@ class Robot:
             map = Map()
             map.update(self.readOdometry())
 
-        if Cfg.exact:
-            updateTime = DeltaVal()
-
         while not self.finished:
             # current processor time in a floating point value, in seconds
             tIni = perf_counter()
 
             # compute updates
-            if Cfg.exact:
-                dT = updateTime.update(perf_counter())
-
             self.internal_update()
 
             if not Cfg.noPlot:
@@ -119,10 +113,10 @@ class Robot:
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
 
     def internal_update(self):
-        leftMotor = self.BP.PORT_B
-        rightMotor = self.BP.PORT_C
 
         # get values
+        leftMotor = self.BP.PORT_B
+        rightMotor = self.BP.PORT_C
         dL = self.BP.get_motor_encoder(leftMotor)
         dR = self.BP.get_motor_encoder(rightMotor)
         self.BP.offset_motor_encoder(leftMotor, dL)
@@ -130,6 +124,7 @@ class Robot:
 
         if Cfg.exact:
             # exact, long
+            dT = 1
             wL = np.deg2rad(dL) / dT
             wR = np.deg2rad(dR) / dT
             v = Cfg.ROBOT_r * (wL + wR) / 2
