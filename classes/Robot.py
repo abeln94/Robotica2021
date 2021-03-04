@@ -34,10 +34,7 @@ class Robot:
         self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder B and C (or all the motors you are using)
-        self.BP.offset_motor_encoder(self.BP.PORT_B, self.BP.get_motor_encoder(self.BP.PORT_B))
-        self.BP.offset_motor_encoder(self.BP.PORT_C, self.BP.get_motor_encoder(self.BP.PORT_C))
-
-        ##################################################
+      Although this module is always available, not all functions are ##################################################
         # Odometry
 
         self.p = None  # the odometry process
@@ -91,6 +88,9 @@ class Robot:
 
         updateTime = DeltaVal()
 
+        logFile = open("./logs/odometry.log", "w")
+        logFile.write("Timestamp; X; Y; Theta\n")
+
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
             tIni = perf_counter()
@@ -136,6 +136,7 @@ class Robot:
             map.update(self.readOdometry())
 
             # save LOG
+            logFile.write("{:.2f}; {:.2f}; {:.2f}; {:.2f}\n".format(tIni - perf_counter(), *self.readOdometry()))
             # Need to decide when to store a log with the updated odometry ...
 
             ######## UPDATE UNTIL HERE with your code ########
@@ -146,6 +147,7 @@ class Robot:
                 if secs > 0: sleep(secs)
 
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}".format(*self.readOdometry()))
+        logFile.close()
 
     def stopOdometry(self):
         """ Stop the odometry thread """
