@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 
 from functions.dibrobot import dibrobot
 
+PADDING = 500
+
 
 class Map:
     """
@@ -9,19 +11,18 @@ class Map:
     """
 
     def __init__(self):
-        # init
+        """ Initializes the map window """
         plt.ion()
         plt.figure('Robot simulation')
         plt.plot([], [])
-        plt.gca().set_aspect(True)
         plt.show(block=False)
 
         self.xpos = [None]
         self.ypos = [None]
-        self.lims = [-500, 500]
+        self.lims = [[-PADDING, PADDING], [-PADDING, PADDING]]
 
-
-    def update(self, loc, plot=True):
+    def update(self, loc):
+        """ Adds a new localization to the map and updates it """
         # reset
         plt.gcf().clear()
         plt.grid()
@@ -35,20 +36,27 @@ class Map:
             self.ypos.append(loc[1])
         plt.plot(self.xpos, self.ypos, 'red')
 
-        # update limits
-        for i in range(2):
-            if loc[i] - 500 < self.lims[0]:
-                self.lims[0] = self.lims[0] * 0.9 + (loc[i] - 500) * 0.1
-            if loc[i] + 500 > self.lims[1]:
-                self.lims[1] = self.lims[1] * 0.9 + (loc[i] + 500) * 0.1
-        plt.xlim(self.lims[0], self.lims[1])
-        plt.ylim(self.lims[0], self.lims[1])
+        # update limits in a smooth way (and using a very convoluted but compact code, can you guess what it does?)
+        for i, f in ((0, plt.xlim), (1, plt.ylim)):
+            lims = f()
+            for j, d in ((0, -PADDING), (1, PADDING)):
+                self.lims[i][j] = self.lims[i][j] * 0.8 + (lims[j] + d) * 0.2
+            f(*self.lims[i])
+        plt.gca().set_aspect(True)
 
         # draw
-        if plot:
-            plt.gcf().canvas.draw()
-            plt.gcf().canvas.flush_events()
+        plt.gcf().canvas.draw()
+        plt.gcf().canvas.flush_events()
 
+    def display(self, x, y):
+        """ Show a full list of coordinates on the map """
+        plt.grid()
+        plt.plot(x, y, 'red')
 
     def save(self, path):
+        """ Saves the currently displayed map to a file """
         plt.savefig(path)
+
+    def block(self):
+        """ Blocks the map until the user closes it """
+        plt.show(block=True)
