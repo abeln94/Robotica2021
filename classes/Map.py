@@ -52,6 +52,10 @@ class Map:
         """ Show a full list of coordinates on the map """
         plt.grid()
         plt.plot(x, y, 'red')
+        for f in (plt.xlim, plt.ylim):
+            lims = f()
+            f(lims[0] - PADDING, lims[1] + PADDING)
+        plt.gca().set_aspect(True)
 
     def save(self, path):
         """ Saves the currently displayed map to a file """
