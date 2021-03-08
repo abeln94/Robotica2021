@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy
 
 from functions.dibrobot import dibrobot
 
@@ -9,7 +8,7 @@ class Map:
     Shows a map of the robot position and its trail
     """
 
-    def __init__(self, file = None):
+    def __init__(self):
         # init
         plt.ion()
         plt.figure('Robot simulation')
@@ -20,7 +19,6 @@ class Map:
         self.xpos = [None]
         self.ypos = [None]
         self.lims = [-500, 500]
-        self.file = file
 
 
     def update(self, loc):
@@ -49,11 +47,3 @@ class Map:
         # draw
         plt.gcf().canvas.draw()
         plt.gcf().canvas.flush_events()
-
-
-    # Plots the log file passed in the constructor (if exists)
-    def plotFile(self):
-        if self.file:  
-            data = numpy.genfromtxt("./logs/" + self.file, delimiter=',')
-            for i in range(1, len(data)):
-                self.update( [data[i][1], data[i][2], data[i][3]] )
