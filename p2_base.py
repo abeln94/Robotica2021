@@ -161,8 +161,7 @@ if __name__ == "__main__":
 
         # wait before start
         pause(3)
-
-        # doSnake()
+        doSnake()
         # pause()
 
         # do the 180 trajectory
