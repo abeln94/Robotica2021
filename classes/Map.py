@@ -21,7 +21,7 @@ class Map:
         self.lims = [-500, 500]
 
 
-    def update(self, loc):
+    def update(self, loc, plot=True):
         # reset
         plt.gcf().clear()
         plt.grid()
@@ -45,5 +45,10 @@ class Map:
         plt.ylim(self.lims[0], self.lims[1])
 
         # draw
-        plt.gcf().canvas.draw()
-        plt.gcf().canvas.flush_events()
+        if plot:
+            plt.gcf().canvas.draw()
+            plt.gcf().canvas.flush_events()
+
+
+    def save(self, path):
+        plt.savefig(path)
