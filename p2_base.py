@@ -3,6 +3,7 @@ import time
 import numpy as np
 
 import Cfg
+from classes.Position import Position
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
@@ -161,7 +162,7 @@ if __name__ == "__main__":
 
         # wait before start
         pause(3)
-        doSnake()
+        # doSnake()
         # pause()
 
         # do the 180 trajectory

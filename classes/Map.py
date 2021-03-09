@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
 
+import Cfg
 from functions.dibrobot import dibrobot
 
-PADDING = 500
+PADDING = 500  # padding of the plot
+loc = plticker.MultipleLocator(base=Cfg.GRID)
 
 
 class Map:
@@ -19,39 +22,36 @@ class Map:
 
         self.xpos = [None]
         self.ypos = [None]
-        self.lims = [[-PADDING, PADDING], [-PADDING, PADDING]]
 
     def update(self, loc):
         """ Adds a new localization to the map and updates it """
         # reset
         plt.gcf().clear()
-        plt.grid()
-
-        # dib robot
-        dibrobot(loc, 'blue')
 
         # dib trail
         if loc[0] != self.xpos[-1] or loc[1] != self.ypos[-1]:
             self.xpos.append(loc[0])
             self.ypos.append(loc[1])
-        plt.plot(self.xpos, self.ypos, 'red')
+        self.drawPath(self.xpos, self.ypos)
 
-        # update limits in a smooth way (and using a very convoluted but compact code, can you guess what it does?)
-        for i, f in ((0, plt.xlim), (1, plt.ylim)):
-            lims = f()
-            for j, d in ((0, -PADDING), (1, PADDING)):
-                self.lims[i][j] = self.lims[i][j] * 0.8 + (lims[j] + d) * 0.2
-            f(*self.lims[i])
-        plt.gca().set_aspect(True)
+        # draw robot
+        dibrobot(loc, 'blue')
 
         # draw
         plt.gcf().canvas.draw()
         plt.gcf().canvas.flush_events()
 
-    def display(self, x, y):
+    def drawPath(self, x, y):
         """ Show a full list of coordinates on the map """
+        # display grid
+        plt.gca().xaxis.set_major_locator(loc)
+        plt.gca().yaxis.set_major_locator(loc)
         plt.grid()
+
+        # display path
         plt.plot(x, y, 'red')
+
+        # add padding to limits
         for f in (plt.xlim, plt.ylim):
             lims = f()
             f(lims[0] - PADDING, lims[1] + PADDING)

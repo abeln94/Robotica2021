@@ -32,7 +32,7 @@ if __name__ == "__main__":
             if delay > 0: time.sleep(delay)
     else:
         # display directly
-        map.display(data['X'], data['Y'])
+        map.drawPath(data['X'], data['Y'])
 
     # save image
     if args.image:
