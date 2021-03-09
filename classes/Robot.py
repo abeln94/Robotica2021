@@ -1,9 +1,9 @@
 """
 The Robot main class
 """
+import time
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, RLock
-from time import perf_counter, sleep
 
 import numpy as np
 
@@ -106,7 +106,7 @@ class Robot:
         # loop
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
-            tIni = perf_counter()
+            tIni = time.clock()
 
             # get values
             dL = leftEncoder.update(self.BP.get_motor_encoder(leftMotor))
@@ -154,9 +154,9 @@ class Robot:
 
             # wait for next update
             if not Cfg.noWait:
-                tEnd = perf_counter()
+                tEnd = time.clock()
                 secs = self.P - (tEnd - tIni)
-                if secs > 0: sleep(secs)
+                if secs > 0: time.sleep(secs)
 
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
         if Cfg.log:

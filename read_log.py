@@ -28,7 +28,7 @@ if __name__ == "__main__":
         # animate
         for t, *xyth in data:
             map.update(xyth)
-            delay = t - time.perf_counter()
+            delay = t - time.clock()
             if delay > 0: time.sleep(delay)
     else:
         # display directly

@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 
 # Fixed parameters
 ROBOT_L = 121  # distance between robot wheels
-ROBOT_r = 28  # radius of robots wheels
+ROBOT_r = 26.7  # radius of robots wheels
 LIN_VEL = 200  # stable velocity for linear motion (mm/s)
 
 # command line arguments

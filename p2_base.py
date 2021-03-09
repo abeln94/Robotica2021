@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
         # wait before start
         pause(3)
-        robot.setSpeed(50, 0)
+        robot.BP.set_motor_dps(robot.BP.PORT_C, 45)
         time.sleep(999)
         # doSnake()
         # pause()
