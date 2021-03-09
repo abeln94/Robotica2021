@@ -3,7 +3,6 @@ import time
 import numpy as np
 
 import Cfg
-from classes.Position import Position
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
