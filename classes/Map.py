@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 
-import Cfg
 from functions.dibrobot import dibrobot
 
 PADDING = 500  # padding of the plot
-loc = plticker.MultipleLocator(base=Cfg.GRID)
+GRID = 335  # grid distance (length of the square tiles)
+loc = plticker.MultipleLocator(base=GRID)
 
 
 class Map:
