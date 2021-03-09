@@ -162,7 +162,7 @@ if __name__ == "__main__":
         # wait before start
         pause(3)
         robot.setSpeed(50, 0)
-        pause(999)
+        time.sleep(999)
         # doSnake()
         # pause()
 
