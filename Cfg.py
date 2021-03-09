@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 # Note: all distances are measures in millimeters and angles in radians (unless stated otherwise)
 
 # Fixed parameters
-ROBOT_L = 121  # distance between robot wheels
+ROBOT_L = 117  # distance between robot wheels
 ROBOT_r = 26.7  # radius of robots wheels
 LIN_VEL = 200  # stable velocity for linear motion (mm/s)
 

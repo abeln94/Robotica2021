@@ -10,11 +10,12 @@ import numpy as np
 import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
+from functions.perf_counter_exact import perf_counter_exact
 from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
-except ModuleNotFoundError:
+except:
     import classes.simbrickpi3 as brickpi3
 
 
@@ -106,7 +107,7 @@ class Robot:
         # loop
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
-            tIni = time.clock()
+            tIni = perf_counter_exact()
 
             # get values
             dL = leftEncoder.update(self.BP.get_motor_encoder(leftMotor))
@@ -154,7 +155,7 @@ class Robot:
 
             # wait for next update
             if not Cfg.noWait:
-                tEnd = time.clock()
+                tEnd = perf_counter_exact()
                 secs = self.P - (tEnd - tIni)
                 if secs > 0: time.sleep(secs)
 

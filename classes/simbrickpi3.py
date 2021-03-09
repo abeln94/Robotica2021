@@ -9,7 +9,7 @@ except ModuleNotFoundError:
 
 """
 import random
-from enum import Enum, auto
+from enum import Enum
 from multiprocessing import Manager
 from time import time
 
@@ -20,7 +20,7 @@ FRICTION = 1  # 0.975
 
 class BrickPi3:
     class SENSOR_TYPE(Enum):
-        TOUCH = auto()
+        TOUCH = 1
 
     PORT_1 = "PORT_1"
     PORT_A = "PORT_A"

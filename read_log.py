@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import numpy
 
 from classes.Map import Map
+from functions.perf_counter_exact import perf_counter_exact
 
 """
 1) Que por defecto solo muestre la gráfica (de golpe, sin animaciones ni robot dibujado, solo el recorrido). Para esto no hay que usar el Map, un if-else y un plot y ya está. La animación de la gráfica se debería mostrar si además se le pasa un parámetro adicional, por ejemplo un -a (de animate) o alguna otra cosa.
@@ -28,7 +29,7 @@ if __name__ == "__main__":
         # animate
         for t, *xyth in data:
             map.update(xyth)
-            delay = t - time.clock()
+            delay = t - perf_counter_exact()
             if delay > 0: time.sleep(delay)
     else:
         # display directly
