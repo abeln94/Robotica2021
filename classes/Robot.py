@@ -41,7 +41,8 @@ class Robot:
         self.BP.offset_motor_encoder(self.BP.PORT_B, self.BP.get_motor_encoder(self.BP.PORT_B))
         self.BP.offset_motor_encoder(self.BP.PORT_C, self.BP.get_motor_encoder(self.BP.PORT_C))
 
-        ##################################################        # Odometry
+        ##################################################
+        # Odometry
 
         self.p = None  # the odometry process
 

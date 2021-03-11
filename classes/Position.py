@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Union
 
 import numpy as np
 
@@ -21,10 +21,10 @@ class Position:
         """
         self.thisLabel = thisLabel
         self.referenceLabel = referenceLabel
-        self.T: np.ndarray = T
+        self.T = T
 
     @classmethod
-    def FromLoc(cls, loc: np.ndarray, referenceLabel: str, thisLabel: str) -> Position:
+    def FromLoc(cls, loc: Union[np.ndarray, tuple], referenceLabel: str, thisLabel: str):
         """
         Constructor from the location array
         :param loc: location array [x,y,rad]
@@ -32,10 +32,11 @@ class Position:
         :param thisLabel: name of this point
         :return: The Position object
         """
+        loc = np.array(loc)
         return cls(hom(loc), referenceLabel, thisLabel)
 
     @classmethod
-    def FromXYRad(cls, x: float, y: float, angle: float, referenceLabel: str, thisLabel: str) -> Position:
+    def FromXYRad(cls, x: float, y: float, angle: float, referenceLabel: str, thisLabel: str):
         """
         Constructor from position and angle in radians
         :param x: x position
@@ -48,7 +49,7 @@ class Position:
         return cls.FromLoc(np.array([x, y, angle]), referenceLabel, thisLabel)
 
     @classmethod
-    def FromXYDeg(cls, x: float, y: float, angle: float, referenceLabel: str, thisLabel: str) -> Position:
+    def FromXYDeg(cls, x: float, y: float, angle: float, referenceLabel: str, thisLabel: str):
         """
         Constructor from position and angle in degrees
         :param x: x position
@@ -61,13 +62,14 @@ class Position:
         return cls.FromXYRad(x, y, np.deg2rad(angle), referenceLabel, thisLabel)
 
     @classmethod
-    def Zero(cls, label: str) -> Position:
+    def Zero(cls, referenceLabel: str, thisLabel: str = None):
         """
         Constructor for [0,0,0]
         :param label: name of the reference and this point
         :return: The Position object
         """
-        return cls.FromXYRad(0, 0, 0, label, label)
+        if thisLabel is None: thisLabel = referenceLabel
+        return cls.FromXYRad(0, 0, 0, referenceLabel, thisLabel)
 
     def getLoc(self) -> np.ndarray:
         """
@@ -75,7 +77,7 @@ class Position:
         """
         return loc(self.T)
 
-    def move(self, linVel: float, angVel: float, time: float, newLabel=None) -> Position:
+    def move(self, linVel: float, angVel: float, time: float, newLabel=None):
         """
         Moves the current position with the given velocity and time
         :param linVel: linear velocity
@@ -98,7 +100,7 @@ class Position:
         """
         dibrobot(loc(self.T), color, size)
 
-    def __mul__(self, other: Position) -> Position:
+    def __mul__(self, other):
         """
         Multiplies two positions
         Use as P * Q
@@ -107,7 +109,7 @@ class Position:
         assert self.thisLabel == other.referenceLabel
         return Position(self.T @ other.T, self.referenceLabel, other.thisLabel)
 
-    def __invert__(self) -> Position:
+    def __invert__(self):
         """
         Inverts the position (reference point from this point)
         Use as ~P

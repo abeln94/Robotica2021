@@ -5,9 +5,11 @@ from argparse import ArgumentParser
 # Note: all distances are measures in millimeters and angles in radians (unless stated otherwise)
 
 # Fixed parameters
+GRID = 200  # grid distance (length of the square tiles
 ROBOT_L = 117  # distance between robot wheels
 ROBOT_r = 26.7  # radius of robots wheels
 LIN_VEL = 150  # stable velocity for linear motion (mm/s)
+MOTOR_VEL = 10  # stable velocity for motors angular motion (rad/s)
 
 # command line arguments
 __parser = ArgumentParser()
