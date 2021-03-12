@@ -3,7 +3,7 @@ from multiprocessing import Value
 
 class DeltaVal:
     """
-    For delta updates of a value (can be shared between processes)
+    For delta updates of a value (can not be shared between processes)
     """
 
     def __init__(self, val=0):
