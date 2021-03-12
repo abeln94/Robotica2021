@@ -138,7 +138,7 @@ def waitUntil(x=None, y=None, th=None, r=200, angle=np.pi / 8):
         rangle = abs(norm_pi(rth - th))
 
         # check
-        if (r < 0 or (rr > minr and minr <= r) or rr < r / 2) and (angle < 0 or (rangle > minAngle and minAngle <= angle) or rangle < angle / 2):
+        if (r < 0 or (rr > minr and minr <= r) or rr < r / 4) and (angle < 0 or (rangle > minAngle and minAngle <= angle) or rangle < angle / 4):
             # If radius check is disabled the test passes
             # else if we are very very close, the test passes
             # else if we are now farther and the previous (closer) value was inside the required radius, the test passes
