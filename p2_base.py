@@ -117,7 +117,7 @@ def doBicy(d, a, r, v):
         waitUntil(x=0, y=0)
 
 
-def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 8):
+def waitUntil(x=None, y=None, th=None, r=200, angle=np.pi / 8):
     if x is None or y is None:
         # disable xy check
         x = y = 0
@@ -126,6 +126,8 @@ def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 8):
         # disable th check
         th = 0
         angle = -1
+
+    print("Waiting until ", x, y, th)
 
     minr = np.inf
     minAngle = 2 * np.pi
