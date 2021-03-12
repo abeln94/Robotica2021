@@ -11,7 +11,6 @@ import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
-from functions.perf_counter_exact import perf_counter_exact
 from functions.simubot import simubot
 
 try:
@@ -131,7 +130,7 @@ class Robot:
         # loop
         while not self.finished.value:
             # current processor time in a floating point value, in seconds
-            tIni = perf_counter_exact()
+            tIni = time.clock()
 
             # get values
             dL = leftEncoder.update(self.BP.get_motor_encoder(self.leftMotor))
@@ -178,7 +177,7 @@ class Robot:
             ######## UPDATE UNTIL HERE with your code ########
 
             # wait for next update
-            tEnd = perf_counter_exact()
+            tEnd = time.clock()
             secs = Cfg.updatePeriod - (tEnd - tIni)
             if secs > 0: time.sleep(secs)
 

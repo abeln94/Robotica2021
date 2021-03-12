@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 import numpy
 
 from classes.Map import Map
-from functions.perf_counter_exact import perf_counter_exact
 
 """
 This script does a plot of a given log file, allowing just plotting or doing an animation of the movement through the 
@@ -28,7 +27,7 @@ if __name__ == "__main__":
         # animate
         for t, *xyth in data:
             map.update(xyth)
-            delay = t - perf_counter_exact()
+            delay = t - time.clock()
             if delay > 0: time.sleep(delay)
     else:
         # display directly
