@@ -117,7 +117,7 @@ def doBicy(d, a, r, v):
         waitUntil(x=0, y=0)
 
 
-def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 16):
+def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 8):
     if x is None or y is None:
         # disable xy check
         x = y = 0
@@ -136,8 +136,9 @@ def waitUntil(x=None, y=None, th=None, r=100, angle=np.pi / 16):
         rangle = abs(norm_pi(rth - th))
 
         # check
-        if (r < 0 or (rr > minr and minr <= r)) and (angle < 0 or (rangle > minAngle and minAngle <= angle)):
+        if (r < 0 or (rr > minr and minr <= r) or rr < r / 2) and (angle < 0 or (rangle > minAngle and minAngle <= angle) or rangle < angle / 2):
             # If radius check is disabled the test passes
+            # else if we are very very close, the test passes
             # else if we are now farther and the previous (closer) value was inside the required radius, the test passes
             # Same for angle
             # if both test pass, then it is time to stop
