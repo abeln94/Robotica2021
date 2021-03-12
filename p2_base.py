@@ -10,19 +10,20 @@ robot = None
 
 
 def pause(sec=5):
+    """
+    Stop the robot during sec seconds
+    :param sec: number of seconds to stop the robot
+    """
     robot.setSpeed(0, 0)
     time.sleep(sec)
 
 
-def doSnake():
-    for i in range(10):
-        robot.setSpeed(200, np.deg2rad(180))
-        time.sleep(1)
-        robot.setSpeed(200, -np.deg2rad(180))
-        time.sleep(1)
-
-
 def do180(d, v):
+    """
+    Do a round trip linear walk of d lenght (mm) with v linear motion (rad/s)
+    :param d: linear walk lenght
+    :param v: linear velocity
+    """
     # linear movement
     robot.setSpeed(v, 0)
     if Cfg.noOdometry:
@@ -53,6 +54,11 @@ def do180(d, v):
 
 
 def do8(d, v):
+    """
+    Do an 8-shaped walk where d is the circles radius (mm) and v is the linear motion (rad/s)
+    :param d: radius of both circles
+    :param v: linear velocity
+    """
     # first half circle
     robot.setSpeed(v, v / d)
     if Cfg.noOdometry:
@@ -77,6 +83,14 @@ def do8(d, v):
 
 
 def doBicy(d, a, r, v):
+    """
+    Do a walk with a bicycle sprocket shape, where d is the big circle's radius (mm), a is the small circle's radius
+    (mm), r is the tangent line lenght (mm) and v is the linear motion (rad/s)
+    :param d: big circle's radius
+    :param a: small circle's radius
+    :param r: tangent line lenght
+    :param v: linear velocity
+    """
     alpha = np.arctan2(d - a, r)
     c = np.cos(alpha)
     s = np.sin(alpha)
@@ -118,6 +132,15 @@ def doBicy(d, a, r, v):
 
 
 def waitUntil(x=None, y=None, th=None, r=200, angle=np.pi / 8):
+    """
+    Wait until location matches the specified as [x,y,th] with an allowed error of r distance (mm) in position and angle
+    radius in orientation (rad)
+    :param x: X axis value as position of the target location
+    :param y: Y axis value as position of the target location
+    :param th: angle as orientation of the target location
+    :param r: distance value allowed as position error
+    :param angle: angle value allowed as orientation error
+    """
     if x is None or y is None:
         # disable xy check
         x = y = 0
@@ -164,8 +187,6 @@ if __name__ == "__main__":
 
         # wait before start
         pause(3)
-        # doSnake()
-        # pause()
 
         # do the 180 trajectory
         if Cfg.length > 0:

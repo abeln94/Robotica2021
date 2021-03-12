@@ -1,5 +1,6 @@
 """
 Simulation of a real robot, this replaces the BrickPi3 module.
+It implements the same API which abstracts the real robot's engines, but functionality is simulated
 Use as:
 
 try:

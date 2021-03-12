@@ -7,9 +7,8 @@ from classes.Map import Map
 from functions.perf_counter_exact import perf_counter_exact
 
 """
-1) Que por defecto solo muestre la gráfica (de golpe, sin animaciones ni robot dibujado, solo el recorrido). Para esto no hay que usar el Map, un if-else y un plot y ya está. La animación de la gráfica se debería mostrar si además se le pasa un parámetro adicional, por ejemplo un -a (de animate) o alguna otra cosa.
-2) Que la reproducción dinámica se haga acorde al timestamp. Ahora mismo se 'reproduce' a full speed, lo rápido que el programa es capaz de dibujar, por lo que no se ve bien lo que realmente le ha costado (para esto hay que hacer sleeps acorde al tiempo del fichero y a lo que le cuesta al programa dibujar)
-3) Algún parámetro extra que permita guardar la gráfica en una imagen (por ejemplo -i imagen.png). Esto debería ser relativamente facil, hay por ahí un imsave, pero tampoco es tan importante ya que manualmente podemos guardarla nosotros desde el propio plot
+This script does a plot of a given log file, allowing just plotting or doing an animation of the movement through the 
+map based on the timestamps of the records
 """
 
 parser = ArgumentParser()

@@ -58,7 +58,11 @@ class Robot:
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
     def setSpeed(self, v, w):
-        """ Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) """
+        """ 
+        Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) 
+        :param v: linear velocity
+        :param w: angular velocity
+        """
         print("Setting speed to {:.2f} {:.2f}".format(v, w))
 
         # compute the speed that should be set in each motor ...
@@ -108,9 +112,7 @@ class Robot:
         print("PID: ", self.p.pid)
 
     def updateOdometry(self):
-        """
-        The odometry update process
-        """
+        """ The odometry update process """
 
         # init map
         if Cfg.plot:

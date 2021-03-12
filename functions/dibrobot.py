@@ -4,7 +4,7 @@ import numpy as np
 
 def dibrobot(loc_eje, c, scale=1):
     """
-    Dibuja robot en location_eje con color (c) y tamano (p/g)
+    Plot robot in loc_eje with colour c and scale size
     """
     largo = 200 / 2 * scale
     corto = 121 / 2 * scale

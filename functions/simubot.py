@@ -5,7 +5,7 @@ from functions.functions import loc, hom, norm_pi
 
 def simubot(vc, xWR, T):
     """
-    Simula movimiento del robot con vc=[v,w] en T seg. desde xWR
+    Simulate robot's movement with vc=[v,w] linear/angular velocity (rad/s) during T second starting from location xWR
     """
     if vc[1] == 0:  # w=0
         xRk = np.array([vc[0] * T, 0, 0])
