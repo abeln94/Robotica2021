@@ -10,6 +10,7 @@ import numpy as np
 import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
+from functions.functions import norm_pi
 from functions.perf_counter_exact import perf_counter_exact
 from functions.simubot import simubot
 
@@ -38,8 +39,10 @@ class Robot:
         # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder B and C (or all the motors you are using)
-        self.BP.offset_motor_encoder(self.BP.PORT_B, self.BP.get_motor_encoder(self.BP.PORT_B))
-        self.BP.offset_motor_encoder(self.BP.PORT_C, self.BP.get_motor_encoder(self.BP.PORT_C))
+        self.leftMotor = self.BP.PORT_B
+        self.rightMotor = self.BP.PORT_C
+        self.BP.offset_motor_encoder(self.leftMotor, self.BP.get_motor_encoder(self.leftMotor))
+        self.BP.offset_motor_encoder(self.rightMotor, self.BP.get_motor_encoder(self.rightMotor))
 
         ##################################################        # Odometry
 
@@ -55,6 +58,7 @@ class Robot:
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
     def setSpeed(self, v, w):
+        """ Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) """
         print("Setting speed to {:.2f} {:.2f}".format(v, w))
 
         # compute the speed that should be set in each motor ...
@@ -64,9 +68,32 @@ class Robot:
         self.BP.set_motor_dps(self.BP.PORT_B, np.rad2deg(wi))
         self.BP.set_motor_dps(self.BP.PORT_C, np.rad2deg(wd))
 
-    def readSpeed(self):
-        """ To be filled"""
-        return 0, 0
+    def readSpeed(self, readTime=0.1):
+        """
+        Reads the robot speed
+        :param readTime: time to check in seconds (the bigger the better but also the longer)
+        :return: the velocity as tuple (v,w) v linear velocity mm/s , w angular velocity rad/s
+        """
+
+        # read
+        previ = self.BP.get_motor_encoder(self.leftMotor)
+        prevd = self.BP.get_motor_encoder(self.rightMotor)
+
+        # wait
+        time.sleep(readTime)
+
+        # read
+        posti = self.BP.get_motor_encoder(self.leftMotor)
+        postd = self.BP.get_motor_encoder(self.rightMotor)
+
+        # calculate
+        wi = np.deg2rad(posti - previ) / readTime
+        wd = np.deg2rad(postd - prevd) / readTime
+
+        v = (wi + wd) * Cfg.ROBOT_r / 2
+        w = (wd - wi) * Cfg.ROBOT_r / Cfg.ROBOT_L
+
+        return v, w
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
@@ -84,8 +111,6 @@ class Robot:
         """
         The odometry update process
         """
-        leftMotor = self.BP.PORT_B
-        rightMotor = self.BP.PORT_C
 
         # init map
         if Cfg.plot:
@@ -94,8 +119,8 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
-        leftEncoder = DeltaVal(self.BP.get_motor_encoder(leftMotor))
-        rightEncoder = DeltaVal(self.BP.get_motor_encoder(rightMotor))
+        leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.leftMotor))
+        rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.rightMotor))
 
         if Cfg.log:
             logFile = open("./logs/" + Cfg.log, "w")
@@ -107,8 +132,8 @@ class Robot:
             tIni = perf_counter_exact()
 
             # get values
-            dL = leftEncoder.update(self.BP.get_motor_encoder(leftMotor))
-            dR = rightEncoder.update(self.BP.get_motor_encoder(rightMotor))
+            dL = leftEncoder.update(self.BP.get_motor_encoder(self.leftMotor))
+            dR = rightEncoder.update(self.BP.get_motor_encoder(self.rightMotor))
 
             # compute updates
             if Cfg.exact:
@@ -130,7 +155,7 @@ class Robot:
                 dth = (sR - sL) / Cfg.ROBOT_L
                 x += ds * np.cos(th + dth / 2)
                 y += ds * np.sin(th + dth / 2)
-                th += dth
+                th = norm_pi(th + dth)
 
             # update
             with self.lock_odometry:

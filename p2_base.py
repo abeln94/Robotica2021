@@ -3,7 +3,6 @@ import time
 import numpy as np
 
 import Cfg
-from classes import Map
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
@@ -167,12 +166,6 @@ if __name__ == "__main__":
         pause(3)
         # doSnake()
         # pause()
-
-        robot.setSpeed(Cfg.LIN_VEL, 0)
-        if Cfg.noOdometry:
-            time.sleep(Map.GRID / Cfg.LIN_VEL)
-        else:
-            waitUntil(x=Map.GRID, y=0)
 
         # do the 180 trajectory
         if Cfg.length > 0:
