@@ -3,7 +3,6 @@ import time
 import numpy as np
 
 import Cfg
-from classes import Map
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
@@ -157,7 +156,7 @@ if __name__ == "__main__":
     try:
         # Instantiate Odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
-        robot = Robot([Map.GRID / 2, Map.GRID / 2, np.deg2rad(90)])
+        robot = Robot()
         robot.startOdometry()
 
         # wait before start
