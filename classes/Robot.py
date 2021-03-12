@@ -54,9 +54,6 @@ class Robot:
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
-        # odometry update period --> UPDATE value!
-        self.P = 0.25  # 0.1 - 0.5
-
     def setSpeed(self, v, w):
         print("Setting speed to {:.2f} {:.2f}".format(v, w))
 
@@ -154,10 +151,9 @@ class Robot:
             ######## UPDATE UNTIL HERE with your code ########
 
             # wait for next update
-            if not Cfg.noWait:
-                tEnd = perf_counter_exact()
-                secs = self.P - (tEnd - tIni)
-                if secs > 0: time.sleep(secs)
+            tEnd = perf_counter_exact()
+            secs = Cfg.updatePeriod - (tEnd - tIni)
+            if secs > 0: time.sleep(secs)
 
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
         if Cfg.log:

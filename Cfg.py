@@ -17,8 +17,8 @@ __parser.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory 
 __parser.add_argument("-a", "--radioA", help="Radio 'a' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 100
 __parser.add_argument("-r", "--distR", help="Distance 'r' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 500
 __parser.add_argument("-f", "--log", help="Log odometry into a file", default=False)
+__parser.add_argument("-u", "--updatePeriod", help="Update period in seconds", default=0.25)
 
-__parser.add_argument("-nw", "--noWait", help="Disable odometry wait", action="store_true")
 __parser.add_argument("-no", "--noOdometry", help="Don't use odometry for movement", action="store_true")
 __parser.add_argument("-e", "--exact", help="Use the exact method for odometry", action="store_true")
 __parser.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
