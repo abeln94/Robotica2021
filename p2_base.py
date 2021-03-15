@@ -6,6 +6,14 @@ import Cfg
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
+# command line arguments
+Cfg.add_argument("-l", "--length", help="Length of the linear trayectory (mm)", type=float, default=-1)  # 1000
+Cfg.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)", type=float, default=-1)  # 200
+Cfg.add_argument("-a", "--radioA", help="Radio 'a' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 100
+Cfg.add_argument("-r", "--distR", help="Distance 'r' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 500
+
+Cfg.add_argument("-no", "--noOdometry", help="Don't use odometry for movement", action="store_true")
+
 robot = None
 
 

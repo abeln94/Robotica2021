@@ -1,8 +1,8 @@
 import time
-from argparse import ArgumentParser
 
 import numpy
 
+import Cfg
 from classes.Map import Map
 
 """
@@ -10,20 +10,18 @@ This script does a plot of a given log file, allowing just plotting or doing an 
 map based on the timestamps of the records
 """
 
-parser = ArgumentParser()
-
-parser.add_argument("-f", "--file", help="LogFile to plot", type=str, required=True)
-parser.add_argument("-i", "--image", help="Outputs an image file", type=str, default=None)
-parser.add_argument("-a", "--animation", help="Animates the robot movement", action="store_true")
-
-args = parser.parse_args()
+Cfg.add_argument("-f", "--file", help="LogFile to plot", type=str, required=True)
+Cfg.add_argument("-i", "--image", help="Outputs an image file", type=str, default=None)
+Cfg.add_argument("-a", "--animation", help="Animates the robot movement", action="store_true")
 
 if __name__ == "__main__":
+    Cfg.parse()
+
     # prepare
-    data = numpy.genfromtxt("./logs/" + args.file, delimiter=',', names=True)
+    data = numpy.genfromtxt("./logs/" + Cfg.file, delimiter=',', names=True)
     map = Map()
 
-    if args.animation:
+    if Cfg.animation:
         # animate
         for t, *xyth in data:
             map.update(xyth)
@@ -34,8 +32,8 @@ if __name__ == "__main__":
         map.drawPath(data['X'], data['Y'])
 
     # save image
-    if args.image:
-        map.save("./" + args.image)
+    if Cfg.image:
+        map.save("./" + Cfg.image)
 
     # wait
     map.block()

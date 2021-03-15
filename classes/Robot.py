@@ -18,6 +18,11 @@ try:
 except:
     import classes.simbrickpi3 as brickpi3
 
+Cfg.add_argument("-f", "--log", help="Log odometry into a file", default=False)
+Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=float, default=0.1)
+Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", action="store_true")
+Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
+
 
 class Robot:
     def __init__(self, init_position=None):
