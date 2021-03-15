@@ -1,3 +1,4 @@
+import os
 import time
 
 import numpy
@@ -15,7 +16,6 @@ Cfg.add_argument("-i", "--image", help="Outputs an image file", type=str, defaul
 Cfg.add_argument("-a", "--animation", help="Animates the robot movement", action="store_true")
 
 if __name__ == "__main__":
-    Cfg.parse()
 
     # prepare
     data = numpy.genfromtxt("./logs/" + Cfg.file, delimiter=',', names=True)
@@ -33,7 +33,9 @@ if __name__ == "__main__":
 
     # save image
     if Cfg.image:
-        map.save("./" + Cfg.image)
+        fileName = Cfg.FOLDER_IMAGES + Cfg.image
+        os.makedirs(os.path.dirname(fileName), exist_ok=True)
+        map.save(fileName)
 
     # wait
     map.block()

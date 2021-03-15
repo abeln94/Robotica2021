@@ -1,6 +1,7 @@
 """
 The Robot main class
 """
+import os
 import time
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, RLock
@@ -129,7 +130,9 @@ class Robot:
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.rightMotor))
 
         if Cfg.log:
-            logFile = open("./logs/" + Cfg.log, "w")
+            fileName = Cfg.FOLDER_LOGS + Cfg.log
+            os.makedirs(os.path.dirname(fileName), exist_ok=True)
+            logFile = open(fileName, "w")
             logFile.write("Timestamp, X, Y, Theta\n")
 
         # loop

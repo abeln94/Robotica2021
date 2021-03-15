@@ -2,7 +2,11 @@ import sys
 from argparse import ArgumentParser
 
 # robot python version 3.5.3
+# robot OpenCV version 3.4.13
 
+# fixed configuration
+FOLDER_LOGS = "./logs/"
+FOLDER_IMAGES = FOLDER_LOGS + "pictures/"
 
 # Fixed parameters
 ROBOT_L = 117  # distance between robot wheels
