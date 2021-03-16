@@ -1,19 +1,16 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import argparse
+import Cfg
+from classes.Robot import Robot
 
-from Robot import Robot
+# command line arguments
+Cfg.add_argument("-c", "--color", help="color of the ball to track", type=float, default=40.0)
 
+robot = None
 
-def main(args):
+if __name__ == "__main__":
     try:
-        if args.radioD < 0:
-            print
-            'd must be a positive value'
-            exit(1)
-
         # Initialize Odometry. Default value will be 0,0,0
         robot = Robot()
+
         # 1. launch updateOdometry thread()
         robot.startOdometry()
 
@@ -29,23 +26,10 @@ def main(args):
         #   robot.catch
 
         # 3. wrap up and close stuff ...
-        # This currently unconfigure the sensors, disable the motors, 
+        # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
-
-    except KeyboardInterrupt:
-        # except the program gets interrupted by Ctrl+C on the keyboard.
-        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
-        robot.stopOdometry()
-
-
-if __name__ == "__main__":
-    # get and parse arguments passed to main
-    # Add as many args as you need ...
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--color", help="color of the ball to track",
-                        type=float, default=40.0)
-    args = parser.parse_args()
-
-    main(args)
+    finally:
+        # wrap up and close stuff before exiting
+        if robot is not None: robot.stopOdometry()

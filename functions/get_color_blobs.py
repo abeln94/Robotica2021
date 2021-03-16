@@ -1,13 +1,6 @@
-# -*- coding: utf-8 -*-
-# !/usr/bin/python
-
 # Standard imports
 import cv2
-import numpy as np;
-
-# Read image
-img_BGR = cv2.imread("red_blue.jpg")
-# img_BGR = cv2.imread("many.jpg")
+import numpy as np
 
 # Setup default values for SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
@@ -34,63 +27,71 @@ params.filterByConvexity = False
 params.filterByInertia = False
 
 # Create a detector with the parameters
-ver = (cv2.__version__).split('.')
+ver = cv2.__version__.split('.')
 if int(ver[0]) < 3:
-	detector = cv2.SimpleBlobDetector(params)
+    detector = cv2.SimpleBlobDetector(params)
 else:
-	detector = cv2.SimpleBlobDetector_create(params)
+    detector = cv2.SimpleBlobDetector_create(params)
 
-#  keypoints on original image (will look for blobs in grayscale)
-keypoints = detector.detect(img_BGR)
-# Draw detected blobs as red circles.
-# cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures
-# the size of the circle corresponds to the size of blob
-im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-# Show blobs
-cv2.imshow("Keypoints on Gray Scale", im_with_keypoints)
-cv2.waitKey(0)
+def get_color_blobs(img_BGR):
+    # keypoints on original image (will look for blobs in grayscale)
+    keypoints = detector.detect(img_BGR)
+    # Draw detected blobs as red circles.
+    # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures
+    # the size of the circle corresponds to the size of blob
+    im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-#  filter certain COLOR channels
+    # Show blobs
+    cv2.imshow("Keypoints on Gray Scale", im_with_keypoints)
+    cv2.waitKey(0)
 
-# Pixels with 100 <= R <= 255, 15 <= B <= 56, 17 <= G <= 50 will be considered red.
-#  similar for BLUE
+    # filter certain COLOR channels
 
-# BY DEFAULT, opencv IMAGES have BGR format
-redMin = (10, 10, 100)
-redMax = (50, 50, 255)
+    # Pixels with 100 <= R <= 255, 15 <= B <= 56, 17 <= G <= 50 will be considered red.
+    # similar for BLUE
 
-blueMin = (60, 10, 10)
-blueMax = (255, 100, 100)
+    # BY DEFAULT, opencv IMAGES have BGR format
+    redMin = (10, 10, 100)
+    redMax = (50, 50, 255)
 
-mask_red = cv2.inRange(img_BGR, redMin, redMax)
-mask_blue = cv2.inRange(img_BGR, blueMin, blueMax)
+    blueMin = (60, 10, 10)
+    blueMax = (255, 100, 100)
 
-# apply the mask
-red = cv2.bitwise_and(img_BGR, img_BGR, mask=mask_red)
-blue = cv2.bitwise_and(img_BGR, img_BGR, mask=mask_blue)
-# show resulting filtered image next to the original one
-cv2.imshow("Red regions", np.hstack([img_BGR, red]))
-cv2.imshow("Blue regions", np.hstack([img_BGR, blue]))
+    mask_red = cv2.inRange(img_BGR, redMin, redMax)
+    mask_blue = cv2.inRange(img_BGR, blueMin, blueMax)
 
-# detector finds "dark" blobs by default, so invert image for results with same detector
-keypoints_red = detector.detect(255 - mask_red)
-keypoints_blue = detector.detect(255 - mask_blue)
+    # apply the mask
+    red = cv2.bitwise_and(img_BGR, img_BGR, mask=mask_red)
+    blue = cv2.bitwise_and(img_BGR, img_BGR, mask=mask_blue)
+    # show resulting filtered image next to the original one
+    cv2.imshow("Red regions", np.hstack([img_BGR, red]))
+    cv2.imshow("Blue regions", np.hstack([img_BGR, blue]))
 
-# documentation of SimpleBlobDetector is not clear on what kp.size is exactly, but it looks like the diameter of the blob.
-for kp in keypoints_red:
-	print
-	kp.pt[0], kp.pt[1], kp.size
+    # detector finds "dark" blobs by default, so invert image for results with same detector
+    keypoints_red = detector.detect(255 - mask_red)
+    keypoints_blue = detector.detect(255 - mask_blue)
 
-# Draw detected blobs as red circles.
-# cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures
-# the size of the circle corresponds to the size of blob
-im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints_red, np.array([]),
-									  (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-im_with_keypoints2 = cv2.drawKeypoints(img_BGR, keypoints_blue, np.array([]),
-									   (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    # documentation of SimpleBlobDetector is not clear on what kp.size is exactly, but it looks like the diameter of the blob.
+    for kp in keypoints_red:
+        print(kp.pt[0], kp.pt[1], kp.size)
 
-# Show mask and blobs found
-cv2.imshow("Keypoints on RED", im_with_keypoints)
-cv2.imshow("Keypoints on BLUE", im_with_keypoints2)
-cv2.waitKey(0)
+    # Draw detected blobs as red circles.
+    # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures
+    # the size of the circle corresponds to the size of blob
+    im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints_red, np.array([]),
+                                          (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    im_with_keypoints2 = cv2.drawKeypoints(img_BGR, keypoints_blue, np.array([]),
+                                           (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    # Show mask and blobs found
+    cv2.imshow("Keypoints on RED", im_with_keypoints)
+    cv2.imshow("Keypoints on BLUE", im_with_keypoints2)
+    cv2.waitKey(0)
+
+
+if __name__ == '__main__':
+    # Read image
+    img_BGR = cv2.imread("tests/red_blue.jpg")
+    # img_BGR = cv2.imread("tests/many.jpg")
+    get_color_blobs(img_BGR)
