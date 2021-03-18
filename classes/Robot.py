@@ -13,6 +13,7 @@ from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
 from functions.simubot import simubot
+from functions.get_color_blobs import get_color_blobs
 
 try:
     import brickpi3  # import the BrickPi3 drivers
@@ -197,3 +198,38 @@ class Robot:
         """ Stop the odometry thread """
         self.finished.value = True
         self.BP.reset_all()
+
+    def trackObject(self, colorRangeMin=[0,0,0], colorRangeMax=[255,255,255], targetSize=500, targetCentroid=[50,50], allowerSizeError = 10, allowerCentroidError = 10):
+        """
+        Track one object with indicated color until the target size and centroid are reached
+        :param colorRangeMin: minimum BGR color value taken into consideration for blob's detection
+        :param colorRangeMax: maximum BGR color value taken into consideration for blob's detection
+        :param targetSize: target size value of the blob
+        :param targetCentroid: on image target coordinates value of the blob's centroid
+        :param allowerSizeError: error value allowed in the size measure to consider the target has been reached
+        :param allowerCentroidError: error value allowed in the centroid measures to consider the target has been reached
+        """
+        targetFound = False
+        finished = False
+        targetPositionReached = False
+        while not finished:
+            # 1. search the most promising blob ..
+            size = -1
+            centroid = [0,0]
+            blobs = get_color_blobs(None) # get the camera's image
+            for blob in blobs: # ADT for blob representation needed
+                tmpSize = blob.size()
+                if tmpSize > size:
+                    size = tmpSize
+                    centroid = blob.centroid
+            while not targetPositionReached:
+                # 2. decide v and w for the robot to get closer to target position
+                if (targetSize - size) <= allowerSizeError and (targetCentroid - centroid) <= allowerCentroidError:
+                    targetPositionReached = True
+                    finished = True
+        return finished
+
+    def catch(self):
+        """ Implements the closing of the robot's claw """
+
+
