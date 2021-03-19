@@ -91,4 +91,4 @@ def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), plot_resu
     blobs = get_color_blobs(img_BGR, rangeMin, rangeMax, plot_result)
     blob = max(blobs, default=None, key=lambda item: item.size)
 
-    return blob.pt[0] / np.size(img_BGR, 0), blob.pt[1] / np.size(img_BGR, 1) if blob is not None else None
+    return (blob.pt[0] / np.size(img_BGR, 0), blob.pt[1] / np.size(img_BGR, 1)) if blob is not None else None
