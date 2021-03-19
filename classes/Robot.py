@@ -227,7 +227,7 @@ class Robot:
         ANGULAR_SPEED = np.deg2rad(20)
         LINEAR_SPEED = 50
         MOVEMENT_TIME = 0.1  # seconds
-        ANGULAR_SPEED_LOST = np.deg2rad(45)  # angular speed when no blob found
+        ANGULAR_SPEED_LOST = np.deg2rad(30)  # angular speed when no blob found
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
