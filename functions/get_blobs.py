@@ -39,11 +39,11 @@ def get_color_blobs(img_BGR,plot_result=True):
     image = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HSV)
 
     # HSV FORMAT ranges
-    redMin1 = (0, 100, 100)
+    redMin1 = (0, 50, 30)
     redMax1 = (10, 255, 255)
 
-    redMin2 = (350, 100, 100)
-    redMax2 = (360, 255, 255)
+    redMin2 = (160, 50, 30)
+    redMax2 = (180, 255, 255)
 
     # Obtain the mask
     mask1 = cv2.inRange(image, redMin1, redMax1)

@@ -7,7 +7,7 @@ ESC = 27
 KNN = 1
 MOG2 = 2
 
-rawCapture = cv2.imread("./many.jpg")
+rawCapture = cv2.imread("./pintado.png")
 
 key_points = get_color_blobs(rawCapture)
 

@@ -24,4 +24,4 @@ cam.capture(rawCapture, format="bgr")
 
 key_points = get_color_blobs(rawCapture.array)
 
-cv2.imwrite('./foto.png', rawCapture) 
+#cv2.imwrite('./foto.png', rawCapture) 
