@@ -39,11 +39,11 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
     image = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
 
     # HSV FORMAT ranges
-    if rangeMin[0] - rangeMax[0] > 0:
+    if rangeMin[0] > rangeMax[0]:
         rangeMin1 = rangeMin
-        rangeMax1 = (rangeMin[0], rangeMax[1], rangeMax[2])
+        rangeMax1 = (179, rangeMax[1], rangeMax[2])
 
-        rangeMin2 = (rangeMax[0], rangeMin[1], rangeMin[2])
+        rangeMin2 = (0, rangeMin[1], rangeMin[2])
         rangeMax2 = rangeMax
     else:
         rangeMin1 = rangeMin
