@@ -9,10 +9,10 @@ MOG2 = 2
 
 #rawCapture = cv2.imread("./media.png")
 #rawCapture = cv2.imread("./AM-lejos.png")
-rawCapture = cv2.imread("./media.png")
+rawCapture = cv2.imread("./lejos.png")
 
 get_color_blobs(rawCapture, plot_result=True)
 
 kp = get_blob(rawCapture)
 
-print(kp.pt[0], kp.pt[1], kp.size)
+print(kp[0], kp[1])

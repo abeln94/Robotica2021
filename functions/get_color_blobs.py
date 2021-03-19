@@ -90,5 +90,5 @@ def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     blobs = get_color_blobs(img_BGR, rangeMin, rangeMax, False)
     blob = max(blobs, default=None, key= lambda item: item.size)
 
-    return cv2.KeyPoint(blob.pt[0] / 240, (320 - blob.pt[1]) / 320, blob.size)
+    return (blob.pt[0] / 240, blob.pt[1] / 320)
 
