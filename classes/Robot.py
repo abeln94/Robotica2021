@@ -219,7 +219,7 @@ class Robot:
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         return rawCapture.array
 
-    def trackObject(self, targetPosition=(0.6, 0.7), allowedPositionError=0.1):
+    def trackObject(self, targetPosition=(0.6, 0.3), allowedPositionError=0.1):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
@@ -251,7 +251,7 @@ class Robot:
                     # 1.4 angular movement to get a proper orientation to the target
                     angular_speed = -deltaX * ANGULAR_SPEED if x < targetPosition[0] else deltaX * ANGULAR_SPEED
                     # 1.5 linear movement to get closer the target
-                    linear_speed = deltaY * LINEAR_SPEED if y < targetPosition[1] else -deltaY * LINEAR_SPEED
+                    linear_speed = -deltaY * LINEAR_SPEED if y < targetPosition[1] else deltaY * LINEAR_SPEED
                     self.setSpeed(linear_speed, angular_speed)
             else:
                 # 1.3 no blob found, turn around until finding something similar to the target
