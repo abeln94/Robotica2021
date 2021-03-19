@@ -33,21 +33,30 @@ if int(ver[0]) < 3:
 else:
     detector = cv2.SimpleBlobDetector_create(params)
 
+#TypeError: 'bool' object is not subscriptable
 
-def get_color_blobs(img_BGR,plot_result=False):
+def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), plot_result=False):
     # keypoints on original image (will look for blobs in grayscale)
     image = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HSV)
 
     # HSV FORMAT ranges
-    redMin1 = (0, 80, 50)
-    redMax1 = (10, 255, 255)
+    if rangeMin[0] > rangeMax[0]:
+        rangeMin1 = rangeMin
+        rangeMax1 = (179, rangeMax[1], rangeMax[2])
 
-    redMin2 = (160, 80, 50)
-    redMax2 = (180, 255, 255)
+        rangeMin2 = (0, rangeMin[1], rangeMin[2])
+        rangeMax2 = rangeMax
+    else:
+        rangeMin1 = rangeMin
+        rangeMax1 = rangeMin
+
+        rangeMin2 = rangeMin
+        rangeMax2 = rangeMax
+
 
     # Obtain the mask
-    mask1 = cv2.inRange(image, redMin1, redMax1)
-    mask2 = cv2.inRange(image, redMin2, redMax2)
+    mask1 = cv2.inRange(image, rangeMin1, rangeMax1)
+    mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
     mask = mask1 | mask2
 
     # some morphological operations (closing) to remove small blobs
@@ -78,7 +87,8 @@ def get_color_blobs(img_BGR,plot_result=False):
     return keypoints
 
 
-def get_blob(img_BGR,plot_result=True):
-    blobs = get_color_blobs(img_BGR)
-    return max(blobs, default=None, key= lambda item: item.size)
+def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
+    blobs = get_color_blobs(img_BGR, rangeMin, rangeMax, False)
+    blob = max(blobs, default=None, key= lambda item: item.size)
 
+    return cv2.KeyPoint(blob.pt[0] / 240, blob.pt[1] / 320, blob.size)
