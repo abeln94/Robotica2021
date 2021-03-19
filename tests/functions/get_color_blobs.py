@@ -11,7 +11,7 @@ params.minThreshold = 10
 params.maxThreshold = 200
 
 # Filter by Area
-params.filterByArea = False
+params.filterByArea = True
 params.minArea = 150
 params.maxArea = 80000
 

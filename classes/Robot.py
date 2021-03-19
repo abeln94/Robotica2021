@@ -15,6 +15,8 @@ from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
+    import picamera
+    from picamera.array import PiRGBArray
 except:
     import classes.simbrickpi3 as brickpi3
 
@@ -56,6 +58,11 @@ class Robot:
 
         # odometry update period --> UPDATE value!
         self.P = 0.25  # 0.1 - 0.5
+
+        # camera cositas
+        self.cam = picamera.PiCamera()
+        self.cam.resolution = (320, 240)
+        self.cam.framerate = 32
 
     def setSpeed(self, v, w):
         print("Setting speed to {:.2f} {:.2f}".format(v, w))
@@ -167,3 +174,9 @@ class Robot:
         """ Stop the odometry thread """
         self.finished.value = True
         self.BP.reset_all()
+
+    def capture_image(self):
+        """ Returns a BGR image taken at the moment """
+        rawCapture = PiRGBArray(self.cam, size=(320, 240))
+        self.cam.capture(rawCapture, format="bgr", use_video_port=True)
+        return rawCapture
