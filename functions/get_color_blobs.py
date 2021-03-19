@@ -61,6 +61,10 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
     mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8)))
     mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10)))
 
+    if cv2.countNonZero(mask) == 0:
+        # nothing to search
+        return None
+
     # apply the mask
     keypoints = detector.detect(255 - mask)
     # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
