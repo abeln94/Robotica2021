@@ -22,7 +22,9 @@ time.sleep(0.1)
 
 cam.capture(rawCapture, format="bgr")
 
-key_points = get_color_blobs(rawCapture)
+key_points = get_color_blobs(rawCapture.array)
 
 cv2.imshow('Captura', key_points)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 cv2.imwrite('./foto.png', rawCapture) 
