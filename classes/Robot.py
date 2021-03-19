@@ -219,7 +219,7 @@ class Robot:
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         return rawCapture.array
 
-    def trackObject(self, targetPosition=(0.6, 0.0), allowedPositionError=0.1):
+    def trackObject(self, targetPosition=(0.6, 0.0), allowedXPositionError=0.1, allowedYPositionError=0.1):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
@@ -242,7 +242,7 @@ class Robot:
                 print("found ball at x=", x, "y=", y)
                 deltaX = abs(x - targetPosition[0])
                 deltaY = abs(y - targetPosition[1])
-                if deltaX <= allowedPositionError and deltaY <= allowedPositionError:
+                if deltaX <= allowedXPositionError and deltaY <= allowedYPositionError:
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
                     targetPositionReached = True
