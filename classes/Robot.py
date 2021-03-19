@@ -236,20 +236,23 @@ class Robot:
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
                 x, y = position
+                print("found ball at x=", x, "y=", y)
                 deltaX = abs(x - targetPosition[0])
                 deltaY = abs(y - targetPosition[1])
                 if deltaX <= allowedPositionError and deltaY <= allowedPositionError:
                     # 1.4 target position reached, let's catch the ball
+                    print("ball in position")
                     targetPositionReached = True
                     self.setSpeed(0, 0)  # stop moving
                 else:
                     # 1.4 angular movement to get a proper orientation to the target
                     angular_speed = -deltaX * ANGULAR_SPEED if x < targetPosition[0] else deltaX * ANGULAR_SPEED
                     # 1.5 linear movement to get closer the target
-                    linear_speed = -deltaY * LINEAR_SPEED if y < targetPosition[1] else deltaY * LINEAR_SPEED
+                    linear_speed = deltaY * LINEAR_SPEED if y < targetPosition[1] else -deltaY * LINEAR_SPEED
                     self.setSpeed(linear_speed, angular_speed)
             else:
                 # 1.3 no blob found, turn around until finding something similar to the target
+                print("not found, turn around")
                 self.setSpeed(0, ANGULAR_SPEED_LOST)
         # 2. Then catch the ball
         self.catch()

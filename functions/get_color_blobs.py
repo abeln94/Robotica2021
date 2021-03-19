@@ -36,7 +36,7 @@ else:
 
 def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), plot_result=False):
     # keypoints on original image (will look for blobs in grayscale)
-    image = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HSV)
+    image = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
 
     # HSV FORMAT ranges
     if rangeMin[0] - rangeMax[0] > 0:
@@ -52,7 +52,6 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
         rangeMin2 = rangeMin
         rangeMax2 = rangeMax
 
-
     # Obtain the mask
     mask1 = cv2.inRange(image, rangeMin1, rangeMax1)
     mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
@@ -63,13 +62,12 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
     mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10)))
 
     # apply the mask
-    keypoints = detector.detect(255-mask)
-    #keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
-
+    keypoints = detector.detect(255 - mask)
+    # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
 
     if plot_result:
-        regions = cv2.bitwise_and(img_BGR, img_BGR, mask = mask)
-        regions = cv2.cvtColor(regions,cv2.COLOR_HSV2BGR)
+        regions = cv2.bitwise_and(img_BGR, img_BGR, mask=mask)
+        regions = cv2.cvtColor(regions, cv2.COLOR_HSV2BGR)
         cv2.imshow("Detected Regions", np.hstack([img_BGR, regions]))
 
         for kp in keypoints:
@@ -77,7 +75,7 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
 
         # Show mask and blobs found
         im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]),
-            (255,255,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                                              (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         cv2.imshow("Keypoints on RED", im_with_keypoints)
         cv2.waitKey(0)
@@ -88,7 +86,6 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255), pl
 
 def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     blobs = get_color_blobs(img_BGR, rangeMin, rangeMax, False)
-    blob = max(blobs, default=None, key= lambda item: item.size)
+    blob = max(blobs, default=None, key=lambda item: item.size)
 
-    return (blob.pt[0] / np.size(img_BGR,0), blob.pt[1] / np.size(img_BGR,1))
-
+    return blob.pt[0] / np.size(img_BGR, 0), blob.pt[1] / np.size(img_BGR, 1)
