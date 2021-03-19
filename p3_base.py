@@ -6,6 +6,8 @@ Cfg.add_argument("-c", "--color", help="color of the ball to track", type=float,
 
 robot = None
 
+#
+
 if __name__ == "__main__":
     try:
         # Initialize Odometry. Default value will be 0,0,0
@@ -14,16 +16,8 @@ if __name__ == "__main__":
         # 1. launch updateOdometry thread()
         robot.startOdometry()
 
-        # 2. Loop running the tracking until ??, then catch the ball
-        # TO-DO: ADD to the Robot class a method to track an object, given certain parameters
-        # for example the different target properties we want (size, position, color, ..)
-        # or a boolean to indicate if we want the robot to catch the object or not
-        # At least COLOR, the rest are up to you, but always put a default value.
-        # res = robot.trackObject(colorRangeMin=[0,0,0], colorRangeMax=[255,255,255],
-        #                   targetSize=??, target??=??, ...)
-
-        # if res:
-        #   robot.catch
+        # 2. Look for and catch the ball
+        robot.trackObject()
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,

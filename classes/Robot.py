@@ -13,6 +13,7 @@ from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
 from functions.simubot import simubot
+from functions.get_color_blobs import get_blob
 
 try:
     import brickpi3  # import the BrickPi3 drivers
@@ -199,6 +200,44 @@ class Robot:
         """ Stop the odometry thread """
         self.finished.value = True
         self.BP.reset_all()
+
+    def trackObject(self, targetPosition=(0.6, 0.8), allowedPositionError=0.1):
+        """
+        Track one object with indicated color until the target size and centroid are reached
+        :param targetPosition: on image target coordinates value of the blob's centroid
+        :param allowerPositionError: error value allowed in the centroid measures to consider the target has been reached
+        """
+        targetPositionReached = False
+        # 0. Parameters
+        ANGULAR_SPEED = np.deg2rad(20)
+        LINEAR_SPEED = 50
+        MOVEMENT_TIME = 0.1  # seconds
+        ANGULAR_SPEED_LOST = np.deg2rad(45)  # angular speed when no blob found
+        # 1. Loop running the tracking until target (centroid position and size) reached
+        while not targetPositionReached:
+            # 1.1. search the most promising blob ..
+            position = get_blob()
+            # 1.2. check the given position
+            if position is not None:
+                # 1.3 blob found, check its position for planning movement
+                x, y = position
+                deltaX = abs(x - targetPosition[0])
+                deltaY = abs(y - targetPosition[1])
+                if deltaX <= allowedPositionError and deltaY <= allowedPositionError:
+                    # 1.4 target position reached, let's catch the ball
+                    targetPositionReached = True
+                    self.setSpeed(0, 0)  # stop moving
+                else:
+                    # 1.4 angular movement to get a proper orientation to the target
+                    angular_speed = -deltaX * ANGULAR_SPEED if x < targetPosition[0] else deltaX * ANGULAR_SPEED
+                    # 1.5 linear movement to get closer the target
+                    linear_speed = -deltaY * LINEAR_SPEED if y < targetPosition[1] else deltaY * LINEAR_SPEED
+                    self.setSpeed(linear_speed, angular_speed)
+            else:
+                # 1.3 no blob found, turn around until finding something similar to the target
+                self.setSpeed(0, ANGULAR_SPEED_LOST)
+        # 2. Then catch the ball
+        self.catch()
 
     def catch(self):
         """ Closes the robot claw """
