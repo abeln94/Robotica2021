@@ -221,33 +221,21 @@ class Robot:
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
                 x, y = position
-                if (x - targetPosition[0]) <= allowedPositionError and (y - targetPosition[1]) <= allowedPositionError:
+                deltaX = abs(x - targetPosition[0])
+                deltaY = abs(y - targetPosition[1])
+                if deltaX <= allowedPositionError and deltaY <= allowedPositionError:
                     # 1.4 target position reached, let's catch the ball
                     targetPositionReached = True
+                    self.setSpeed(0, 0) # stop moving
                 else:
                     # 1.4 angular movement to get a proper orientation to the target
-                    angular_speed = 0
-                    if x < targetPosition[0]:
-                        angular_speed = -ANGULAR_SPEED # turn right
-                    elif x > targetPosition[0]:
-                        angular_speed = ANGULAR_SPEED  # turn left
+                    angular_speed = -deltaX*ANGULAR_SPEED if x < targetPosition[0] else deltaX*ANGULAR_SPEED
                     # 1.5 linear movement to get closer the target
-                    linear_speed = 0
-                    if y < targetPosition[1]:
-                        # robot is too close, it has to go back
-                        linear_speed = -LINEAR_SPEED
-                    elif y > targetPosition[1]:
-                        # ball is far, robot has to approach it
-                        linear_speed = LINEAR_SPEED
+                    linear_speed = -deltaY*LINEAR_SPEED if y < targetPosition[1] else deltaY*LINEAR_SPEED
                     self.setSpeed(linear_speed, angular_speed)
-                    time.sleep(MOVEMENT_TIME)
-                    self.setSpeed(0, 0)
             else:
                 # 1.3 no blob found, turn around until finding something similar to the target
                 self.setSpeed(0, ANGULAR_SPEED_LOST)
-                while get_blob(colorRangeMin, colorRangeMax) == None:
-                    time.sleep(MOVEMENT_TIME)
-                self.setSpeed(0, 0)
         # 2. Then catch the ball
         self.catch()
 
