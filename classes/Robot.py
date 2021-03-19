@@ -214,7 +214,7 @@ class Robot:
         """ Returns a BGR image taken at the moment """
         rawCapture = PiRGBArray(self.cam, size=(320, 240))  # TODO: extract constants to CFG
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
-        return rawCapture
+        return rawCapture.array
 
     def trackObject(self, targetPosition=(0.6, 0.8), allowedPositionError=0.1):
         """
