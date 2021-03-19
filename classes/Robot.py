@@ -199,37 +199,59 @@ class Robot:
         self.finished.value = True
         self.BP.reset_all()
 
-    def trackObject(self, colorRangeMin=[0,0,0], colorRangeMax=[255,255,255], targetSize=500, targetCentroid=[50,50], allowerSizeError = 10, allowerCentroidError = 10):
+    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255], targetPosition=[0.6, 0.8], allowedPositionError=0.1):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param colorRangeMin: minimum BGR color value taken into consideration for blob's detection
         :param colorRangeMax: maximum BGR color value taken into consideration for blob's detection
-        :param targetSize: target size value of the blob
-        :param targetCentroid: on image target coordinates value of the blob's centroid
-        :param allowerSizeError: error value allowed in the size measure to consider the target has been reached
-        :param allowerCentroidError: error value allowed in the centroid measures to consider the target has been reached
+        :param targetPosition: on image target coordinates value of the blob's centroid
+        :param allowerPositionError: error value allowed in the centroid measures to consider the target has been reached
         """
-        targetFound = False
-        finished = False
         targetPositionReached = False
-        while not finished:
-            # 1. search the most promising blob ..
-            size = -1
-            centroid = [0,0]
-            blobs = get_color_blobs(None) # get the camera's image
-            for blob in blobs: # ADT for blob representation needed
-                tmpSize = blob.size()
-                if tmpSize > size:
-                    size = tmpSize
-                    centroid = blob.centroid
-            while not targetPositionReached:
-                # 2. decide v and w for the robot to get closer to target position
-                if (targetSize - size) <= allowerSizeError and (targetCentroid - centroid) <= allowerCentroidError:
+        # 0. Parameters
+        angular_speed = np.deg2rad(20)
+        linear_speed = 50
+        movement_time = 1 # seconds
+        angular_speed_lost = np.deg2rad(45) # angular speed when no blob found
+        # 1. Loop running the tracking until target (centroid position and size) reached
+        while not targetPositionReached:
+            # 1.1. search the most promising blob ..
+            position = get_blob(colorRangeMin, colorRangeMax)
+            # 1.2. check the given position
+            if position is not None:
+                # 1.3 blob found, check its position for planning movement
+                x, y = position
+                if (x - targetPosition[0]) <= allowedPositionError and (y - targetPosition[1]) <= allowedPositionError:
+                    # 1.4 target position reached, let's catch the ball
                     targetPositionReached = True
-                    finished = True
-        return finished
+                else:
+                    # 1.4 angular movement to get a proper orientation to the target
+                    if x < targetPosition[0]:
+                        self.setSpeed(0, -angular_speed) # turn right
+                        time.sleep(movement_time)
+                        self.setSpeed(0, 0)
+                    elif x > targetPosition[0]:
+                        self.setSpeed(0, angular_speed)  # turn left
+                        time.sleep(movement_time)
+                        self.setSpeed(0, 0)
+                    # 1.5 linear movement to get closer the target
+                    if y < targetPosition[1]:
+                        self.setSpeed(linear_speed, 0)
+                        time.sleep(movement_time)
+                        self.setSpeed(0, 0)
+                    elif y > targetPosition[1]:
+                        self.setSpeed(linear_speed, 0)
+                        time.sleep(movement_time)
+                        self.setSpeed(0, 0)
+            else:
+                # 1.3 no blob found, turn around until finding something similar to the target
+                while get_blob(colorRangeMin, colorRangeMax) == None:
+                    self.setSpeed(0, angular_speed_lost)
+                    time.sleep(movement_time)
+                    self.setSpeed(0, 0)
+        # 2. Then catch the ball
+        self.catch()
 
     def catch(self):
         """ Implements the closing of the robot's claw """
-
 
