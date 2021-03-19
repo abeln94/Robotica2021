@@ -6,7 +6,6 @@ import time
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, RLock
 
-import cv2
 import numpy as np
 
 import Cfg
@@ -215,10 +214,7 @@ class Robot:
         """ Returns a BGR image taken at the moment """
         rawCapture = PiRGBArray(self.cam, size=(320, 240))  # TODO: extract constants to CFG
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
-        image = rawCapture.array
-        cv2.imshow('image', image)
-        cv2.waitKey(1)
-        return image
+        return rawCapture.array
 
     def trackObject(self, targetPosition=(0.6, 0.8), allowedPositionError=0.1):
         """
@@ -235,7 +231,7 @@ class Robot:
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
-            position = get_blob(self.capture_image())
+            position = get_blob(self.capture_image(), plot_result=True)
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
