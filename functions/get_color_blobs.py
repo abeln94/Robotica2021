@@ -12,11 +12,11 @@ params.maxThreshold = 200
 
 # Filter by Area
 params.filterByArea = True
-params.minArea = 200
-params.maxArea = 10000
+params.minArea = 150
+params.maxArea = 80000
 
 # Filter by Circularity
-params.filterByCircularity = True
+params.filterByCircularity = False
 params.minCircularity = 0.1
 
 # Filter by Color
@@ -39,10 +39,10 @@ def get_color_blobs(img_BGR,plot_result=True):
     image = cv2.cvtColor(img_BGR,cv2.COLOR_BGR2HSV)
 
     # HSV FORMAT ranges
-    redMin1 = (0, 50, 30)
+    redMin1 = (0, 80, 50)
     redMax1 = (10, 255, 255)
 
-    redMin2 = (160, 50, 30)
+    redMin2 = (160, 80, 50)
     redMax2 = (180, 255, 255)
 
     # Obtain the mask
@@ -51,8 +51,8 @@ def get_color_blobs(img_BGR,plot_result=True):
     mask = mask1 | mask2
 
     # some morphological operations (closing) to remove small blobs
-    #mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
-    #mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8)))
+    mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8)))
+    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10)))
 
     # apply the mask
     keypoints = detector.detect(255-mask)
