@@ -12,11 +12,13 @@ import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
-from functions.simubot import simubot
 from functions.get_color_blobs import get_blob
+from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
+    import picamera
+    from picamera.array import PiRGBArray
 except:
     import classes.simbrickpi3 as brickpi3
 
@@ -64,6 +66,13 @@ class Robot:
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
+
+        # odometry update period --> UPDATE value!
+
+        # camera cositas
+        self.cam = picamera.PiCamera()
+        self.cam.resolution = (320, 240)
+        self.cam.framerate = 32
 
     def setSpeed(self, v, w):
         """ 
@@ -201,6 +210,12 @@ class Robot:
         self.finished.value = True
         self.BP.reset_all()
 
+    def capture_image(self):
+        """ Returns a BGR image taken at the moment """
+        rawCapture = PiRGBArray(self.cam, size=(320, 240))  # TODO: extract constants to CFG
+        self.cam.capture(rawCapture, format="bgr", use_video_port=True)
+        return rawCapture
+
     def trackObject(self, targetPosition=(0.6, 0.8), allowedPositionError=0.1):
         """
         Track one object with indicated color until the target size and centroid are reached
@@ -216,7 +231,7 @@ class Robot:
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
-            position = get_blob()
+            position = get_blob(self.capture_image())
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
