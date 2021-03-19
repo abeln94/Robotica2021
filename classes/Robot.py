@@ -6,6 +6,7 @@ import time
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, RLock
 
+import cv2
 import numpy as np
 
 import Cfg
@@ -209,6 +210,8 @@ class Robot:
         """ Stop the odometry thread """
         self.finished.value = True
         self.BP.reset_all()
+        self.cam.close()
+        cv2.destroyAllWindows()
 
     def capture_image(self):
         """ Returns a BGR image taken at the moment """
