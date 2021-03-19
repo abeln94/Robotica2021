@@ -199,7 +199,7 @@ class Robot:
         self.finished.value = True
         self.BP.reset_all()
 
-    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255], targetPosition=[0.6, 0.8], allowedPositionError=0.1):
+    def trackObject(self, colorRangeMin=(0, 0, 0), colorRangeMax=(255, 255, 255), targetPosition=(0.6, 0.8), allowedPositionError=0.1):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param colorRangeMin: minimum BGR color value taken into consideration for blob's detection
@@ -209,10 +209,10 @@ class Robot:
         """
         targetPositionReached = False
         # 0. Parameters
-        angular_speed = np.deg2rad(20)
-        linear_speed = 50
-        movement_time = 1 # seconds
-        angular_speed_lost = np.deg2rad(45) # angular speed when no blob found
+        ANGULAR_SPEED = np.deg2rad(20)
+        LINEAR_SPEED = 50
+        MOVEMENT_TIME = 0.1 # seconds
+        ANGULAR_SPEED_LOST = np.deg2rad(45) # angular speed when no blob found
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
@@ -226,29 +226,28 @@ class Robot:
                     targetPositionReached = True
                 else:
                     # 1.4 angular movement to get a proper orientation to the target
+                    angular_speed = 0
                     if x < targetPosition[0]:
-                        self.setSpeed(0, -angular_speed) # turn right
-                        time.sleep(movement_time)
-                        self.setSpeed(0, 0)
+                        angular_speed = -ANGULAR_SPEED # turn right
                     elif x > targetPosition[0]:
-                        self.setSpeed(0, angular_speed)  # turn left
-                        time.sleep(movement_time)
-                        self.setSpeed(0, 0)
+                        angular_speed = ANGULAR_SPEED  # turn left
                     # 1.5 linear movement to get closer the target
+                    linear_speed = 0
                     if y < targetPosition[1]:
-                        self.setSpeed(linear_speed, 0)
-                        time.sleep(movement_time)
-                        self.setSpeed(0, 0)
+                        # robot is too close, it has to go back
+                        linear_speed = -LINEAR_SPEED
                     elif y > targetPosition[1]:
-                        self.setSpeed(linear_speed, 0)
-                        time.sleep(movement_time)
-                        self.setSpeed(0, 0)
+                        # ball is far, robot has to approach it
+                        linear_speed = LINEAR_SPEED
+                    self.setSpeed(linear_speed, angular_speed)
+                    time.sleep(MOVEMENT_TIME)
+                    self.setSpeed(0, 0)
             else:
                 # 1.3 no blob found, turn around until finding something similar to the target
+                self.setSpeed(0, ANGULAR_SPEED_LOST)
                 while get_blob(colorRangeMin, colorRangeMax) == None:
-                    self.setSpeed(0, angular_speed_lost)
-                    time.sleep(movement_time)
-                    self.setSpeed(0, 0)
+                    time.sleep(MOVEMENT_TIME)
+                self.setSpeed(0, 0)
         # 2. Then catch the ball
         self.catch()
 

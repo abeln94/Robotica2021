@@ -17,7 +17,7 @@ if __name__ == "__main__":
         robot.startOdometry()
 
         # 2. Look for and catch the ball
-        robot.trackObject([0,0,0], [255,255,255], 500, [50,50], 20, 20)
+        robot.trackObject()
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
