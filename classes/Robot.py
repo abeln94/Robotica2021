@@ -234,7 +234,7 @@ class Robot:
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
-            position = get_blob(self.capture_image(), plot_result=True)
+            position = get_blob(self.capture_image())
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
