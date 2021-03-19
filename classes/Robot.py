@@ -43,13 +43,15 @@ class Robot:
         # Configure sensors, for example a touch sensor.
         # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
-        # reset encoder B and C (or all the motors you are using)
+        # reset encoder of all motors
+        self.clawMotor = self.BP.PORT_A
         self.leftMotor = self.BP.PORT_B
         self.rightMotor = self.BP.PORT_C
-        self.BP.offset_motor_encoder(self.leftMotor, self.BP.get_motor_encoder(self.leftMotor))
-        self.BP.offset_motor_encoder(self.rightMotor, self.BP.get_motor_encoder(self.rightMotor))
+        for motor in (self.clawMotor, self.leftMotor, self.rightMotor):
+            self.BP.offset_motor_encoder(motor, self.BP.get_motor_encoder(motor))
 
-        ##################################################        # Odometry
+        ##################################################
+        # Odometry
 
         self.p = None  # the odometry process
 
@@ -197,3 +199,18 @@ class Robot:
         """ Stop the odometry thread """
         self.finished.value = True
         self.BP.reset_all()
+
+    def catch(self):
+        """ Closes the robot claw """
+        ANGLE = 90  # degrees
+        TIME = 3  # seconds
+
+        # sanity check
+        if self.BP.get_motor_encoder(self.clawMotor) > ANGLE / 2:
+            print("attempting to use claw again")
+            return
+
+        # catch
+        self.BP.set_motor_dps(self.clawMotor, ANGLE / TIME)
+        time.sleep(TIME)
+        self.BP.set_motor_dps(self.clawMotor, 0)
