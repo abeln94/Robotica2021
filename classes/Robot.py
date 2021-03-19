@@ -217,6 +217,7 @@ class Robot:
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         image = rawCapture.array
         cv2.imshow('image', image)
+        cv2.waitKey(1)
         return image
 
     def trackObject(self, targetPosition=(0.6, 0.8), allowedPositionError=0.1):
