@@ -18,10 +18,15 @@ from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
-    import picamera
+except:
+    import classes.sim_brickpi3 as brickpi3
+
+try:
+    import picamera  # import the picamera
     from picamera.array import PiRGBArray
 except:
-    import classes.simbrickpi3 as brickpi3
+    import classes.sim_picamera as picamera
+    from classes.sim_picamera import PiRGBArray
 
 Cfg.add_argument("-f", "--log", help="Log odometry into a file", default=False)
 Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=float, default=0.1)
@@ -67,8 +72,6 @@ class Robot:
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
-
-        # odometry update period --> UPDATE value!
 
         # camera cositas
         self.cam = picamera.PiCamera()
