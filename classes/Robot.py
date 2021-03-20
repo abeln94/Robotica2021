@@ -228,12 +228,14 @@ class Robot:
         :param targetPosition: on image target coordinates value of the blob's centroid
         :param allowerPositionError: error value allowed in the centroid measures to consider the target has been reached
         """
-        targetPositionReached = False
-        # 0. Parameters
+        NOT_FOUND_WAIT = 10
         ANGULAR_SPEED = np.deg2rad(20)
         LINEAR_SPEED = 50
         MOVEMENT_TIME = 0.1  # seconds
         ANGULAR_SPEED_LOST = np.deg2rad(30)  # angular speed when no blob found
+        # 0. Parameters
+        targetPositionReached = False
+        notFoundCounter = 0
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
@@ -241,6 +243,7 @@ class Robot:
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
+                notFoundCounter = 0
                 x, y = position
                 print("found ball at x=", x, "y=", y)
                 deltaX = abs(x - targetPosition[0])
@@ -256,10 +259,18 @@ class Robot:
                     # 1.5 linear movement to get closer the target
                     linear_speed = -deltaY * LINEAR_SPEED if y < targetPosition[1] else deltaY * LINEAR_SPEED
                     self.setSpeed(linear_speed, angular_speed)
+                    time.sleep(MOVEMENT_TIME)
             else:
-                # 1.3 no blob found, turn around until finding something similar to the target
-                print("not found, turn around")
-                self.setSpeed(0, ANGULAR_SPEED_LOST)
+                # 1.3 no blob found
+                if notFoundCounter > NOT_FOUND_WAIT:
+                    # turn around until finding something similar to the target
+                    print("not found, turn around")
+                    self.setSpeed(0, ANGULAR_SPEED_LOST)
+                else:
+                    # wait a bit
+                    print("temporary lost")
+                    notFoundCounter += 1
+                    self.setSpeed(0, 0)
         # 2. Then catch the ball
         self.catch()
 
