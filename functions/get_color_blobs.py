@@ -94,4 +94,4 @@ def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     blobs = get_color_blobs(img_BGR, rangeMin, rangeMax)
     blob = max(blobs, default=None, key=lambda item: item.size)
 
-    return (blob.pt[0] / np.size(img_BGR, 0), blob.pt[1] / np.size(img_BGR, 1)) if blob is not None else None
+    return (blob.pt[0] / Cfg.CAMERA_WIDTH, blob.pt[1] / Cfg.CAMERA_HEIGHT) if blob is not None else None

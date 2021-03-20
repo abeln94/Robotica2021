@@ -12,6 +12,8 @@ FOLDER_IMAGES = FOLDER_LOGS + "pictures/"
 ROBOT_L = 117  # distance between robot wheels
 ROBOT_r = 26.7  # radius of robots wheels
 LIN_VEL = 150  # stable velocity for linear motion (mm/s)
+CAMERA_WIDTH = 320  # px
+CAMERA_HEIGHT = 240  # px
 
 
 class __CFG:

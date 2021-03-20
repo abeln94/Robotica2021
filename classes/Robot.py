@@ -75,7 +75,7 @@ class Robot:
 
         # camera cositas
         self.cam = picamera.PiCamera()
-        self.cam.resolution = (320, 240)
+        self.cam.resolution = (Cfg.CAMERA_WIDTH, Cfg.CAMERA_HEIGHT)
         self.cam.framerate = 32
 
     def setSpeed(self, v, w):
@@ -218,7 +218,7 @@ class Robot:
 
     def capture_image(self):
         """ Returns a BGR image taken at the moment """
-        rawCapture = PiRGBArray(self.cam, size=(320, 240))  # TODO: extract constants to CFG
+        rawCapture = PiRGBArray(self.cam, size=(Cfg.CAMERA_WIDTH, Cfg.CAMERA_HEIGHT))
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         return rawCapture.array
 
