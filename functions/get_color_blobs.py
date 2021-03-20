@@ -76,7 +76,6 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     if Cfg.camera:
         regions = cv2.bitwise_and(img_BGR, img_BGR, mask=mask)
         regions = cv2.cvtColor(regions, cv2.COLOR_HSV2BGR)
-        cv2.imshow("Detected Regions", np.hstack([img_BGR, regions]))
 
         for kp in keypoints:
             print(kp.pt[0], kp.pt[1], kp.size)
@@ -85,7 +84,7 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
         im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]),
                                               (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-        cv2.imshow("Keypoints on RED", im_with_keypoints)
+        cv2.imshow("Detected Regions", np.hstack([im_with_keypoints, regions]))
         cv2.waitKey(1)
 
     return keypoints
