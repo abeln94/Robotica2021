@@ -15,6 +15,7 @@ from classes.Map import Map
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
 from functions.simubot import simubot
+from functions.math import sigmoid
 
 try:
     import brickpi3  # import the BrickPi3 drivers
@@ -222,7 +223,7 @@ class Robot:
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         return rawCapture.array
 
-    def trackObject(self, targetPosition=(0.6, 0.0), allowedXPositionError=0.1, allowedYPositionError=0.1):
+    def trackObject(self, targetPosition=(0.6, 0.0)):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
@@ -247,18 +248,18 @@ class Robot:
                 notFoundCounter = 0
                 x, y = position
                 print("found ball at x=", x, "y=", y)
-                deltaX = abs(x - targetPosition[0])
-                deltaY = abs(y - targetPosition[1])
                 if position_reached(img):
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
                     targetPositionReached = True
                     self.setSpeed(0, 0)  # stop moving
                 else:
+                    deltaX = abs(x - targetPosition[0])
+                    deltaY = abs(y - targetPosition[1])
                     # 1.4 angular movement to get a proper orientation to the target
-                    angular_speed = -deltaX * ANGULAR_SPEED if x < targetPosition[0] else deltaX * ANGULAR_SPEED
+                    angular_speed = -sigmoid(deltaX) * ANGULAR_SPEED if x < targetPosition[0] else sigmoid(deltaX) * ANGULAR_SPEED
                     # 1.5 linear movement to get closer the target
-                    linear_speed = -deltaY * LINEAR_SPEED if y < targetPosition[1] else deltaY * LINEAR_SPEED
+                    linear_speed = -sigmoid(deltaY) * LINEAR_SPEED if y < targetPosition[1] else sigmoid(deltaY) * LINEAR_SPEED
                     self.setSpeed(linear_speed, angular_speed)
                     time.sleep(MOVEMENT_TIME)
             else:
