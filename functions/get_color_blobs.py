@@ -1,3 +1,4 @@
+
 # Standard imports
 import cv2
 import numpy as np
@@ -15,18 +16,18 @@ params.minThreshold = 10
 params.maxThreshold = 200
 
 # Filter by Area
-params.filterByArea = True
+params.filterByArea = False
 params.minArea = 150
-params.maxArea = 20000
+params.maxArea = 50000
 
 # Filter by Circularity
 params.filterByCircularity = False
 params.minCircularity = 0.1
 
 # Filter by Color
-params.filterByColor = False
+params.filterByColor = True
 # not directly color, but intensity on the channel input
-# params.blobColor = 0
+params.blobColor = 255
 params.filterByConvexity = False
 params.filterByInertia = False
 
@@ -70,7 +71,7 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
         return []
 
     # apply the mask
-    keypoints = detector.detect(255 - mask)
+    keypoints = detector.detect(mask)
     # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
 
     if Cfg.camera:
@@ -119,9 +120,9 @@ def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
 
 
     sum = 0
-    for i in range(80):
+    for i in range(50):
         for j in range(320):
             if(mask[i][j] == 255): sum = sum + 1
-    percentaje = sum / 320 / 80
+    percentaje = sum / 320 / 50
 
-    return percentaje > 0.65
+    return percentaje > 0.73
