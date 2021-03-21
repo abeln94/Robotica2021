@@ -95,3 +95,33 @@ def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     blob = max(blobs, default=None, key=lambda item: item.size)
 
     return (blob.pt[0] / Cfg.CAMERA_WIDTH, blob.pt[1] / Cfg.CAMERA_HEIGHT) if blob is not None else None
+
+
+def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
+    image = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
+    if rangeMin[0] > rangeMax[0]:
+        rangeMin1 = rangeMin
+        rangeMax1 = (179, rangeMax[1], rangeMax[2])
+
+        rangeMin2 = (0, rangeMin[1], rangeMin[2])
+        rangeMax2 = rangeMax
+    else:
+        rangeMin1 = rangeMin
+        rangeMax1 = rangeMin
+
+        rangeMin2 = rangeMin
+        rangeMax2 = rangeMax
+
+    # Obtain the mask
+    mask1 = cv2.inRange(image, rangeMin1, rangeMax1)
+    mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
+    mask = mask1 | mask2
+
+
+    sum = 0
+    for i in range(80):
+        for j in range(320):
+            if(mask[i][j] == 255): sum = sum + 1
+    percentaje = sum / 320 / 80
+
+    return percentaje > 0.65

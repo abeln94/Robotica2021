@@ -13,7 +13,7 @@ import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
-from functions.get_color_blobs import get_blob
+from functions.get_color_blobs import get_blob, position_reached
 from functions.simubot import simubot
 
 try:
@@ -239,7 +239,8 @@ class Robot:
         # 1. Loop running the tracking until target (centroid position and size) reached
         while not targetPositionReached:
             # 1.1. search the most promising blob ..
-            position = get_blob(self.capture_image())
+            img = self.capture_image()
+            position = get_blob(img)
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
@@ -248,7 +249,7 @@ class Robot:
                 print("found ball at x=", x, "y=", y)
                 deltaX = abs(x - targetPosition[0])
                 deltaY = abs(y - targetPosition[1])
-                if deltaX <= allowedXPositionError and deltaY <= allowedYPositionError:
+                if position_reached(img):
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
                     targetPositionReached = True
