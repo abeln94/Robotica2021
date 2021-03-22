@@ -290,6 +290,7 @@ class Robot:
         """ Closes the robot claw """
         ANGLE = 90  # degrees
         TIME = 3  # seconds
+        ADVANCE = 15  # mm
 
         # sanity check
         if self.BP.get_motor_encoder(self.clawMotor) > ANGLE / 2:
@@ -298,5 +299,7 @@ class Robot:
 
         # catch
         self.BP.set_motor_dps(self.clawMotor, ANGLE / TIME)
+        self.setSpeed(ADVANCE / TIME, 0)
         time.sleep(TIME)
         self.BP.set_motor_dps(self.clawMotor, 0)
+        self.setSpeed(0, 0)
