@@ -253,7 +253,7 @@ class Robot:
                 # 1.4 angular movement to get a proper orientation to the target
                 angular_speed = sigmoid(x - targetPosition[0], 6, 0, False) * Cfg.ANG_VEL
                 # 1.5 linear movement to get closer the target
-                linear_speed = sigmoid(y - targetPosition[1], 6, -3, True) * Cfg.LIN_VEL
+                linear_speed = sigmoid(y - targetPosition[1], 6, -2.8, True) * Cfg.LIN_VEL
                 self.setSpeed(linear_speed, angular_speed)
 
             else:
