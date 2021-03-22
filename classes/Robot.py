@@ -14,8 +14,8 @@ from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
-from functions.simubot import simubot
 from functions.math import sigmoid
+from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
@@ -227,41 +227,41 @@ class Robot:
         """
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
-        :param allowerPositionError: error value allowed in the centroid measures to consider the target has been reached
         """
         NOT_FOUND_WAIT = 10
-        ANGULAR_SPEED = np.deg2rad(20)
-        LINEAR_SPEED = 50
         MOVEMENT_TIME = 0.1  # seconds
         ANGULAR_SPEED_LOST = np.deg2rad(30)  # angular speed when no blob found
+
         # 0. Parameters
-        targetPositionReached = False
         notFoundCounter = 0
+
         # 1. Loop running the tracking until target (centroid position and size) reached
-        while not targetPositionReached:
+        while True:
+
             # 1.1. search the most promising blob ..
             img = self.capture_image()
             position = get_blob(img)
+
             # 1.2. check the given position
             if position is not None:
                 # 1.3 blob found, check its position for planning movement
                 notFoundCounter = 0
                 x, y = position
                 print("found ball at x=", x, "y=", y)
+
                 if position_reached(img):
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
-                    targetPositionReached = True
                     self.setSpeed(0, 0)  # stop moving
+                    break  # stop loop immediately
+
                 else:
-                    deltaX = abs(x - targetPosition[0])
-                    deltaY = abs(y - targetPosition[1])
                     # 1.4 angular movement to get a proper orientation to the target
-                    angular_speed = -sigmoid(deltaX) * ANGULAR_SPEED if x < targetPosition[0] else sigmoid(deltaX) * ANGULAR_SPEED
+                    angular_speed = sigmoid(x - targetPosition[0]) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
-                    linear_speed = -sigmoid(deltaY) * LINEAR_SPEED if y < targetPosition[1] else sigmoid(deltaY) * LINEAR_SPEED
+                    linear_speed = sigmoid(y - targetPosition[1]) * Cfg.LIN_VEL
                     self.setSpeed(linear_speed, angular_speed)
-                    time.sleep(MOVEMENT_TIME)
+
             else:
                 # 1.3 no blob found
                 if notFoundCounter > NOT_FOUND_WAIT:
@@ -273,6 +273,9 @@ class Robot:
                     print("temporary lost")
                     notFoundCounter += 1
                     self.setSpeed(0, 0)
+
+            time.sleep(MOVEMENT_TIME)
+
         # 2. Then catch the ball
         self.catch()
 

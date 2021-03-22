@@ -1,6 +1,8 @@
 import sys
 from argparse import ArgumentParser
 
+import numpy as np
+
 # robot python version 3.5.3
 # robot OpenCV version 3.4.13
 
@@ -12,6 +14,7 @@ FOLDER_IMAGES = FOLDER_LOGS + "pictures/"
 ROBOT_L = 117  # distance between robot wheels
 ROBOT_r = 26.7  # radius of robots wheels
 LIN_VEL = 150  # stable velocity for linear motion (mm/s)
+ANG_VEL = np.deg2rad(30)  # stable velocity for angular motion (rad/s)
 CAMERA_WIDTH = 320  # px
 CAMERA_HEIGHT = 240  # px
 
