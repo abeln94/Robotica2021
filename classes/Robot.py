@@ -228,10 +228,10 @@ class Robot:
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
         """
-        NOT_FOUND_WAIT = 10
+        NOT_FOUND_WAIT = 20  # frames
         MOVEMENT_TIME = 0.1  # seconds
         ANGULAR_SPEED_LOST = np.deg2rad(30)  # angular speed when no blob found
-        BACKTRACK_VELOCITY = 10  # mm/s
+        BACKTRACK_VELOCITY = 50  # mm/s
 
         # 0. Parameters
         notFoundCounter = 0
@@ -260,7 +260,7 @@ class Robot:
                     # 1.4 angular movement to get a proper orientation to the target
                     angular_speed = sigmoid(x - targetPosition[0]) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
-                    linear_speed = sigmoid(y - targetPosition[1]) * Cfg.LIN_VEL
+                    linear_speed = sigmoid(y - targetPosition[1], 6, -3, True) * Cfg.LIN_VEL
                     self.setSpeed(linear_speed, angular_speed)
 
             else:
