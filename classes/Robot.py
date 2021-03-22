@@ -231,6 +231,7 @@ class Robot:
         NOT_FOUND_WAIT = 10
         MOVEMENT_TIME = 0.1  # seconds
         ANGULAR_SPEED_LOST = np.deg2rad(30)  # angular speed when no blob found
+        BACKTRACK_VELOCITY = 10  # mm/s
 
         # 0. Parameters
         notFoundCounter = 0
@@ -272,7 +273,7 @@ class Robot:
                     # wait a bit
                     print("temporary lost")
                     notFoundCounter += 1
-                    self.setSpeed(0, 0)
+                    self.setSpeed(-BACKTRACK_VELOCITY, 0)
 
             time.sleep(MOVEMENT_TIME)
 

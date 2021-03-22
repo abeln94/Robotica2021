@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def sigmoid(x, alpha=6):
+def sigmoid(x, alpha=3):
     """
     Sigmoid function implemented as hyperbolic tangent of x*alpha, where x is the independent variable and alpha the curve's slope measure
     :param x: independent variable
