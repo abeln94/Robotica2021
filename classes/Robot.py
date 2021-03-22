@@ -250,21 +250,21 @@ class Robot:
                 x, y = position
                 print("found ball at x=", x, "y=", y)
 
+                # 1.4 angular movement to get a proper orientation to the target
+                angular_speed = sigmoid(x - targetPosition[0], 6, 0, False) * Cfg.ANG_VEL
+                # 1.5 linear movement to get closer the target
+                linear_speed = sigmoid(y - targetPosition[1], 6, -3, True) * Cfg.LIN_VEL
+                self.setSpeed(linear_speed, angular_speed)
+
+            else:
+                # 1.3 no blob found
+
                 if position_reached(img):
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
                     self.setSpeed(0, 0)  # stop moving
                     break  # stop loop immediately
 
-                else:
-                    # 1.4 angular movement to get a proper orientation to the target
-                    angular_speed = sigmoid(x - targetPosition[0], 6, 0, False) * Cfg.ANG_VEL
-                    # 1.5 linear movement to get closer the target
-                    linear_speed = sigmoid(y - targetPosition[1], 6, -3, True) * Cfg.LIN_VEL
-                    self.setSpeed(linear_speed, angular_speed)
-
-            else:
-                # 1.3 no blob found
                 if notFoundCounter > NOT_FOUND_WAIT:
                     # turn around until finding something similar to the target
                     print("not found, turn around")
