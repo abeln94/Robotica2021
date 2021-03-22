@@ -1,4 +1,3 @@
-
 # Standard imports
 import cv2
 import numpy as np
@@ -118,11 +117,5 @@ def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
     mask = mask1 | mask2
 
-
-    sum = 0
-    for i in range(50):
-        for j in range(320):
-            if(mask[i][j] == 255): sum = sum + 1
-    percentaje = sum / 320 / 50
-
-    return percentaje > 0.73
+    PX = 50
+    return cv2.countNonZero(mask[0:PX, :]) / Cfg.CAMERA_WIDTH / PX > 0.73
