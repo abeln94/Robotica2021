@@ -1,3 +1,16 @@
+"""
+Replacement of the picamera to use a webcam.
+It implements the same API but uses the user webcam instead of the picamera
+Use as:
+
+try:
+    import picamera
+    from picamera.array import PiRGBArray
+except:
+    import classes.sim_picamera as picamera
+    from classes.sim_picamera import PiRGBArray
+
+"""
 import cv2
 
 

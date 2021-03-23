@@ -14,7 +14,7 @@ from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
-from functions.math import sigmoid
+from functions.math import sigmoid, logistic
 from functions.simubot import simubot
 
 try:
@@ -235,9 +235,10 @@ class Robot:
 
         # 0. Parameters
         notFoundCounter = 0
+        found = False
 
         # 1. Loop running the tracking until target (centroid position and size) reached
-        while True:
+        while not found:
 
             # 1.1. search the most promising blob ..
             img = self.capture_image()
@@ -254,13 +255,14 @@ class Robot:
                     # 1.4 target position reached, let's catch the ball
                     print("ball in position")
                     self.setSpeed(0, 0)  # stop moving
-                    break  # stop loop immediately
+                    found = True  # stop loop immediately
 
-                # 1.4 angular movement to get a proper orientation to the target
-                angular_speed = sigmoid(x - targetPosition[0], 6, 0, False) * Cfg.ANG_VEL
-                # 1.5 linear movement to get closer the target
-                linear_speed = sigmoid(y - targetPosition[1], 6, -2, True) * Cfg.LIN_VEL
-                self.setSpeed(linear_speed, angular_speed)
+                else:
+                    # 1.4 angular movement to get a proper orientation to the target
+                    angular_speed = sigmoid(x - targetPosition[0], 6) * Cfg.ANG_VEL
+                    # 1.5 linear movement to get closer the target
+                    linear_speed = logistic(y - targetPosition[1], 12, 0.35) * Cfg.LIN_VEL
+                    self.setSpeed(linear_speed, angular_speed)
 
             else:
                 # 1.3 no blob found
@@ -269,19 +271,21 @@ class Robot:
                     # 1.4 target position reached, let's catch the ball
                     print("ball lost because of too near")
                     self.setSpeed(0, 0)  # stop moving
-                    break  # stop loop immediately
+                    found = True  # stop loop immediately
 
-                if notFoundCounter > NOT_FOUND_WAIT:
-                    # turn around until finding something similar to the target
-                    print("not found, turn around")
-                    self.setSpeed(0, ANGULAR_SPEED_LOST)
                 else:
-                    # wait a bit
-                    print("temporary lost")
-                    notFoundCounter += 1
-                    self.setSpeed(-BACKTRACK_VELOCITY, 0)
+                    if notFoundCounter > NOT_FOUND_WAIT:
+                        # turn around until finding something similar to the target
+                        print("not found, turn around")
+                        self.setSpeed(0, ANGULAR_SPEED_LOST)
+                    else:
+                        # wait a bit
+                        print("temporary lost")
+                        notFoundCounter += 1
+                        self.setSpeed(-BACKTRACK_VELOCITY, 0)
 
-            time.sleep(MOVEMENT_TIME)
+            if not found:
+                time.sleep(MOVEMENT_TIME)
 
         # 2. Then catch the ball
         self.catch()

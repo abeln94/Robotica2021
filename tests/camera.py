@@ -1,8 +1,8 @@
+import time
+
 import cv2
 import picamera
 from picamera.array import PiRGBArray
-import numpy as np
-import time
 
 ESC = 27
 KNN = 1

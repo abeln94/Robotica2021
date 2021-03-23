@@ -80,15 +80,13 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
 
     if Cfg.camera:
-        regions = cv2.bitwise_and(img_BGR, img_BGR, mask=mask)
-        regions = cv2.cvtColor(regions, cv2.COLOR_HSV2BGR)
+        regions = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
 
         for kp in keypoints:
-            print(kp.pt[0], kp.pt[1], kp.size)
+            print("Keypoint:", kp.pt[0], kp.pt[1], kp.size)
 
         # Show mask and blobs found
-        im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]),
-                                              (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]), (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         cv2.imshow("Detected Regions", np.hstack([im_with_keypoints, regions]))
         cv2.waitKey(1)
