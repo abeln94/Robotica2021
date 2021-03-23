@@ -383,14 +383,15 @@ class Map2D:
     # METHODS to IMPLEMENT in P4
     # ############################################################
 
-    # def fillCostMatrix(self, ??):
-    # """
-    # NOTE: Make sure self.costMatrix is a 2D numpy array of dimensions dimX x dimY
-    # TO-DO
-    # """
-    # self.costMatrix = ....
+    def fillCostMatrix(self):
+        """
+        NOTE: Make sure self.costMatrix is a 2D numpy array of dimensions dimX x dimY
+        TO-DO
+        """
+        # self.costMatrix = ....
+        pass
 
-    def findPath(self, x_ini, y_ini, x_end, y_end):
+    def planPath(self, x_ini, y_ini, x_end, y_end):
         """
         x_ini, y_ini, x_end, y_end: integer values that indicate \
             the x and y coordinates of the starting (ini) and ending (end) cell
@@ -406,5 +407,6 @@ class Map2D:
 
         return pathFound
 
-    # def replanPath(self, ??):
-    # """ TO-DO """
+    def replanPath(self):
+        """ TO-DO """
+        pass

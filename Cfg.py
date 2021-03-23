@@ -9,6 +9,7 @@ import numpy as np
 # fixed configuration
 FOLDER_LOGS = "./logs/"
 FOLDER_IMAGES = FOLDER_LOGS + "pictures/"
+FOLDER_MAPS = "./maps/"
 
 # Fixed parameters
 ROBOT_L = 117  # distance between robot wheels
