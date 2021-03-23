@@ -2,10 +2,6 @@
 import cv2
 import numpy as np
 
-import Cfg
-
-Cfg.add_argument("-cam", "--camera", help="Show the camera in the robot", action="store_true")
-
 # Setup default values for SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
 
@@ -39,12 +35,6 @@ else:
 
 
 def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
-    """
-    Returns the detected blobs of a BGR image between an range of HSV color
-    :param img_BGR: The BGR image to apply the detector
-    :param rangeMin: The min HSV value to be detected
-    :param rangeMax: The max HSV value to be detected
-    """
     # keypoints on original image (will look for blobs in grayscale)
     image = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
 
@@ -79,42 +69,31 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     keypoints = detector.detect(mask)
     # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
 
-    if Cfg.camera:
-        regions = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
+    if True:
+        regions = cv2.bitwise_and(img_BGR, img_BGR, mask=mask)
+        regions = cv2.cvtColor(regions, cv2.COLOR_HSV2BGR)
 
         for kp in keypoints:
-            print("Keypoint:", kp.pt[0], kp.pt[1], kp.size)
+            print(kp.pt[0], kp.pt[1], kp.size)
 
         # Show mask and blobs found
-        im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]), (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]),
+                                              (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         cv2.imshow("Detected Regions", np.hstack([im_with_keypoints, regions]))
-        cv2.waitKey(1)
+        cv2.waitKey(0)
 
     return keypoints
 
 
 def get_blob(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
-    """
-    Returns the most promising blob (the bigger) of a BGR image between an range of HSV color
-    :param img_BGR: The BGR image to apply the detector
-    :param rangeMin: The min HSV value to be detected
-    :param rangeMax: The max HSV value to be detected
-    """
     blobs = get_color_blobs(img_BGR, rangeMin, rangeMax)
     blob = max(blobs, default=None, key=lambda item: item.size)
 
-    return (blob.pt[0] / Cfg.CAMERA_WIDTH, blob.pt[1] / Cfg.CAMERA_HEIGHT) if blob is not None else None
+    return (blob.pt[0] / 320, blob.pt[1] / 240) if blob is not None else None
 
 
 def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
-    """
-    Returns if the robot has reached the position to catch the ball
-        given an image and the range of colours of the ball
-    :param img_BGR: The BGR image to apply the detector
-    :param rangeMin: The min HSV value to be detected
-    :param rangeMax: The max HSV value to be detected
-    """
     image = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
     if rangeMin[0] > rangeMax[0]:
         rangeMin1 = rangeMin
@@ -134,5 +113,11 @@ def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
     mask = mask1 | mask2
 
-    PX = 50
-    return cv2.countNonZero(mask[0:PX, :]) / Cfg.CAMERA_WIDTH / PX > 0.6
+
+    sum = 0
+    for i in range(80):
+        for j in range(320):
+            if(mask[i][j] == 255): sum = sum + 1
+    percentaje = sum / 320 / 80
+
+    return percentaje > 0.65
