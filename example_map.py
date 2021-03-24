@@ -31,6 +31,7 @@ if __name__ == "__main__":
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
+        myMap.fillCostMatrix(2, 2)
         # myMap.verbose = True
         myMap.drawMap(saveSnapshot=False)
 

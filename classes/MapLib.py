@@ -152,7 +152,11 @@ class Map2D:
         """
         connX = 2 * cellX + 1
         connY = 2 * cellY + 1
-        p = [connX, connY]
+
+        return self._neighbour(connX, connY, numNeigh)
+
+    def _neighbour(self, cellX, cellY, numNeigh):
+        p = [cellX, cellY]
 
         result = {
             0: lambda p: [p[0], p[1] + 1],
@@ -383,13 +387,22 @@ class Map2D:
     # METHODS to IMPLEMENT in P4
     # ############################################################
 
-    def fillCostMatrix(self):
+    def fillCostMatrix(self, x_end, y_end):
         """
-        NOTE: Make sure self.costMatrix is a 2D numpy array of dimensions dimX x dimY
-        TO-DO
+        Fills the internal costMatrix variable where (x_end, y_end) will have cost 0, using the connection matrix
+        :param x_end: horizontal cell coordinate of the cell with cost 0
+        :param y_end: vertical cell coordinate of the cell with cost 0
         """
-        # self.costMatrix = ....
-        pass
+        USE_DIAGONALS = True  # if true use 8-neighbour, if false use 4-neighbour
+
+        wavefront = [((x_end, y_end), 0)]  # create the wavefront list points ((x,y),cost), and initialize with the end point
+        while len(wavefront) != 0:  # evaluate each wavefront
+            (x, y), c = wavefront.pop(0)  # get and remove the first element (will always have min-or-equal cost from all the others)
+            if self.costMatrix[x, y] < 0 and 0 <= x < self.sizeX and 0 <= y < self.sizeY:  # inside the matrix and with uninitialized cost (because if already initialized it will always be better)
+                self.costMatrix[x, y] = c  # set cost
+                for neighbor in range(0, 8, 1 if USE_DIAGONALS else 2):  # and for all neighbors (diagonal neighbors are odd)
+                    if self.isConnected(x, y, neighbor):  # if they are connected
+                        wavefront.append((self._neighbour(x, y, neighbor), c + 1))  # add to wavefront as cost+1
 
     def planPath(self, x_ini, y_ini, x_end, y_end):
         """
