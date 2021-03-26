@@ -3,7 +3,7 @@ import time
 
 import numpy
 
-import Cfg
+from classes import Cfg
 from classes.Map import Map
 
 """

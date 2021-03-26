@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-import Cfg
+from classes import Cfg
 
 Cfg.add_argument("-cam", "--camera", help="Show the camera in the robot", action="store_true")
 

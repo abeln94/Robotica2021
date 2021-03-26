@@ -1,4 +1,4 @@
-import Cfg
+from classes import Cfg
 from classes.Robot import Robot
 
 # command line arguments

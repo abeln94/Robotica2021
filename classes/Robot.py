@@ -9,7 +9,7 @@ from multiprocessing import Process, Value, RLock
 import cv2
 import numpy as np
 
-import Cfg
+from classes import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
 from functions.functions import norm_pi
@@ -20,14 +20,14 @@ from functions.simubot import simubot
 try:
     import brickpi3  # import the BrickPi3 drivers
 except:
-    import classes.sim_brickpi3 as brickpi3
+    import simulation.brickpi3 as brickpi3
 
 try:
     import picamera  # import the picamera
     from picamera.array import PiRGBArray
 except:
-    import classes.sim_picamera as picamera
-    from classes.sim_picamera import PiRGBArray
+    import simulation.picamera as picamera
+    from simulation.picamera import PiRGBArray
 
 Cfg.add_argument("-f", "--log", help="Log odometry into a file", default=False)
 Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=float, default=0.1)

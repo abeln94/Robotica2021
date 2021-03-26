@@ -2,7 +2,7 @@ import os
 
 import matplotlib
 
-import Cfg
+from classes import Cfg
 
 matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available

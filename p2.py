@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-import Cfg
+from classes import Cfg
 from classes.Robot import Robot
 from functions.functions import norm_pi
 
