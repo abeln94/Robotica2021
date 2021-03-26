@@ -383,6 +383,9 @@ class Map2D:
         return self.planPath(point_ini[0], point_ini[1],
                              point_end[0], point_end[1])
 
+    def closeAll(self):
+        plt.close('all')
+
     # ############################################################
     # METHODS to IMPLEMENT in P4
     # ############################################################

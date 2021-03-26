@@ -3,12 +3,10 @@ import os
 import matplotlib
 
 from classes import Cfg
-
-matplotlib.use("TkAgg")
-# sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
-
-# from Robot import Robot
 from classes.MapLib import Map2D
+from classes.Robot import Robot
+
+matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1.txt")
 
@@ -17,17 +15,19 @@ Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1
 # 2) go(x,y) and detectObstacle() could be part of your Robot class (depending how you have implemented things)
 # 3) you can change these method signatures if you need, depending how you have implemented things
 
+robot = None
 
 if __name__ == "__main__":
     try:
+        # check map file
         mapFile = Cfg.FOLDER_MAPS + Cfg.mapfile
         os.makedirs(os.path.dirname(mapFile), exist_ok=True)
         if not os.path.isfile(mapFile):
             print('Map file %s does not exist' % Cfg.mapfile)
             exit(1)
+
         # Instantiate Odometry with your own files from P2/P3
-        # robot = Robot()
-        # ...
+        robot = Robot()
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
@@ -56,10 +56,10 @@ if __name__ == "__main__":
         sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
         myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
 
-        matplotlib.pyplot.close('all')
+        myMap.closeAll()
+
         # 2. launch updateOdometry thread()
-        # robot.startOdometry()
-        # ...
+        robot.startOdometry()
 
         # 3. perform trajectory
         # robot.setSpeed(1,1) ...
@@ -70,13 +70,6 @@ if __name__ == "__main__":
         # deal with them...
         # Avoid_obstacle(...) OR RePlanPath(...)
 
-        # 4. wrap up and close stuff ...
-        # This currently unconfigure the sensors, disable the motors,
-        # and restore the LED to the control of the BrickPi3 firmware.
-        # robot.stopOdometry()
-
     finally:
-        # except the program gets interrupted by Ctrl+C on the keyboard.
-        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
-        #    robot.stopOdometry()
-        print('do something to stop Robot when we Ctrl+C ...')
+        # wrap up and close stuff before exiting
+        if robot is not None: robot.stopOdometry()
