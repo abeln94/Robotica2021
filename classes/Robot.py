@@ -12,6 +12,7 @@ import numpy as np
 from classes import Cfg
 from classes.DeltaVal import DeltaVal
 from classes.Map import Map
+from classes.Periodic import Periodic
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
 from functions.math import sigmoid, logistic
@@ -307,3 +308,33 @@ class Robot:
         time.sleep(TIME)
         self.BP.set_motor_dps(self.clawMotor, 0)
         self.setSpeed(0, 0)
+
+    def go(self, x_goal, y_goal, radius=5):
+        """
+        Makes the robot move to a specific circle, based on the internal odometry
+        :param x_goal: x coordinate of the circle's center
+        :param y_goal: y coordinate of the circle's center
+        :param radius: radius of the circle
+        """
+        periodic = Periodic()
+
+        while periodic():
+            x, y, th = self.readOdometry()
+
+            # calculate movement
+            dx = x_goal - x
+            dy = y_goal - y
+            dth = norm_pi(np.arctan2(dy, dx) - th)
+            dist = np.linalg.norm([dx, dy])
+
+            if dist < radius:
+                # inside the circle, stop
+                self.setSpeed(0, 0)
+                return
+
+            # calculate velocity (all the constants were found by try&error)
+            w = sigmoid(dth, 3) * Cfg.ANG_VEL
+            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL * pow(np.cos(dth / 2), 50)  # the last factor allows advancing only if the necessary rotation is low
+
+            # move
+            self.setSpeed(v, w)

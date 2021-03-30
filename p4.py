@@ -3,7 +3,7 @@ import os
 import matplotlib
 
 from classes import Cfg
-from classes.MapLib import Map2D
+from classes.Map import GRID
 from classes.Robot import Robot
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -29,37 +29,43 @@ if __name__ == "__main__":
         # Instantiate Odometry with your own files from P2/P3
         robot = Robot()
 
-        # 1. load map and compute costs and path
-        myMap = Map2D(mapFile)
-        myMap.fillCostMatrix(2, 2)
-        # myMap.verbose = True
-        myMap.drawMap(saveSnapshot=False)
-
-        # you can set verbose to False to stop displaying plots interactively
-        # (and maybe just save the snapshots of the map)
-        # myMap.verbose = False
-
-        # sample commands to see how to draw the map
-        sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
-        # this will save a .png with the current map visualization,
-        # all robot positions, last one in green
-        # myMap.verbose = True
-        myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-
-        # this shows the current, and empty, map and an additionally closed connection
-        myMap.deleteConnection(0, 0, 0)
-        # myMap.verbose = True
-        myMap.drawMap(saveSnapshot=False)
-
-        # this will open a window with the results, but does not work well remotely
-        # myMap.verbose = True
-        sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-        myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-
-        myMap.closeAll()
+        # # 1. load map and compute costs and path
+        # myMap = Map2D(mapFile)
+        # myMap.fillCostMatrix(2, 2)
+        # # myMap.verbose = True
+        # myMap.drawMap(saveSnapshot=False)
+        #
+        # # you can set verbose to False to stop displaying plots interactively
+        # # (and maybe just save the snapshots of the map)
+        # # myMap.verbose = False
+        #
+        # # sample commands to see how to draw the map
+        # sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
+        # # this will save a .png with the current map visualization,
+        # # all robot positions, last one in green
+        # # myMap.verbose = True
+        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
+        #
+        # # this shows the current, and empty, map and an additionally closed connection
+        # myMap.deleteConnection(0, 0, 0)
+        # # myMap.verbose = True
+        # myMap.drawMap(saveSnapshot=False)
+        #
+        # # this will open a window with the results, but does not work well remotely
+        # # myMap.verbose = True
+        # sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
+        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
+        #
+        # myMap.closeAll()
 
         # 2. launch updateOdometry thread()
         robot.startOdometry()
+
+        d = GRID
+        robot.go(d, d)
+        robot.go(-d, d)
+        robot.go(d, -d)
+        robot.go(-d, -d)
 
         # 3. perform trajectory
         # robot.setSpeed(1,1) ...
