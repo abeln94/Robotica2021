@@ -351,4 +351,4 @@ class Robot:
         :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
-        return BP.get_sensor(BP.PORT_1) * 10
+        return self.BP.get_sensor(BP.PORT_1) * 10
