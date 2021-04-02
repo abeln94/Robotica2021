@@ -423,6 +423,13 @@ class Map2D:
 
         return pathFound
 
-    def replanPath(self):
-        """ TO-DO """
-        pass
+    def replanPath(self, current_x, current_y, x_end, y_end):
+        """ 
+        Replans the path if needed 
+        :param current_x: OX position of the current robot's position
+        :param current_y: OY position of the current robot's position
+        """
+        x_ini, y_ini = self._pos2cell(current_x, current_y)
+        # Just recalculates the plan invoking NF1 (assuming it calculates the cost matrix)
+        newPath = self.planPath(x_ini, y_ini, x_end, y_end)
+        return newPath
