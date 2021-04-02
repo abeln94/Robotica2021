@@ -338,3 +338,14 @@ class Robot:
 
             # move
             self.setSpeed(v, w)
+
+    def lookAt(self, x, y):
+        """ Looks at position x,y """
+        raise Exception("Not implemented yet")
+
+    def getObstacleDistance(self):
+        """
+        :return: the distance of the obstacle in front of the robot
+        """
+        # return distance
+        raise Exception("Not implemented yet")

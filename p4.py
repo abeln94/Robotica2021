@@ -70,6 +70,8 @@ if __name__ == "__main__":
         initial_position = myMap._pos2cell(x, y)
         path = myMap.planPath(*initial_position, *target_position)
         for position in path:
+            # check if there is an obstacle
+            # if there is, replan
             robot.go(*myMap._cell2pos(*position))
 
         #
