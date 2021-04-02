@@ -4,7 +4,6 @@ import matplotlib
 
 from classes import Cfg
 from classes.MapLib import Map2D
-from classes.Map import GRID
 from classes.Robot import Robot
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -18,8 +17,11 @@ Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1
 
 robot = None
 
+target_position = [5, 7]  # CHANGE ME
+
 if __name__ == "__main__":
     try:
+
         # check map file
         mapFile = Cfg.FOLDER_MAPS + Cfg.mapfile
         os.makedirs(os.path.dirname(mapFile), exist_ok=True)
@@ -32,9 +34,7 @@ if __name__ == "__main__":
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
-        myMap.fillCostMatrix(2, 2)
-        myMap.planPath(0,0,2,2)
-        print(myMap.currentPath)
+        myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
         myMap.drawMap(saveSnapshot=False)
 
@@ -43,32 +43,32 @@ if __name__ == "__main__":
         # myMap.verbose = False
 
         # sample commands to see how to draw the map
-        sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
+        # sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
         # this will save a .png with the current map visualization,
         # all robot positions, last one in green
         # myMap.verbose = True
-        myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
+        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
 
         # this shows the current, and empty, map and an additionally closed connection
-        myMap.deleteConnection(0, 0, 0)
+        # myMap.deleteConnection(0, 0, 0)
         # myMap.verbose = True
-        myMap.drawMap(saveSnapshot=False)
+        # myMap.drawMap(saveSnapshot=False)
 
         # this will open a window with the results, but does not work well remotely
         # myMap.verbose = True
-        sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-        myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-        myMap.closeAll()
+        # sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
+        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
+        # myMap.closeAll()
 
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
         # 3. perform trajectory
-        initial_position = myMap._pos2cell(robot.x, robot.y)
-        target_position = [5,7] # CHANGE ME
+        x, y, th = robot.readOdometry()
+        initial_position = myMap._pos2cell(x, y)
         path = myMap.planPath(*initial_position, *target_position)
         for position in path:
-            robot.go(position[0], position[1])
+            robot.go(*position)
 
         #
         # check if there are close obstacles
