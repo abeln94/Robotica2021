@@ -62,10 +62,13 @@ if __name__ == "__main__":
         robot.startOdometry()
 
         # 3. perform trajectory
-        # robot.setSpeed(1,1) ...
-        # while (notfinished){
+        initial_position = myMap._pos2cell(robot.x, robot.y)
+        target_position = [5,7] # CHANGE ME
+        path = myMap.planPath(*initial_position, *target_position)
+        for position in path:
+            robot.go(position[0], position[1])
 
-        # robot.go(pathX[i],pathY[i]);
+        #
         # check if there are close obstacles
         # deal with them...
         # Avoid_obstacle(...) OR RePlanPath(...)
