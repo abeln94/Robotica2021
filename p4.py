@@ -4,6 +4,7 @@ import matplotlib
 
 from classes import Cfg
 from classes.MapLib import Map2D
+from classes.Map import GRID
 from classes.Robot import Robot
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
