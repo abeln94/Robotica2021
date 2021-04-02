@@ -7,7 +7,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
+
 
 class Map2D:
     def __init__(self, map_description_file):
@@ -409,36 +409,31 @@ class Map2D:
 
     def planPath(self, x_ini, y_ini, x_end, y_end):
         """
-        x_ini, y_ini, x_end, y_end: integer values that indicate \
-            the x and y coordinates of the starting (ini) and ending (end) cell
+        x_ini, y_ini, x_end, y_end: integer values that indicate the x and y coordinates of the starting (ini) and ending (end) cell
         """
-        # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        # self.currentPath = np.array([[0, 0]] * num_steps)
+
+        currentPath = [[x_ini, y_ini]]
+        while [x_end, y_end] != currentPath[-1]:
+            # Search the next neighbour
+            best_neight = min([
+                self._neighbour(*currentPath[-1], dir)  # search all neighbors
+                for dir in range(8)  # in all directions
+                if self.isConnected(*currentPath[-1], dir)  # which are connected
+            ],
+                key=lambda x: self.costMatrix[x[0], x[1]],  # and get the minimum cost
+                default=None  # or none if not found
+            )
+
+            # add to path
+            if best_neight is not None:
+                currentPath.append(best_neight)
+            else:
+                # no path found
+                raise Exception("No path found")
 
         # Make sure self.currentPath is a 2D numpy array
-        self.currentPath = [[x_ini, y_ini]]
-        smallest = np.inf
-        best_neight = None
-        while [x_end, y_end] != self.currentPath[-1]:
-            # Search the next neighbour
-            for dir in range(8):
-                if self.isConnected(self.currentPath[-1][0],self.currentPath[-1][1],dir): # Candidato valido
-                    if self.costMatrix[self.currentPath[-1][0],self.currentPath[-1][1]] < smallest: 
-                        best_neight = self._neighbour(self.currentPath[-1][0], self.currentPath[-1][1], dir)
-                        smallest = self.costMatrix[best_neight[0], best_neight[1]]
-            
-            # 
-            if best_neight is not None:
-                self.currentPath.append(best_neight)
-                best_neight = None
-            else:
-                # Punto muerto
-                print("MAAAAAAAAAAAAAAAAAAAAAAAAAAAL")
-                break
-
-        pathFound = True
-
-        return pathFound
+        self.currentPath = np.array(currentPath)
+        return True
 
     def replanPath(self):
         """ TO-DO """
