@@ -72,7 +72,9 @@ if __name__ == "__main__":
         for position in path:
             # check if there is an obstacle
             # if there is, replan
-            robot.go(*myMap._cell2pos(*position))
+            destiny = myMap._cell2pos(*position)
+            robot.lookAt(*destiny)
+            robot.go(*destiny)
 
         #
         # check if there are close obstacles

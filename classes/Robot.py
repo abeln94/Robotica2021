@@ -342,9 +342,33 @@ class Robot:
             # move
             self.setSpeed(v, w)
 
-    def lookAt(self, x, y):
-        """ Looks at position x,y """
-        raise Exception("Not implemented yet")
+    def lookAt(self, x_goal, y_goal, arc=np.deg2rad(5)):
+        """
+        Rotates the robot so that it looks at some coordinates
+        :param x_goal: x coordinate of the looked point
+        :param y_goal: y coordinate of the looked point
+        :param arc: threshold of the destination rotation (rad)
+        """
+        periodic = Periodic()
+
+        while periodic():
+            x, y, th = self.readOdometry()
+
+            # calculate angle
+            dx = x_goal - x
+            dy = y_goal - y
+            dth = norm_pi(np.arctan2(dy, dx) - th)
+
+            if abs(dth) < arc:
+                # inside the arc, stop
+                self.setSpeed(0, 0)
+                return
+
+            # calculate velocity (all the constants were found by try&error)
+            w = sigmoid(dth, 3) * Cfg.ANG_VEL
+
+            # move
+            self.setSpeed(0, w)
 
     def getObstacleDistance(self):
         """
