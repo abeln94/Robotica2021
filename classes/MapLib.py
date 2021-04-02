@@ -178,6 +178,10 @@ class Map2D:
         y_cell = int(np.floor(y_mm / self.sizeCell))
         return [x_cell, y_cell]
 
+    def _cell2pos(self, x_pos, y_pos):
+        """ Convert from cell coordinates to robot coordinates (in mm) """
+        return [(x + 0.5) * self.sizeCell for x in [x_pos, y_pos]]
+
     # ############################################################
     # public methods
     # ############################################################
@@ -433,7 +437,7 @@ class Map2D:
 
         # Make sure self.currentPath is a 2D numpy array
         self.currentPath = np.array(currentPath)
-        return True
+        return self.currentPath
 
     def replanPath(self, current_x, current_y, x_end, y_end):
         """ 

@@ -17,8 +17,6 @@ Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1
 
 robot = None
 
-target_position = [5, 7]  # CHANGE ME
-
 if __name__ == "__main__":
     try:
 
@@ -34,6 +32,7 @@ if __name__ == "__main__":
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
+        target_position = [myMap.sizeX - 1, myMap.sizeY - 1]  # CHANGE ME
         myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
         myMap.drawMap(saveSnapshot=False)
@@ -68,7 +67,7 @@ if __name__ == "__main__":
         initial_position = myMap._pos2cell(x, y)
         path = myMap.planPath(*initial_position, *target_position)
         for position in path:
-            robot.go(*position)
+            robot.go(*myMap._cell2pos(*position))
 
         #
         # check if there are close obstacles
