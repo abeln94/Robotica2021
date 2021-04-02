@@ -1,8 +1,10 @@
 import os
 
 import matplotlib
+import numpy as np
 
 from classes import Cfg
+from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Robot import Robot
 
@@ -28,10 +30,11 @@ if __name__ == "__main__":
             exit(1)
 
         # Instantiate Odometry with your own files from P2/P3
-        robot = Robot()
+        robot = Robot([GRID / 2, GRID / 2, np.deg2rad(90)])
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
+        myMap.sizeCell = GRID  # hardcoded because it should not be in the file!!!!
         target_position = [2, 0]  # CHANGE ME
         myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
