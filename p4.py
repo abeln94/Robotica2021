@@ -35,7 +35,7 @@ if __name__ == "__main__":
         target_position = [myMap.sizeX - 1, myMap.sizeY - 1]  # CHANGE ME
         myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
-        myMap.drawMap(saveSnapshot=False)
+        # myMap.drawMap(saveSnapshot=False)
 
         # you can set verbose to False to stop displaying plots interactively
         # (and maybe just save the snapshots of the map)
