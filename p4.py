@@ -32,6 +32,8 @@ if __name__ == "__main__":
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
         myMap.fillCostMatrix(2, 2)
+        myMap.planPath(0,0,2,2)
+        print(myMap.currentPath)
         # myMap.verbose = True
         myMap.drawMap(saveSnapshot=False)
 
@@ -55,7 +57,6 @@ if __name__ == "__main__":
         # myMap.verbose = True
         sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
         myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-
         myMap.closeAll()
 
         # 2. launch updateOdometry thread()
