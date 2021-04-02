@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
         # 1. load map and compute costs and path
         myMap = Map2D(mapFile)
-        target_position = [myMap.sizeX - 1, myMap.sizeY - 1]  # CHANGE ME
+        target_position = [2, 0]  # CHANGE ME
         myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
         # myMap.drawMap(saveSnapshot=False)
