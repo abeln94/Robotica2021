@@ -75,10 +75,13 @@ class Robot:
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
-        # camera cositas
+        # camera conf
         self.cam = picamera.PiCamera()
         self.cam.resolution = (Cfg.CAMERA_WIDTH, Cfg.CAMERA_HEIGHT)
         self.cam.framerate = 32
+
+        # Sensor conf
+        self.BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
     def setSpeed(self, v, w):
         """ 
@@ -345,7 +348,7 @@ class Robot:
 
     def getObstacleDistance(self):
         """
-        :return: the distance of the obstacle in front of the robot
+        :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
-        raise Exception("Not implemented yet")
+        return BP.get_sensor(BP.PORT_1) * 10
