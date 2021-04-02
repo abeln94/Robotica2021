@@ -7,7 +7,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sys
 
 class Map2D:
     def __init__(self, map_description_file):
@@ -411,15 +411,32 @@ class Map2D:
         """
         x_ini, y_ini, x_end, y_end: integer values that indicate \
             the x and y coordinates of the starting (ini) and ending (end) cell
-
-        NOTE: Make sure self.currentPath is a 2D numpy array
-        ...  TO-DO  ....
         """
         # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        self.currentPath = np.array([[0, 0]] * num_steps)
-        pathFound = True
+        # self.currentPath = np.array([[0, 0]] * num_steps)
 
-        # ????
+        # Make sure self.currentPath is a 2D numpy array
+        self.currentPath = [[x_ini, y_ini]]
+        smallest = np.inf
+        best_neight = None
+        while [x_end, y_end] != self.currentPath[-1]:
+            # Search the next neighbour
+            for dir in range(8):
+                if self.isConnected(self.currentPath[-1][0],self.currentPath[-1][1],dir): # Candidato valido
+                    if self.costMatrix[self.currentPath[-1][0],self.currentPath[-1][1]] < smallest: 
+                        best_neight = self._neighbour(self.currentPath[-1][0], self.currentPath[-1][1], dir)
+                        smallest = self.costMatrix[best_neight[0], best_neight[1]]
+            
+            # 
+            if best_neight is not None:
+                self.currentPath.append(best_neight)
+                best_neight = None
+            else:
+                # Punto muerto
+                print("MAAAAAAAAAAAAAAAAAAAAAAAAAAAL")
+                break
+
+        pathFound = True
 
         return pathFound
 
