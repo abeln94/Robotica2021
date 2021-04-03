@@ -20,84 +20,114 @@ from classes.DeltaVal import SyncDeltaVal
 
 sg.theme('DarkAmber')  # Add a touch of color
 
-FRICTION = 1  # 0.975
-MIN_DISTANCE = 200  # 20 cm
-MAX_DISTANCE = 2000  # 2 m
+_FRICTION = 1  # 0.975
+
+_encoder = "_encoder"
+_dps = "_dps"
+_offset = "_offset"
 
 
 class BrickPi3:
-    class SENSOR_TYPE:
-        TOUCH = "Button"
-        NXT_ULTRASONIC = "Proximity sensor"
-
     PORT_1 = "PORT_1"
+    PORT_2 = "PORT_2"
+    PORT_3 = "PORT_3"
     PORT_A = "PORT_A"
     PORT_B = "PORT_B"
     PORT_C = "PORT_C"
 
+    class SENSOR_TYPE:
+        TOUCH = "Touch"
+        NXT_ULTRASONIC = "Ultrasonic"
+
+        _MOTOR = "Motor"
+
     def __init__(self):
         m = Manager()
-        self.encoders = m.dict()
-        self.offsets = m.dict()
-        self.dps = m.dict()
+        self.ports = m.dict()
+        self.data = m.dict()
         self.lastUpdate = SyncDeltaVal()
 
-        self.finished = Value('b', False, lock=self.lock_odometry)
-        self.p = Process(target=self.ui)
+        self.finished = Value('b', False)
+        self.p = Process(target=self._ui)
         self.p.start()
 
-    def ui(self):
-        layout = [
-            [sg.Text('Some text on Row 1', key='text')],
-            [sg.Text('Motor'), sg.Slider(range=(0, 500), default_value=222, size=(20, 15), orientation='horizontal', font=('Helvetica', 12), key='slider')]
-        ]
-
-        # Create the Window
-        window = sg.Window('Robot simulator', layout)
-
-        while not self.finished.value:
-            event, values = window.read(timeout=200)
-            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
-                break
-            self.encoders[self.PORT_C] = values['slider']
-            window['text'].update(self.getOrDefault(self.encoders, self.PORT_B))
-            window['slider'].update(self.getOrDefault(self.encoders, self.PORT_C))
-
-    def reset_all(self):
-        self.finished.value = True
-        self.lastUpdate.reset()
-        for d in [self.encoders, self.offsets, self.dps]:
-            for m in d.keys():
-                d[m] = 0
-
-    def getOrDefault(self, dict, port):
-        return dict[port] if port in dict else 0
+    ########## general ##########
 
     def set_sensor_type(self, port, type):
-        pass
-
-    def get_motor_encoder(self, port):
-        self.update()
-        return int(self.getOrDefault(self.encoders, port) - self.getOrDefault(self.offsets, port))
-
-    def get_abs_motor_encoder(self, port):
-        self.update()
-        return self.getOrDefault(self.encoders, port)
-
-    def offset_motor_encoder(self, port, value):
-        self.update()
-        self.offsets[port] = self.getOrDefault(self.offsets, port) + value
-
-    def set_motor_dps(self, port, value):
-        self.update()
-        self.dps[port] = value
+        self.ports[port] = type
+        # add to ui
 
     def update(self):
         dT = self.lastUpdate.update(time())
 
-        for motor in self.dps.keys():
-            self.encoders[motor] = self.getOrDefault(self.encoders, motor) + self.dps[motor] * random.uniform(FRICTION, 1) * dT
+        for port, type in self.ports.items():
+            if type == self.SENSOR_TYPE._MOTOR:
+                self.data[port + _encoder] += self.data[port + _dps] * random.uniform(_FRICTION, 1) * dT
 
-    def get_sensor(self, port):
-        # method is not static because the distance simulation should be edited to be more sophisticated
-        return random.randint(MIN_DISTANCE, MAX_DISTANCE)
+    def reset_all(self):
+        self.finished.value = True
+        self.lastUpdate.reset()
+        for key in self.data.keys():
+            self.data[key] = 0
+
+    ########## Motor ##########
+
+    def _assertMotor(self, port):
+        if port in self.ports:
+            assert self.ports[port] == self.SENSOR_TYPE._MOTOR
+        else:
+            self.ports[port] = self.SENSOR_TYPE._MOTOR
+            self.data[port + _encoder] = 0.0
+            self.data[port + _dps] = 0.0
+            self.data[port + _offset] = 0.0
+
+    def get_motor_encoder(self, port):
+        self.update()
+        self._assertMotor(port)
+        return int(self.data[port + _encoder] - self.data[port + _offset])
+
+    def offset_motor_encoder(self, port, value):
+        self.update()
+        self._assertMotor(port)
+        self.data[port + _offset] += value
+
+    def set_motor_dps(self, port, value):
+        self.update()
+        self._assertMotor(port)
+        self.data[port + _dps] = value
+
+    ########## UI ##########
+
+    def _ui(self):
+
+        createdPorts = []
+
+        # Create the Window
+        window = sg.Window('Robot simulator controller', [[]], size=(512, 512))
+
+        while not self.finished.value:
+            event, values = window.read(timeout=0)
+            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
+                break
+
+            for port, type in self.ports.items():
+
+                if port not in createdPorts:
+                    createdPorts.append(port)
+                    if type == self.SENSOR_TYPE._MOTOR:
+                        window.extend_layout(window, [[
+                            sg.Text(port + ": Motor:"),
+                            sg.RealtimeButton("-", key=port + "-"),
+                            sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
+                            sg.RealtimeButton("+", key=port + "+"),
+                        ]])
+
+                if type == self.SENSOR_TYPE._MOTOR:
+                    encoder = self.get_motor_encoder(port)
+                    window[port + "º"].update(str(encoder % 360) + "º")
+                    if event == port + "+":
+                        self.data[port + _encoder] += 1
+                    if event == port + "-":
+                        self.data[port + _encoder] -= 1
+
+            # window['slider'].update(self.getOrDefault(self.encoders, self.PORT_C))
