@@ -25,6 +25,7 @@ _FRICTION = 1  # 0.975
 _encoder = "_encoder"
 _dps = "_dps"
 _offset = "_offset"
+_value = "_value"
 
 
 class BrickPi3:
@@ -55,7 +56,7 @@ class BrickPi3:
 
     def set_sensor_type(self, port, type):
         self.ports[port] = type
-        # add to ui
+        self.data[port + _value] = 0
 
     def update(self):
         dT = self.lastUpdate.update(time())
@@ -69,6 +70,9 @@ class BrickPi3:
         self.lastUpdate.reset()
         for key in self.data.keys():
             self.data[key] = 0
+
+    def get_sensor(self, port):
+        return self.data[port + _value]
 
     ########## Motor ##########
 
@@ -121,6 +125,11 @@ class BrickPi3:
                             sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
                             sg.RealtimeButton("+", key=port + "+"),
                         ]])
+                    if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
+                        window.extend_layout(window, [[
+                            sg.Text(port + ": Ultrasonic:"),
+                            sg.Slider(range=(0, 255), default_value=125, orientation='horizontal', key=port),
+                        ]])
 
                 if type == self.SENSOR_TYPE._MOTOR:
                     encoder = self.get_motor_encoder(port)
@@ -130,4 +139,6 @@ class BrickPi3:
                     if event == port + "-":
                         self.data[port + _encoder] -= 1
 
-            # window['slider'].update(self.getOrDefault(self.encoders, self.PORT_C))
+                if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
+                    if port in values:
+                        self.data[port + _value] = values[port]
