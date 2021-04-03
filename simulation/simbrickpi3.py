@@ -10,11 +10,15 @@ except ModuleNotFoundError:
 
 """
 import random
-from enum import Enum
-from multiprocessing import Manager
+from multiprocessing import Manager, Value
+from multiprocessing.context import Process
 from time import time
 
+import PySimpleGUI as sg
+
 from classes.DeltaVal import SyncDeltaVal
+
+sg.theme('DarkAmber')  # Add a touch of color
 
 FRICTION = 1  # 0.975
 MIN_DISTANCE = 200  # 20 cm
@@ -22,9 +26,9 @@ MAX_DISTANCE = 2000  # 2 m
 
 
 class BrickPi3:
-    class SENSOR_TYPE(Enum):
-        TOUCH = 1
-        NXT_ULTRASONIC = 2
+    class SENSOR_TYPE:
+        TOUCH = "Button"
+        NXT_ULTRASONIC = "Proximity sensor"
 
     PORT_1 = "PORT_1"
     PORT_A = "PORT_A"
@@ -38,7 +42,29 @@ class BrickPi3:
         self.dps = m.dict()
         self.lastUpdate = SyncDeltaVal()
 
+        self.finished = Value('b', False, lock=self.lock_odometry)
+        self.p = Process(target=self.ui)
+        self.p.start()
+
+    def ui(self):
+        layout = [
+            [sg.Text('Some text on Row 1', key='text')],
+            [sg.Text('Motor'), sg.Slider(range=(0, 500), default_value=222, size=(20, 15), orientation='horizontal', font=('Helvetica', 12), key='slider')]
+        ]
+
+        # Create the Window
+        window = sg.Window('Robot simulator', layout)
+
+        while not self.finished.value:
+            event, values = window.read(timeout=200)
+            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
+                break
+            self.encoders[self.PORT_C] = values['slider']
+            window['text'].update(self.getOrDefault(self.encoders, self.PORT_B))
+            window['slider'].update(self.getOrDefault(self.encoders, self.PORT_C))
+
     def reset_all(self):
+        self.finished.value = True
         self.lastUpdate.reset()
         for d in [self.encoders, self.offsets, self.dps]:
             for m in d.keys():
