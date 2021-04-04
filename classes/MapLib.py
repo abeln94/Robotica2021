@@ -449,3 +449,13 @@ class Map2D:
         # Just recalculates the plan invoking NF1 (assuming it calculates the cost matrix)
         newPath = self.planPath(x_ini, y_ini, x_end, y_end)
         return newPath
+
+    def addObstacle(self, obs_x, obs_y):
+        """
+        Being obs_x and obs_y values in position coordinates, deletes all connections
+        of the correspondent cell with its neighbours
+        :param obs_x: X coordinate of the obstacle
+        :param obs_y: Y coordinate of the obstacle
+        """
+        x, y = self._pos2cell(obs_x, obs_y)
+        for i in range(1,8): self.deleteConnection(x,y,i)

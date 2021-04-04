@@ -81,7 +81,7 @@ class Robot:
         self.cam.framerate = 32
 
         # Sensor conf
-        self.BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
     def setSpeed(self, v, w):
         """ 
@@ -312,7 +312,7 @@ class Robot:
         self.BP.set_motor_dps(self.clawMotor, 0)
         self.setSpeed(0, 0)
 
-    def go(self, x_goal, y_goal, radius=5):
+    def go(self, x_goal, y_goal, radius=10):
         """
         Makes the robot move to a specific circle, based on the internal odometry
         :param x_goal: x coordinate of the circle's center
@@ -375,4 +375,18 @@ class Robot:
         :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
-        return self.BP.get_sensor(BP.PORT_1) * 10
+        return self.BP.get_sensor(self.BP.PORT_1) * 10
+
+    def detectObstacle(self, x_goal, y_goal):
+        """
+        Checks if it exists an obstacle in the trail from the current position to [x_goal,y_goal]
+        :param x_goal: current x axis position
+        :param y_goal: current y axis position
+        :return: a pair (boolean,position), being the boolean if it exists an obstacle an position
+                 the position where it is located
+        """
+        distance = self.getObstacleDistance()
+        if distance <= x_goal: # because the sensor is located right on the X axis
+            return True, [x_goal + distance, y_goal]
+        else:
+            return False, None

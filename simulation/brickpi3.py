@@ -17,11 +17,14 @@ from time import time
 from classes.DeltaVal import SyncDeltaVal
 
 FRICTION = 1  # 0.975
+MIN_DISTANCE = 200  # 20 cm
+MAX_DISTANCE = 2000  # 2 m
 
 
 class BrickPi3:
     class SENSOR_TYPE(Enum):
         TOUCH = 1
+        NXT_ULTRASONIC = 2
 
     PORT_1 = "PORT_1"
     PORT_A = "PORT_A"
@@ -68,3 +71,7 @@ class BrickPi3:
 
         for motor in self.dps.keys():
             self.encoders[motor] = self.getOrDefault(self.encoders, motor) + self.dps[motor] * random.uniform(FRICTION, 1) * dT
+
+    def get_sensor(self, port):
+        # method is not static because the distance simulation should be edited to be more sophisticated
+        return random.randint(MIN_DISTANCE, MAX_DISTANCE)
