@@ -21,14 +21,14 @@ from functions.simubot import simubot
 try:
     import brickpi3  # import the BrickPi3 drivers
 except:
-    import simulation.brickpi3 as brickpi3
+    import simulation.simbrickpi3 as brickpi3
 
 try:
     import picamera  # import the picamera
     from picamera.array import PiRGBArray
 except:
-    import simulation.picamera as picamera
-    from simulation.picamera import PiRGBArray
+    import simulation.simpicamera as picamera
+    from simulation.simpicamera import PiRGBArray
 
 Cfg.add_argument("-f", "--log", help="Log odometry into a file", default=False)
 Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=float, default=0.1)

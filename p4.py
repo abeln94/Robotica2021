@@ -37,7 +37,6 @@ if __name__ == "__main__":
         myMap = Map2D(mapFile)
         myMap.sizeCell = GRID  # hardcoded because it should not be in the file!!!!
         target_position = [2, 0]  # CHANGE ME
-        myMap.fillCostMatrix(*target_position)
         # myMap.verbose = True
         # myMap.drawMap(saveSnapshot=False)
 
