@@ -71,16 +71,13 @@ if __name__ == "__main__":
         path = myMap.planPath(*initial_position, *target_position)
         current_index = 0
         while current_index < len(path) - 1:
+            destiny = myMap._cell2pos(*(path[current_index + 1]))
 
             # check if there is an obstacle
-            destiny = myMap._cell2pos(*(path[current_index + 1]))
-            robot.lookAt(*destiny)
-
-            # if there is, replan
-            if robot.getObstacleDistance() < myMap.sizeCell:
-                # there is an obstacle
+            if robot.detectObstacle(*destiny):
+                # if there is, replan
                 th = norm_pi(robot.th.value)
-                vecino = ((-th + np.pi / 8) // (np.pi / 4) + 2) % 8  # TODO: extract function
+                vecino = myMap.getNeighbour(th)  # TODO: extract function
 
                 current_pos = path[current_index]
                 myMap.deleteConnection(*current_pos, (vecino - 1) % 8)

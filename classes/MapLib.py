@@ -418,6 +418,7 @@ class Map2D:
         """
         x_ini, y_ini, x_end, y_end: integer values that indicate the x and y coordinates of the starting (ini) and ending (end) cell
         """
+        USE_DIAGONALS = False  # if true use 8-neighbour, if false use 4-neighbour
 
         # first, calculate costs
         self.fillCostMatrix(x_end, y_end)
@@ -427,7 +428,7 @@ class Map2D:
             # Search the next neighbour
             best_neight = min([
                 self._neighbour(*currentPath[-1], dir)  # search all neighbors
-                for dir in range(0, 8, 2)  # only horizontal coordinates
+                for dir in range(0, 8, 1 if USE_DIAGONALS else 2)  # only horizontal coordinates
                 if self.isConnected(*currentPath[-1], dir)  # which are connected
             ],
                 key=lambda x: self.costMatrix[x[0], x[1]],  # and get the minimum cost
@@ -447,3 +448,15 @@ class Map2D:
         # Make sure self.currentPath is a 2D numpy array
         self.currentPath = np.array(currentPath)
         return self.currentPath
+
+    def replanPath(self, x_ini, y_ini, x_end, y_end):
+        """
+        See planPath
+        """
+        return self.planPath(x_ini, y_ini, x_end, y_end)
+
+    def getNeighbour(self, angle):
+        """
+        TODO
+        """
+        return ((-angle + np.pi / 8) // (np.pi / 4) + 2) % 8

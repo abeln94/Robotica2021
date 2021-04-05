@@ -376,3 +376,19 @@ class Robot:
         """
         # return distance
         return self.BP.get_sensor(self.BP.PORT_1) * 10
+
+    def detectObstacle(self, x_dest, y_dest):
+        """
+        Detect an obstacle between the current position and the destination (turns the robot)
+        :param x_dest:
+        :param y_dest:
+        :return: true iff there is an obstacle
+        """
+
+        # turn to look
+        self.lookAt(x_dest, y_dest)
+        x, y, _ = self.readOdometry()
+
+        # check if there is nothing in between
+        dist = np.linalg.norm([x_dest - x, y_dest - y])
+        return self.getObstacleDistance() < dist
