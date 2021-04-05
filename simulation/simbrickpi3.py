@@ -56,7 +56,7 @@ class BrickPi3:
 
     def set_sensor_type(self, port, type):
         self.ports[port] = type
-        self.data[port + _value] = 0
+        self.data[port + _value] = 255
 
     def update(self):
         dT = self.lastUpdate.update(time())
@@ -132,7 +132,7 @@ class BrickPi3:
                     if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
                         window.extend_layout(window, [[
                             sg.Text(port + ": Ultrasonic:"),
-                            sg.Slider(range=(0, 255), default_value=125, orientation='horizontal', key=port),
+                            sg.Slider(range=(0, 255), default_value=self.data[port + _value], orientation='horizontal', key=port),
                         ]])
 
                 if type == self.SENSOR_TYPE._MOTOR:

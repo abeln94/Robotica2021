@@ -400,7 +400,10 @@ class Map2D:
         :param x_end: horizontal cell coordinate of the cell with cost 0
         :param y_end: vertical cell coordinate of the cell with cost 0
         """
-        USE_DIAGONALS = True  # if true use 8-neighbour, if false use 4-neighbour
+        USE_DIAGONALS = False  # if true use 8-neighbour, if false use 4-neighbour
+
+        # first reset the cost matrix
+        self._initCostMatrix()
 
         wavefront = [((x_end, y_end), 0)]  # create the wavefront list points ((x,y),cost), and initialize with the end point
         while len(wavefront) != 0:  # evaluate each wavefront
@@ -415,6 +418,9 @@ class Map2D:
         """
         x_ini, y_ini, x_end, y_end: integer values that indicate the x and y coordinates of the starting (ini) and ending (end) cell
         """
+
+        # first, calculate costs
+        self.fillCostMatrix(x_end, y_end)
 
         currentPath = [[x_ini, y_ini]]
         while [x_end, y_end] != currentPath[-1]:
@@ -434,6 +440,9 @@ class Map2D:
             else:
                 # no path found
                 raise Exception("No path found")
+
+            if len(currentPath) > 1000:
+                raise Exception("Infinite loop")
 
         # Make sure self.currentPath is a 2D numpy array
         self.currentPath = np.array(currentPath)
