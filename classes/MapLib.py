@@ -421,7 +421,7 @@ class Map2D:
             # Search the next neighbour
             best_neight = min([
                 self._neighbour(*currentPath[-1], dir)  # search all neighbors
-                for dir in range(8)  # in all directions
+                for dir in range(0, 8, 2)  # only horizontal coordinates
                 if self.isConnected(*currentPath[-1], dir)  # which are connected
             ],
                 key=lambda x: self.costMatrix[x[0], x[1]],  # and get the minimum cost
@@ -438,24 +438,3 @@ class Map2D:
         # Make sure self.currentPath is a 2D numpy array
         self.currentPath = np.array(currentPath)
         return self.currentPath
-
-    def replanPath(self, current_x, current_y, x_end, y_end):
-        """ 
-        Replans the path if needed 
-        :param current_x: OX position of the current robot's position
-        :param current_y: OY position of the current robot's position
-        """
-        x_ini, y_ini = self._pos2cell(current_x, current_y)
-        # Just recalculates the plan invoking NF1 (assuming it calculates the cost matrix)
-        newPath = self.planPath(x_ini, y_ini, x_end, y_end)
-        return newPath
-
-    def addObstacle(self, obs_x, obs_y):
-        """
-        Being obs_x and obs_y values in position coordinates, deletes all connections
-        of the correspondent cell with its neighbours
-        :param obs_x: X coordinate of the obstacle
-        :param obs_y: Y coordinate of the obstacle
-        """
-        x, y = self._pos2cell(obs_x, obs_y)
-        for i in range(1,8): self.deleteConnection(x,y,i)

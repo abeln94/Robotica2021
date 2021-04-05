@@ -345,8 +345,8 @@ class Robot:
     def lookAt(self, x_goal, y_goal, arc=np.deg2rad(5)):
         """
         Rotates the robot so that it looks at some coordinates
-        :param x_goal: x coordinate of the looked point
-        :param y_goal: y coordinate of the looked point
+        :param x_goal: x coordinate of the looked point (in world coordinates)
+        :param y_goal: y coordinate of the looked point (in world coordinates)
         :param arc: threshold of the destination rotation (rad)
         """
         periodic = Periodic()
@@ -376,17 +376,3 @@ class Robot:
         """
         # return distance
         return self.BP.get_sensor(self.BP.PORT_1) * 10
-
-    def detectObstacle(self, x_goal, y_goal):
-        """
-        Checks if it exists an obstacle in the trail from the current position to [x_goal,y_goal]
-        :param x_goal: current x axis position
-        :param y_goal: current y axis position
-        :return: a pair (boolean,position), being the boolean if it exists an obstacle an position
-                 the position where it is located
-        """
-        distance = self.getObstacleDistance()
-        if distance <= x_goal: # because the sensor is located right on the X axis
-            return True, [x_goal + distance, y_goal]
-        else:
-            return False, None

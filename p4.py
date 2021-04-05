@@ -7,6 +7,7 @@ from classes import Cfg
 from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Robot import Robot
+from functions.functions import norm_pi
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -69,17 +70,30 @@ if __name__ == "__main__":
         x, y, th = robot.readOdometry()
         initial_position = myMap._pos2cell(x, y)
         path = myMap.planPath(*initial_position, *target_position)
-        for position in path:
+        current_index = 0
+        while current_index < len(path) - 1:
+
             # check if there is an obstacle
-            # if there is, replan
-            destiny = myMap._cell2pos(*position)
+            destiny = myMap._cell2pos(*(path[current_index + 1]))
             robot.lookAt(*destiny)
-            obstacleDetected, obstaclePosition = robot.detectObstacle(*position)
-            if not obstacleDetected:
-                robot.go(*destiny)
+
+            # if there is, replan
+            if robot.getObstacleDistance() < myMap.sizeCell:
+                # there is an obstacle
+                th = norm_pi(robot.th)
+                vecino = ((th + np.pi / 8) // (np.pi / 4) + 2) % 8  # TODO: extract function
+
+                current_pos = path[current_index]
+                myMap.deleteConnection(*current_pos, (vecino - 1) % 8)
+                myMap.deleteConnection(*current_pos, vecino)
+                myMap.deleteConnection(*current_pos, (vecino + 1) % 8)
+
+                path = myMap.planPath(*current_pos, *target_position)
+                current_index = 0
             else:
-                myMap.addObstacle(*obstaclePosition)
-                myMap.replanPath(robot.x, robot.y, *target_position)
+                # no obstacle, go
+                robot.go(*destiny)
+                current_index += 1
 
         #
         # check if there are close obstacles
