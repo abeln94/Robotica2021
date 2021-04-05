@@ -121,8 +121,12 @@ class BrickPi3:
                     if type == self.SENSOR_TYPE._MOTOR:
                         window.extend_layout(window, [[
                             sg.Text(port + ": Motor:"),
-                            sg.RealtimeButton("-", key=port + "-"),
+                            sg.RealtimeButton("<", key=port + "<"),
                             sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
+                            sg.RealtimeButton(">", key=port + ">"),
+                            sg.VerticalSeparator(),
+                            sg.RealtimeButton("-", key=port + "-"),
+                            sg.Text(key=port + "dps", auto_size_text=False, size=(5, 1)),
                             sg.RealtimeButton("+", key=port + "+"),
                         ]])
                     if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
@@ -132,12 +136,16 @@ class BrickPi3:
                         ]])
 
                 if type == self.SENSOR_TYPE._MOTOR:
-                    encoder = self.get_motor_encoder(port)
-                    window[port + "º"].update(str(encoder % 360) + "º")
-                    if event == port + "+":
+                    window[port + "º"].update(str(self.get_motor_encoder(port) % 360) + "º")
+                    window[port + "dps"].update(str(self.data[port + _dps]) + " dps")
+                    if event == port + "<":
                         self.data[port + _encoder] += 1
-                    if event == port + "-":
+                    if event == port + ">":
                         self.data[port + _encoder] -= 1
+                    if event == port + "-":
+                        self.data[port + _dps] += 1
+                    if event == port + "+":
+                        self.data[port + _dps] -= 1
 
                 if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
                     if port in values:
