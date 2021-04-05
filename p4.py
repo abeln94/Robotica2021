@@ -80,7 +80,7 @@ if __name__ == "__main__":
             # if there is, replan
             if robot.getObstacleDistance() < myMap.sizeCell:
                 # there is an obstacle
-                th = norm_pi(robot.th)
+                th = norm_pi(robot.th.value)
                 vecino = ((th + np.pi / 8) // (np.pi / 4) + 2) % 8  # TODO: extract function
 
                 current_pos = path[current_index]
