@@ -80,7 +80,7 @@ if __name__ == "__main__":
             if robot.getObstacleDistance() < myMap.sizeCell:
                 # there is an obstacle
                 th = norm_pi(robot.th.value)
-                vecino = ((th + np.pi / 8) // (np.pi / 4) + 2) % 8  # TODO: extract function
+                vecino = ((-th + np.pi / 8) // (np.pi / 4) + 2) % 8  # TODO: extract function
 
                 current_pos = path[current_index]
                 myMap.deleteConnection(*current_pos, (vecino - 1) % 8)
