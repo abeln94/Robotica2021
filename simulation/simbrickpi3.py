@@ -15,6 +15,7 @@ from multiprocessing.context import Process
 from time import time
 
 import PySimpleGUI as sg
+import numpy as np
 
 from classes.DeltaVal import SyncDeltaVal
 
@@ -22,60 +23,65 @@ sg.theme('DarkAmber')  # Add a touch of color
 
 _FRICTION = 1  # 0.975
 
-_encoder = "_encoder"
-_dps = "_dps"
-_offset = "_offset"
-_value = "_value"
-
 
 class _Motor:
-    @staticmethod
-    def init(port, data):
-        data[port + _encoder] = 0.0
-        data[port + _dps] = 0.0
-        data[port + _offset] = 0.0
+    _encoder = "_encoder"
+    _dps = "_dps"
+    _offset = "_offset"
+    _RAD = 10
 
     @staticmethod
-    def get_encoder(port, data):
-        return int(data[port + _encoder] - data[port + _offset])
+    def init(port, data):
+        data[port + _Motor._encoder] = 0.0
+        data[port + _Motor._dps] = 0.0
+        data[port + _Motor._offset] = 0.0
+
+    @staticmethod
+    def read(port, data):
+        return int(data[port + _Motor._encoder] - data[port + _Motor._offset])
 
     @staticmethod
     def offset_encoder(port, data, value):
-        data[port + _offset] += value
+        data[port + _Motor._offset] += value
 
     @staticmethod
     def set_dps(port, data, value):
-        data[port + _dps] = value
+        data[port + _Motor._dps] = value
 
     @staticmethod
     def update(port, data, dT):
-        data[port + _encoder] += data[port + _dps] * random.uniform(_FRICTION, 1) * dT
+        data[port + _Motor._encoder] += data[port + _Motor._dps] * random.uniform(_FRICTION, 1) * dT
 
     @staticmethod
     def initUI(port, data):
         return [[
             sg.Text(port + ": Motor:"),
             sg.RealtimeButton("<", key=port + "<"),
-            sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
+            sg.Graph(canvas_size=(_Motor._RAD * 2, _Motor._RAD * 2), graph_bottom_left=(0, 0), graph_top_right=(_Motor._RAD * 2, _Motor._RAD * 2), key=port + "º"),
             sg.RealtimeButton(">", key=port + ">"),
             sg.VerticalSeparator(),
             sg.RealtimeButton("-", key=port + "-"),
-            sg.Text(key=port + "dps", auto_size_text=False, size=(5, 1)),
+            sg.Text(key=port + "dps", auto_size_text=False, size=(8, 1)),
             sg.RealtimeButton("+", key=port + "+"),
         ]]
 
     @staticmethod
     def updateUI(event, values, window, port, data):
-        window[port + "º"].update(str(int(data[port + _encoder] - data[port + _offset]) % 360) + "º")
-        window[port + "dps"].update(str(data[port + _dps]) + " dps")
+
+        graph = window[port + 'º']
+        circle = graph.DrawCircle((_Motor._RAD, _Motor._RAD), _Motor._RAD, fill_color='white')
+        angle = np.deg2rad(_Motor.read(port, data))
+        line = graph.DrawLine((_Motor._RAD, _Motor._RAD), (_Motor._RAD + _Motor._RAD * np.cos(angle), _Motor._RAD + _Motor._RAD * np.sin(angle)), color='red')
+
+        window[port + "dps"].update("{:.2f} dps".format(data[port + _Motor._dps]))
         if event == port + "<":
-            data[port + _encoder] += 1
+            data[port + _Motor._encoder] += 1
         if event == port + ">":
-            data[port + _encoder] -= 1
+            data[port + _Motor._encoder] -= 1
         if event == port + "-":
-            data[port + _dps] += 1
+            data[port + _Motor._dps] += 1
         if event == port + "+":
-            data[port + _dps] -= 1
+            data[port + _Motor._dps] -= 1
 
 
 class _Touch:
@@ -86,6 +92,10 @@ class _Touch:
     @staticmethod
     def update(port, data, dT):
         pass
+
+    @staticmethod
+    def read(port, data):
+        return data[port]
 
     @staticmethod
     def initUI(port, data):
@@ -102,23 +112,27 @@ class _Touch:
 class _Ultrasonic:
     @staticmethod
     def init(port, data):
-        data[port + _value] = 255
+        data[port] = 255
 
     @staticmethod
     def update(port, data, dT):
         pass
 
     @staticmethod
+    def read(port, data):
+        return data[port]
+
+    @staticmethod
     def initUI(port, data):
         return [[
             sg.Text(port + ": Ultrasonic:"),
-            sg.Slider(range=(0, 255), default_value=data[port + _value], orientation='horizontal', key=port),
+            sg.Slider(range=(0, 255), default_value=data[port], orientation='horizontal', key=port),
         ]]
 
     @staticmethod
     def updateUI(event, values, window, port, data):
         if port in values:
-            data[port + _value] = values[port]
+            data[port] = values[port]
 
 
 class BrickPi3:
@@ -152,7 +166,7 @@ class BrickPi3:
         type.init(port, self.data)
 
     def get_sensor(self, port):
-        return self.data[port + _value]
+        return self.ports[port].read(port, self.data)
 
     def reset_all(self):
         # this is more of a 'close_all' than a 'reset_all'
@@ -175,7 +189,7 @@ class BrickPi3:
     def get_motor_encoder(self, port):
         self._update()
         self._assertMotor(port)
-        return _Motor.get_encoder(port, self.data)
+        return _Motor.read(port, self.data)
 
     def offset_motor_encoder(self, port, value):
         self._update()
@@ -194,7 +208,7 @@ class BrickPi3:
         createdPorts = []  # already initialized ports
 
         # Create the Window
-        window = sg.Window('Robot simulator controller', [[]], size=(512, 512))
+        window = sg.Window('Robot simulator controller', [[]], size=(512, 200))
 
         while not self.finished.value:
             event, values = window.read(timeout=0)  # ui magic
