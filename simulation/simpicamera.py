@@ -12,6 +12,7 @@ except:
 
 """
 import cv2
+import numpy as np
 
 
 class PiRGBArray:
@@ -26,12 +27,20 @@ class PiCamera:
         self.framerate = None
         self.videoCapture = cv2.VideoCapture(0)
 
-        # wait until the camera returns something
-        print("INITIALIZING CAMERA...")
-        self._read_retry()
-        print("...CAMERA INITIALIZED")
+        if self.videoCapture.isOpened():
+            # wait until the camera returns something
+            print("INITIALIZING CAMERA...")
+            self._read_retry()
+            print("...CAMERA INITIALIZED")
+        else:
+            print("No camera connected, using the no-cam mode")
 
     def _read_retry(self):
+        if not self.videoCapture.isOpened():
+            # no-camera mode, a single black pixel
+            return np.zeros((1, 1, 3), np.uint8)
+
+        # retry until a frame is read
         ok = False
         img = None
         while not ok:
