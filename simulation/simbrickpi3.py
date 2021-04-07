@@ -28,6 +28,99 @@ _offset = "_offset"
 _value = "_value"
 
 
+class _Motor:
+    @staticmethod
+    def init(port, data):
+        data[port + _encoder] = 0.0
+        data[port + _dps] = 0.0
+        data[port + _offset] = 0.0
+
+    @staticmethod
+    def get_encoder(port, data):
+        return int(data[port + _encoder] - data[port + _offset])
+
+    @staticmethod
+    def offset_encoder(port, data, value):
+        data[port + _offset] += value
+
+    @staticmethod
+    def set_dps(port, data, value):
+        data[port + _dps] = value
+
+    @staticmethod
+    def update(port, data, dT):
+        data[port + _encoder] += data[port + _dps] * random.uniform(_FRICTION, 1) * dT
+
+    @staticmethod
+    def initUI(port, data):
+        return [[
+            sg.Text(port + ": Motor:"),
+            sg.RealtimeButton("<", key=port + "<"),
+            sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
+            sg.RealtimeButton(">", key=port + ">"),
+            sg.VerticalSeparator(),
+            sg.RealtimeButton("-", key=port + "-"),
+            sg.Text(key=port + "dps", auto_size_text=False, size=(5, 1)),
+            sg.RealtimeButton("+", key=port + "+"),
+        ]]
+
+    @staticmethod
+    def updateUI(event, values, window, port, data):
+        window[port + "º"].update(str(int(data[port + _encoder] - data[port + _offset]) % 360) + "º")
+        window[port + "dps"].update(str(data[port + _dps]) + " dps")
+        if event == port + "<":
+            data[port + _encoder] += 1
+        if event == port + ">":
+            data[port + _encoder] -= 1
+        if event == port + "-":
+            data[port + _dps] += 1
+        if event == port + "+":
+            data[port + _dps] -= 1
+
+
+class _Touch:
+    @staticmethod
+    def init(port, data):
+        data[port] = 0
+
+    @staticmethod
+    def update(port, data, dT):
+        pass
+
+    @staticmethod
+    def initUI(port, data):
+        return [[
+            sg.Text(port + ": Touch: "),
+            sg.RealtimeButton("(+)", key=port),
+        ]]
+
+    @staticmethod
+    def updateUI(event, values, window, port, data):
+        data[port] = event == port
+
+
+class _Ultrasonic:
+    @staticmethod
+    def init(port, data):
+        data[port + _value] = 255
+
+    @staticmethod
+    def update(port, data, dT):
+        pass
+
+    @staticmethod
+    def initUI(port, data):
+        return [[
+            sg.Text(port + ": Ultrasonic:"),
+            sg.Slider(range=(0, 255), default_value=data[port + _value], orientation='horizontal', key=port),
+        ]]
+
+    @staticmethod
+    def updateUI(event, values, window, port, data):
+        if port in values:
+            data[port + _value] = values[port]
+
+
 class BrickPi3:
     PORT_1 = "PORT_1"
     PORT_2 = "PORT_2"
@@ -37,15 +130,15 @@ class BrickPi3:
     PORT_C = "PORT_C"
 
     class SENSOR_TYPE:
-        TOUCH = "Touch"
-        NXT_ULTRASONIC = "Ultrasonic"
+        TOUCH = _Touch
+        NXT_ULTRASONIC = _Ultrasonic
 
-        _MOTOR = "Motor"
+        _MOTOR = _Motor  # by default
 
     def __init__(self):
         m = Manager()
-        self.ports = m.dict()
-        self.data = m.dict()
+        self.ports = m.dict()  # used ports
+        self.data = m.dict()  # all the data (in a synced dict)
         self.lastUpdate = SyncDeltaVal()
 
         self.finished = Value('b', False)
@@ -56,97 +149,67 @@ class BrickPi3:
 
     def set_sensor_type(self, port, type):
         self.ports[port] = type
-        self.data[port + _value] = 255
-
-    def update(self):
-        dT = self.lastUpdate.update(time())
-
-        for port, type in self.ports.items():
-            if type == self.SENSOR_TYPE._MOTOR:
-                self.data[port + _encoder] += self.data[port + _dps] * random.uniform(_FRICTION, 1) * dT
-
-    def reset_all(self):
-        self.finished.value = True
-        self.lastUpdate.reset()
-        for key in self.data.keys():
-            self.data[key] = 0
+        type.init(port, self.data)
 
     def get_sensor(self, port):
         return self.data[port + _value]
 
+    def reset_all(self):
+        # this is more of a 'close_all' than a 'reset_all'
+        self.finished.value = True
+
+    def _update(self):
+        dT = self.lastUpdate.update(time())
+
+        for port, type in self.ports.items():
+            type.update(port, self.data, dT)
+
     ########## Motor ##########
 
     def _assertMotor(self, port):
-        if port in self.ports:
-            assert self.ports[port] == self.SENSOR_TYPE._MOTOR
-        else:
-            self.ports[port] = self.SENSOR_TYPE._MOTOR
-            self.data[port + _encoder] = 0.0
-            self.data[port + _dps] = 0.0
-            self.data[port + _offset] = 0.0
+        if port not in self.ports:
+            # not yet, init
+            self.set_sensor_type(port, _Motor)
+        assert self.ports[port] == _Motor
 
     def get_motor_encoder(self, port):
-        self.update()
+        self._update()
         self._assertMotor(port)
-        return int(self.data[port + _encoder] - self.data[port + _offset])
+        return _Motor.get_encoder(port, self.data)
 
     def offset_motor_encoder(self, port, value):
-        self.update()
+        self._update()
         self._assertMotor(port)
-        self.data[port + _offset] += value
+        _Motor.offset_encoder(port, self.data, value)
 
     def set_motor_dps(self, port, value):
-        self.update()
+        self._update()
         self._assertMotor(port)
-        self.data[port + _dps] = value
+        _Motor.set_dps(port, self.data, value)
 
     ########## UI ##########
 
     def _ui(self):
 
-        createdPorts = []
+        createdPorts = []  # already initialized ports
 
         # Create the Window
         window = sg.Window('Robot simulator controller', [[]], size=(512, 512))
 
         while not self.finished.value:
-            event, values = window.read(timeout=0)
-            if event == sg.WIN_CLOSED:  # if user closes window or clicks cancel
+            event, values = window.read(timeout=0)  # ui magic
+
+            if event == sg.WIN_CLOSED:
+                # if user closes window or clicks cancel, exit
                 break
 
-            for port, type in self.ports.items():
+            # check each port
+            for port, type in sorted(self.ports.items()):
 
                 if port not in createdPorts:
+                    # new one, create first
                     createdPorts.append(port)
-                    if type == self.SENSOR_TYPE._MOTOR:
-                        window.extend_layout(window, [[
-                            sg.Text(port + ": Motor:"),
-                            sg.RealtimeButton("<", key=port + "<"),
-                            sg.Text(key=port + "º", auto_size_text=False, size=(3, 1)),
-                            sg.RealtimeButton(">", key=port + ">"),
-                            sg.VerticalSeparator(),
-                            sg.RealtimeButton("-", key=port + "-"),
-                            sg.Text(key=port + "dps", auto_size_text=False, size=(5, 1)),
-                            sg.RealtimeButton("+", key=port + "+"),
-                        ]])
-                    if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
-                        window.extend_layout(window, [[
-                            sg.Text(port + ": Ultrasonic:"),
-                            sg.Slider(range=(0, 255), default_value=self.data[port + _value], orientation='horizontal', key=port),
-                        ]])
+                    window.extend_layout(window, type.initUI(port, self.data))
 
-                if type == self.SENSOR_TYPE._MOTOR:
-                    window[port + "º"].update(str(self.get_motor_encoder(port) % 360) + "º")
-                    window[port + "dps"].update(str(self.data[port + _dps]) + " dps")
-                    if event == port + "<":
-                        self.data[port + _encoder] += 1
-                    if event == port + ">":
-                        self.data[port + _encoder] -= 1
-                    if event == port + "-":
-                        self.data[port + _dps] += 1
-                    if event == port + "+":
-                        self.data[port + _dps] -= 1
-
-                if type == self.SENSOR_TYPE.NXT_ULTRASONIC:
-                    if port in values:
-                        self.data[port + _value] = values[port]
+                # update
+                type.updateUI(event, values, window, port, self.data)
