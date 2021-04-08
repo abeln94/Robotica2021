@@ -73,6 +73,8 @@ class Robot:
         self.x = Value('d', init_position[0], lock=self.lock_odometry)
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
+        self.wd = Value('d', 0.0, lock=self.lock_odometry)
+        self.wi = Value('d', 0.0, lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
         # camera conf
@@ -94,6 +96,12 @@ class Robot:
         # compute the speed that should be set in each motor ...
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
+
+        wd = wd * 0.3 + self.wd.value * 0.7
+        wi = wi * 0.3 + self.wi.value * 0.7
+
+        self.wd.value = wd
+        self.wi.value = wi
 
         self.BP.set_motor_dps(self.BP.PORT_B, np.rad2deg(wi))
         self.BP.set_motor_dps(self.BP.PORT_C, np.rad2deg(wd))

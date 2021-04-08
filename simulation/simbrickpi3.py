@@ -147,8 +147,6 @@ class BrickPi3:
         TOUCH = _Touch
         NXT_ULTRASONIC = _Ultrasonic
 
-        _MOTOR = _Motor  # by default
-
     def __init__(self):
         m = Manager()
         self.ports = m.dict()  # used ports
