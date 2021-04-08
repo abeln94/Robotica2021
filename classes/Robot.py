@@ -372,6 +372,7 @@ class Robot:
 
     def getObstacleDistance(self):
         """
+        Uses the ultrasound sensor to get the distance to the next obstacle in front of the robot
         :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
