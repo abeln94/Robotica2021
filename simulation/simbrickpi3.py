@@ -171,6 +171,7 @@ class BrickPi3:
     def reset_all(self):
         # this is more of a 'close_all' than a 'reset_all'
         self.finished.value = True
+        self.p.join()
 
     def _update(self):
         dT = self.lastUpdate.update(time())

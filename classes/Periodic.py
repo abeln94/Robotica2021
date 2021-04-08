@@ -21,6 +21,13 @@ class Periodic:
         self.delay = delay
         self.delta = None
 
+    @property
+    def time(self):
+        """
+        :return: the current time
+        """
+        return self.delta.val if self.delta is not None else 0
+
     def __call__(self, condition=True):
         """
         Note 1: On first call no delay is performed (initialization)

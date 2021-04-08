@@ -157,9 +157,8 @@ class Robot:
             logFile.write("Timestamp, X, Y, Theta\n")
 
         # loop
-        while not self.finished.value:
-            # current processor time in a floating point value, in seconds
-            tIni = time.clock()
+        periodic = Periodic(Cfg.updatePeriod)
+        while periodic(not self.finished.value):
 
             # get values
             dL = leftEncoder.update(self.BP.get_motor_encoder(self.leftMotor))
@@ -201,14 +200,9 @@ class Robot:
 
             # save LOG
             if Cfg.log:
-                logFile.write("{}, {}, {}, {}\n".format(tIni, x, y, th))
+                logFile.write("{}, {}, {}, {}\n".format(periodic.time, x, y, th))
 
             ######## UPDATE UNTIL HERE with your code ########
-
-            # wait for next update
-            tEnd = time.clock()
-            secs = Cfg.updatePeriod - (tEnd - tIni)
-            if secs > 0: time.sleep(secs)
 
         print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
         if Cfg.log:
@@ -217,6 +211,7 @@ class Robot:
     def stopOdometry(self):
         """ Stop the odometry thread """
         self.finished.value = True
+        self.p.join()
         self.BP.reset_all()
         self.cam.close()
         cv2.destroyAllWindows()
