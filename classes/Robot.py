@@ -336,6 +336,7 @@ class Robot:
             if dist < radius:
                 # inside the circle, stop
                 self.setSpeed(0, 0)
+                time.sleep(0.5)
                 return
 
             # calculate velocity (all the constants were found by try&error)
@@ -365,6 +366,7 @@ class Robot:
             if abs(dth) < arc:
                 # inside the arc, stop
                 self.setSpeed(0, 0)
+                time.sleep(0.5)
                 return
 
             # calculate velocity (all the constants were found by try&error)
