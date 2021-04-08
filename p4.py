@@ -1,7 +1,6 @@
 import os
 
 import matplotlib
-import numpy as np
 
 from classes import Cfg
 from classes.Map import GRID
@@ -11,12 +10,10 @@ from functions.functions import norm_pi
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
+# args
 Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1.txt")
-
-# NOTES ABOUT TASKS to DO in P4:
-# 1)findPath(x1,y1, x2,y2),   fillCostMatrix(), replanPath () --> should be methods from the new Map2D class
-# 2) go(x,y) and detectObstacle() could be part of your Robot class (depending how you have implemented things)
-# 3) you can change these method signatures if you need, depending how you have implemented things
+Cfg.add_argument("-start", "--startCell", help="Cell where the robot starts", default=(0, 0), nargs=2, type=int)
+Cfg.add_argument("-end", "--endCell", help="Cell where the robot ends", default=(-1, -1), nargs=2, type=int)
 
 robot = None
 
@@ -30,71 +27,41 @@ if __name__ == "__main__":
             print('Map file %s does not exist' % Cfg.mapfile)
             exit(1)
 
-        # Instantiate Odometry with your own files from P2/P3
-        robot = Robot([GRID / 2, GRID / 2, np.deg2rad(90)])
-
-        # 1. load map and compute costs and path
+        # 1. load map
         myMap = Map2D(mapFile)
         myMap.sizeCell = GRID  # hardcoded because it should not be in the file!!!!
-        target_position = [2, 0]  # CHANGE ME
-        # myMap.verbose = True
-        # myMap.drawMap(saveSnapshot=False)
+        initial_position = [Cfg.startCell[0] % myMap.sizeX, Cfg.startCell[1] % myMap.sizeY]
+        target_position = [Cfg.endCell[0] % myMap.sizeX, Cfg.endCell[1] % myMap.sizeY]
 
-        # you can set verbose to False to stop displaying plots interactively
-        # (and maybe just save the snapshots of the map)
-        # myMap.verbose = False
-
-        # sample commands to see how to draw the map
-        # sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
-        # this will save a .png with the current map visualization,
-        # all robot positions, last one in green
-        # myMap.verbose = True
-        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-
-        # this shows the current, and empty, map and an additionally closed connection
-        # myMap.deleteConnection(0, 0, 0)
-        # myMap.verbose = True
-        # myMap.drawMap(saveSnapshot=False)
-
-        # this will open a window with the results, but does not work well remotely
-        # myMap.verbose = True
-        # sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-        # myMap.drawMapWithRobotLocations(sampleRobotLocations, saveSnapshot=False)
-        # myMap.closeAll()
-
-        # 2. launch updateOdometry thread()
+        # 2. init Robot and launch updateOdometry thread()
+        robot = Robot([*myMap._cell2pos(*initial_position), 0])
         robot.startOdometry()
 
         # 3. perform trajectory
-        x, y, th = robot.readOdometry()
-        initial_position = myMap._pos2cell(x, y)
+        # get path
         path = myMap.planPath(*initial_position, *target_position)
         current_index = 0
         while current_index < len(path) - 1:
-            destiny = myMap._cell2pos(*(path[current_index + 1]))
+            # while not at the last cell, go to the next
+            next_pos = myMap._cell2pos(*(path[current_index + 1]))
 
-            # check if there is an obstacle
-            if robot.detectObstacle(*destiny):
-                # if there is, replan
-                th = norm_pi(robot.th.value)
-                vecino = myMap.getNeighbour(th)  # TODO: extract function
+            if robot.detectObstacle(*next_pos):
+                # there is an obstacle, can't go there directly
 
-                current_pos = path[current_index]
-                myMap.deleteConnection(*current_pos, (vecino - 1) % 8)
-                myMap.deleteConnection(*current_pos, vecino)
-                myMap.deleteConnection(*current_pos, (vecino + 1) % 8)
+                # delete the 3 front connections (a wall extends to the corners too)
+                current_cell = path[current_index]
+                neighbour = myMap.getNeighbour(norm_pi(robot.th.value))
+                myMap.deleteConnection(*current_cell, (neighbour - 1) % 8)
+                myMap.deleteConnection(*current_cell, neighbour)
+                myMap.deleteConnection(*current_cell, (neighbour + 1) % 8)
 
-                path = myMap.planPath(*current_pos, *target_position)
+                # get the new path
+                path = myMap.planPath(*current_cell, *target_position)
                 current_index = 0
             else:
                 # no obstacle, go
-                robot.go(*destiny)
+                robot.go(*next_pos)
                 current_index += 1
-
-        #
-        # check if there are close obstacles
-        # deal with them...
-        # Avoid_obstacle(...) OR RePlanPath(...)
 
     finally:
         # wrap up and close stuff before exiting

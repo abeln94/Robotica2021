@@ -21,14 +21,14 @@ from classes.DeltaVal import SyncDeltaVal
 
 sg.theme('DarkAmber')  # Add a touch of color
 
-_FRICTION = 1  # 0.975
-
 
 class _Motor:
     _encoder = "_encoder"
     _dps = "_dps"
     _offset = "_offset"
+
     _RAD = 10
+    _FRICTION = 1  # 0.975
 
     @staticmethod
     def init(port, data):
@@ -50,7 +50,7 @@ class _Motor:
 
     @staticmethod
     def update(port, data, dT):
-        data[port + _Motor._encoder] += data[port + _Motor._dps] * random.uniform(_FRICTION, 1) * dT
+        data[port + _Motor._encoder] += data[port + _Motor._dps] * random.uniform(_Motor._FRICTION, 1) * dT
 
     @staticmethod
     def initUI(port, data):
@@ -69,9 +69,9 @@ class _Motor:
     def updateUI(event, values, window, port, data):
 
         graph = window[port + 'º']
-        circle = graph.DrawCircle((_Motor._RAD, _Motor._RAD), _Motor._RAD, fill_color='white')
+        graph.DrawCircle((_Motor._RAD, _Motor._RAD), _Motor._RAD, fill_color='white')
         angle = np.deg2rad(_Motor.read(port, data))
-        line = graph.DrawLine((_Motor._RAD, _Motor._RAD), (_Motor._RAD + _Motor._RAD * np.cos(angle), _Motor._RAD + _Motor._RAD * np.sin(angle)), color='red')
+        graph.DrawLine((_Motor._RAD, _Motor._RAD), (_Motor._RAD + _Motor._RAD * np.cos(angle), _Motor._RAD + _Motor._RAD * np.sin(angle)), color='red')
 
         window[port + "dps"].update("{:.2f} dps".format(data[port + _Motor._dps]))
         if event == port + "<":

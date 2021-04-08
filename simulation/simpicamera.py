@@ -7,8 +7,8 @@ try:
     import picamera
     from picamera.array import PiRGBArray
 except:
-    import classes.sim_picamera as picamera
-    from classes.sim_picamera import PiRGBArray
+    import simpicamera as picamera
+    from simpicamera import PiRGBArray
 
 """
 import cv2
@@ -47,8 +47,8 @@ class PiCamera:
             ok, img = self.videoCapture.read()
         return img
 
-    def capture(self, array, format, use_video_port):
-        # assume use_video_port=true and format="bgr"
+    def capture(self, array, format="bgr", use_video_port=True):
+        assert use_video_port and format == "bgr"
         array.array = cv2.resize(self._read_retry(), array.size)
 
     def close(self):
