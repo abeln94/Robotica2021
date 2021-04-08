@@ -97,8 +97,8 @@ class Robot:
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
-        wd = wd * 0.3 + self.wd.value * 0.7
-        wi = wi * 0.3 + self.wi.value * 0.7
+        wd = wd * 0.4 + self.wd.value * 0.6
+        wi = wi * 0.4 + self.wi.value * 0.6
 
         self.wd.value = wd
         self.wi.value = wi
