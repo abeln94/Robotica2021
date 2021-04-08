@@ -416,7 +416,12 @@ class Map2D:
 
     def planPath(self, x_ini, y_ini, x_end, y_end):
         """
-        x_ini, y_ini, x_end, y_end: integer values that indicate the x and y coordinates of the starting (ini) and ending (end) cell
+        Plans a path into the map from (x_ini, y_ini) to (x_end, y_end)
+        :param x_ini: horizontal cell coordinate of the starting cell
+        :param y_ini: vertical cell coordinate of the starting cell
+        :param x_end: horizontal cell coordinate of the ending cell
+        :param y_end: vertical cell coordinate of the ending cell
+        :return: the list of cells which describe the calculated path from (x_ini, y_ini) to (x_end, y_end)
         """
         USE_DIAGONALS = False  # if true use 8-neighbour, if false use 4-neighbour
 
@@ -451,12 +456,19 @@ class Map2D:
 
     def replanPath(self, x_ini, y_ini, x_end, y_end):
         """
-        See planPath
+        Just invokes planPath (same arguments)
         """
         return self.planPath(x_ini, y_ini, x_end, y_end)
 
     def getNeighbour(self, angle):
         """
-        TODO
+        Calculates the neighbour which corresponds to the given orientation value in angle
+        E.g., when angle equals pi/2 rad (90º), returns 0
+              when angle equals -pi/2 rad (-90º), returns 4
+        7     0       1
+        6   (x,y)     2
+        5     4       3
+        :param angle: orientation over the neigbour's circle
+        :return: returns the corresponding neighbour to the given angle orientation
         """
         return ((-angle + np.pi / 8) // (np.pi / 4) + 2) % 8
