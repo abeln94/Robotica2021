@@ -63,6 +63,8 @@ if __name__ == "__main__":
                 robot.go(*next_pos)
                 current_index += 1
 
+        myMap.drawMapWithRobotLocations([robot.readOdometry()], True)
+
     finally:
         # wrap up and close stuff before exiting
         if robot is not None: robot.stopOdometry()

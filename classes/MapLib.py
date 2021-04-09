@@ -3,10 +3,13 @@
 from __future__ import division  # ''
 from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
 
+import os
 import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+from classes import Cfg
 
 
 class Map2D:
@@ -230,8 +233,8 @@ class Map2D:
         plt.grid(True)
         plt.tight_layout()
 
-        x_t = range(0, (self.sizeX + 1) * 400, 400)
-        y_t = range(0, (self.sizeY + 1) * 400, 400)
+        x_t = range(0, (self.sizeX + 1) * self.sizeCell, self.sizeCell)
+        y_t = range(0, (self.sizeY + 1) * self.sizeCell, self.sizeCell)
         x_labels = [str(n) for n in x_t]
         y_labels = [str(n) for n in y_t]
         plt.xticks(x_t, x_labels)
@@ -292,7 +295,7 @@ class Map2D:
         return True
 
     # Dibuja robot en location_eje con color (c) y tamano (p/g)
-    def _drawRobot(self, loc_x_y_th=[0, 0, 0], robotPlotStyle='b', small=False):
+    def _drawRobot(self, loc_x_y_th=[0, 0, 0], robotPlotStyle='b', small=True):
         """
         UPDATES existing plot to include current robot position
         It expects an existing open figure (probably with the map already on it)
@@ -346,8 +349,8 @@ class Map2D:
         if verbose, it displays the plot
         if saveSnapshot: saves a figure as mapstatus_currenttimestamp_FIGNUM.png
         """
-        self.verbose = True
-        # self.verbose=False
+        # self.verbose = True
+        self.verbose = False
 
         # create a new figure and set it as current axis
         current_fig = plt.figure()
@@ -356,8 +359,7 @@ class Map2D:
         self._drawGrid()
 
         # if flag is true, draw also current CostMatrix
-        if self.verbose:
-            self._drawCostMatrix()
+        self._drawCostMatrix()
 
         if robotPosVectors:
             for loc in robotPosVectors:
@@ -368,7 +370,8 @@ class Map2D:
 
         if saveSnapshot:
             ts = str(time.time())
-            snapshot_name = "mapstatus_" + ts + "_F" + str(current_fig.number) + ".png"
+            snapshot_name = Cfg.FOLDER_IMAGES + "mapstatus_" + ts + "_F" + str(current_fig.number) + ".png"
+            os.makedirs(os.path.dirname(snapshot_name), exist_ok=True)
             print("saving %s " % snapshot_name)
             plt.savefig(snapshot_name)
 

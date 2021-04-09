@@ -16,7 +16,7 @@ class Map:
     def __init__(self):
         """ Initializes the map window """
         plt.ion()
-        plt.figure('Robot simulation')
+        plt.figure('Robot odometry')
         plt.plot([], [])
         plt.show(block=False)
 
