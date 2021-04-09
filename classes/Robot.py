@@ -85,7 +85,7 @@ class Robot:
         # Sensor conf
         self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
-    def setSpeed(self, v, w):
+    def setSpeed(self, v, w, smooth=True):
         """ 
         Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) 
         :param v: linear velocity
@@ -97,8 +97,9 @@ class Robot:
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
-        wd = wd * 0.4 + self.wd.value * 0.6
-        wi = wi * 0.4 + self.wi.value * 0.6
+        if smooth:
+            wd = wd * 0.4 + self.wd.value * 0.6
+            wi = wi * 0.4 + self.wi.value * 0.6
 
         self.wd.value = wd
         self.wi.value = wi

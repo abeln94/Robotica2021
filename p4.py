@@ -63,6 +63,7 @@ if __name__ == "__main__":
                 robot.go(*next_pos)
                 current_index += 1
 
+        robot.setSpeed(0, 0, False)
         myMap.drawMapWithRobotLocations([robot.readOdometry()], True)
 
     finally:
