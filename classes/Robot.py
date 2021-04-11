@@ -34,6 +34,7 @@ Cfg.add_argument("-f", "--log", help="Log odometry into a file", default=False)
 Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=float, default=0.1)
 Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", action="store_true")
 Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
+Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 
 
 class Robot:
@@ -86,7 +87,7 @@ class Robot:
         self.wi = Value('d', 0.0, lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
-    def setSpeed(self, v, w, smooth=True):
+    def setSpeed(self, v, w):
         """ 
         Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) 
         :param v: linear velocity
@@ -98,15 +99,8 @@ class Robot:
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
-        if smooth:
-            wd = wd * 0.4 + self.wd.value * 0.6
-            wi = wi * 0.4 + self.wi.value * 0.6
-
         self.wd.value = wd
         self.wi.value = wi
-
-        self.BP.set_motor_dps(self.BP.PORT_B, np.rad2deg(wi))
-        self.BP.set_motor_dps(self.BP.PORT_C, np.rad2deg(wd))
 
     def readSpeed(self, readTime=0.1):
         """
@@ -157,6 +151,8 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
+        wi = self.wi.value
+        wd = self.wd.value
         leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
 
@@ -201,6 +197,13 @@ class Robot:
                 self.x.value = x
                 self.y.value = y
                 self.th.value = th
+
+            # change velocity
+            wi = wi * Cfg.smoothness + self.wi.value * (1 - Cfg.smoothness)
+            wd = wd * Cfg.smoothness + self.wd.value * (1 - Cfg.smoothness)
+
+            self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
+            self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
             # display
             print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
