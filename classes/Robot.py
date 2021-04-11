@@ -47,22 +47,22 @@ class Robot:
             init_position = [0.0, 0.0, 0.0]
 
         ##################################################
-        # Motors and sensors setup
-
         # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
         self.BP = brickpi3.BrickPi3()
 
-        # Configure sensors, for example a touch sensor.
+        # Motors and sensors setup
+        self.MOTOR_CLAW = self.BP.PORT_A
+        self.MOTOR_LEFT = self.BP.PORT_B
+        self.MOTOR_RIGHT = self.BP.PORT_C
         self.SENSOR_ULTRASONIC = self.BP.PORT_1
-        self.SENSOR_LIGHT = self.BP.PORT_2
+        self.SENSOR_LIGHT = self.BP.PORT_3
+
+        # Configure sensors, for example a touch sensor.
         self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder of all motors
-        self.MOTOR_CLAW = self.BP.PORT_A
-        self.MOTOR_LEFT = self.BP.PORT_B
-        self.MOTOR_RIGHT = self.BP.PORT_C
         for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
             self.BP.offset_motor_encoder(motor, self.BP.get_motor_encoder(motor))
 
