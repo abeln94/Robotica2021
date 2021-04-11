@@ -21,13 +21,14 @@ from classes.DeltaVal import SyncDeltaVal
 
 sg.theme('DarkAmber')  # Add a touch of color
 
+_ICON = 20  # icons size in pixels
+
 
 class _Motor:
     _encoder = "_encoder"
     _dps = "_dps"
     _offset = "_offset"
 
-    _RAD = 10
     _FRICTION = 1  # 0.975
 
     @staticmethod
@@ -57,7 +58,7 @@ class _Motor:
         return [[
             sg.Text(port + ": Motor:"),
             sg.RealtimeButton("<", key=port + "<"),
-            sg.Graph(canvas_size=(_Motor._RAD * 2, _Motor._RAD * 2), graph_bottom_left=(0, 0), graph_top_right=(_Motor._RAD * 2, _Motor._RAD * 2), key=port + "º"),
+            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "º"),
             sg.RealtimeButton(">", key=port + ">"),
             sg.VerticalSeparator(),
             sg.RealtimeButton("-", key=port + "-"),
@@ -69,9 +70,11 @@ class _Motor:
     def updateUI(event, values, window, port, data):
 
         graph = window[port + 'º']
-        graph.DrawCircle((_Motor._RAD, _Motor._RAD), _Motor._RAD, fill_color='white')
+        graph.DrawCircle((_ICON / 2, _ICON / 2), _ICON / 2, fill_color='white')
+        angle = np.deg2rad(int(data[port + _Motor._offset]))
+        graph.DrawLine((_ICON / 2, _ICON / 2), (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='blue')
         angle = np.deg2rad(_Motor.read(port, data))
-        graph.DrawLine((_Motor._RAD, _Motor._RAD), (_Motor._RAD + _Motor._RAD * np.cos(angle), _Motor._RAD + _Motor._RAD * np.sin(angle)), color='red')
+        graph.DrawLine((_ICON / 2, _ICON / 2), (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='red')
 
         window[port + "dps"].update("{:.2f} dps".format(data[port + _Motor._dps]))
         if event == port + "<":
@@ -135,6 +138,36 @@ class _Ultrasonic:
             data[port] = values[port]
 
 
+class _Light:
+    @staticmethod
+    def init(port, data):
+        data[port] = 512
+
+    @staticmethod
+    def update(port, data, dT):
+        pass
+
+    @staticmethod
+    def read(port, data):
+        return data[port]
+
+    @staticmethod
+    def initUI(port, data):
+        return [[
+            sg.Text(port + ": Light:"),
+            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "#"),
+            sg.Slider(range=(0, 1023), default_value=data[port], orientation='horizontal', key=port),
+        ]]
+
+    @staticmethod
+    def updateUI(event, values, window, port, data):
+        graph = window[port + '#']
+        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(int(_Light.read(port, data) / 1023 * 255)))
+
+        if port in values:
+            data[port] = values[port]
+
+
 class BrickPi3:
     PORT_1 = "PORT_1"
     PORT_2 = "PORT_2"
@@ -146,6 +179,7 @@ class BrickPi3:
     class SENSOR_TYPE:
         TOUCH = _Touch
         NXT_ULTRASONIC = _Ultrasonic
+        NXT_LIGHT_ON = _Light
 
     def __init__(self):
         m = Manager()

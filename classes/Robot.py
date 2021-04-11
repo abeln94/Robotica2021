@@ -52,14 +52,23 @@ class Robot:
         self.BP = brickpi3.BrickPi3()
 
         # Configure sensors, for example a touch sensor.
+        self.SENSOR_ULTRASONIC = self.BP.PORT_1
+        self.SENSOR_LIGHT = self.BP.PORT_2
+        self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder of all motors
-        self.clawMotor = self.BP.PORT_A
-        self.leftMotor = self.BP.PORT_B
-        self.rightMotor = self.BP.PORT_C
-        for motor in (self.clawMotor, self.leftMotor, self.rightMotor):
+        self.MOTOR_CLAW = self.BP.PORT_A
+        self.MOTOR_LEFT = self.BP.PORT_B
+        self.MOTOR_RIGHT = self.BP.PORT_C
+        for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
             self.BP.offset_motor_encoder(motor, self.BP.get_motor_encoder(motor))
+
+        # camera conf
+        self.cam = picamera.PiCamera()
+        self.cam.resolution = (Cfg.CAMERA_WIDTH, Cfg.CAMERA_HEIGHT)
+        self.cam.framerate = 32
 
         ##################################################
         # Odometry
@@ -76,14 +85,6 @@ class Robot:
         self.wd = Value('d', 0.0, lock=self.lock_odometry)
         self.wi = Value('d', 0.0, lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
-
-        # camera conf
-        self.cam = picamera.PiCamera()
-        self.cam.resolution = (Cfg.CAMERA_WIDTH, Cfg.CAMERA_HEIGHT)
-        self.cam.framerate = 32
-
-        # Sensor conf
-        self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
     def setSpeed(self, v, w, smooth=True):
         """ 
@@ -115,15 +116,15 @@ class Robot:
         """
 
         # read
-        previ = self.BP.get_motor_encoder(self.leftMotor)
-        prevd = self.BP.get_motor_encoder(self.rightMotor)
+        previ = self.BP.get_motor_encoder(self.MOTOR_LEFT)
+        prevd = self.BP.get_motor_encoder(self.MOTOR_RIGHT)
 
         # wait
         time.sleep(readTime)
 
         # read
-        posti = self.BP.get_motor_encoder(self.leftMotor)
-        postd = self.BP.get_motor_encoder(self.rightMotor)
+        posti = self.BP.get_motor_encoder(self.MOTOR_LEFT)
+        postd = self.BP.get_motor_encoder(self.MOTOR_RIGHT)
 
         # calculate
         wi = np.deg2rad(posti - previ) / readTime
@@ -156,8 +157,8 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
-        leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.leftMotor))
-        rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.rightMotor))
+        leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
+        rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -170,8 +171,8 @@ class Robot:
         while periodic(not self.finished.value):
 
             # get values
-            dL = leftEncoder.update(self.BP.get_motor_encoder(self.leftMotor))
-            dR = rightEncoder.update(self.BP.get_motor_encoder(self.rightMotor))
+            dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
+            dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
 
             # compute updates
             if Cfg.exact:
@@ -305,15 +306,15 @@ class Robot:
         ADVANCE = 15  # mm
 
         # sanity check
-        if self.BP.get_motor_encoder(self.clawMotor) > ANGLE / 2:
+        if self.BP.get_motor_encoder(self.MOTOR_CLAW) > ANGLE / 2:
             print("attempting to use claw again")
             return
 
         # catch
-        self.BP.set_motor_dps(self.clawMotor, ANGLE / TIME)
+        self.BP.set_motor_dps(self.MOTOR_CLAW, ANGLE / TIME)
         self.setSpeed(ADVANCE / TIME, 0)
         time.sleep(TIME)
-        self.BP.set_motor_dps(self.clawMotor, 0)
+        self.BP.set_motor_dps(self.MOTOR_CLAW, 0)
         self.setSpeed(0, 0)
 
     def go(self, x_goal, y_goal, radius=10):
@@ -382,7 +383,7 @@ class Robot:
         :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
-        return self.BP.get_sensor(self.BP.PORT_1) * 10
+        return self.BP.get_sensor(self.SENSOR_ULTRASONIC) * 10
 
     def detectObstacle(self, x_dest, y_dest):
         """
@@ -399,3 +400,10 @@ class Robot:
         # check if there is nothing in between
         dist = np.linalg.norm([x_dest - x, y_dest - y])
         return self.getObstacleDistance() < dist
+
+    def getLight(self):
+        """
+        Uses the light sensor to get the amount of light
+        :return: the amount of light from 0 (dark, no light) to 1 (bright, full light)
+        """
+        return self.BP.get_sensor(self.SENSOR_LIGHT) / 1023
