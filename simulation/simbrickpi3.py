@@ -78,13 +78,13 @@ class _Motor:
 
         window[port + "dps"].update("{:.2f} dps".format(data[port + _Motor._dps]))
         if event == port + "<":
-            data[port + _Motor._encoder] += 1
+            data[port + _Motor._encoder] += 5
         if event == port + ">":
-            data[port + _Motor._encoder] -= 1
+            data[port + _Motor._encoder] -= 5
         if event == port + "-":
-            data[port + _Motor._dps] += 1
+            data[port + _Motor._dps] += 5
         if event == port + "+":
-            data[port + _Motor._dps] -= 1
+            data[port + _Motor._dps] -= 5
 
 
 class _Touch:

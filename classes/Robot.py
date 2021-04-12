@@ -155,6 +155,7 @@ class Robot:
         wd = self.wd.value
         leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
+        swap = False
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -167,8 +168,12 @@ class Robot:
         while periodic(not self.finished.value):
 
             # get values
-            dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
-            dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
+            if swap:
+                dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
+                dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
+            else:
+                dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
+                dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
 
             # compute updates
             if Cfg.exact:
@@ -202,8 +207,12 @@ class Robot:
             wi = wi * Cfg.smoothness + self.wi.value * (1 - Cfg.smoothness)
             wd = wd * Cfg.smoothness + self.wd.value * (1 - Cfg.smoothness)
 
-            self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
-            self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
+            if swap:
+                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
+                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
+            else:
+                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
+                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
             # display
             print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
@@ -214,6 +223,8 @@ class Robot:
             # save LOG
             if Cfg.log:
                 logFile.write("{}, {}, {}, {}\n".format(periodic.time, x, y, th))
+
+            swap = not swap
 
             ######## UPDATE UNTIL HERE with your code ########
 
