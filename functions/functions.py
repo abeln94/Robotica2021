@@ -1,5 +1,15 @@
 import numpy as np
 
+def plotLocVector(l: np.array, name="location"):
+    """
+    prints the location vector in an understandable format
+    :param l: location vector
+    :param name: name of the object represented
+    """
+    assert l.shape == (3,)
+    assert -np.pi <= l[2] and l[2] <= np.pi
+    theta = np.degrees(l[2])
+    print(name,"= ( x:", l[0], ", y:", l[1], ", theta:", theta, ")")
 
 def hom(x: np.ndarray) -> np.ndarray:
     """
