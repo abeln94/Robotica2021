@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from functions.dibrobot import dibrobot
-from functions.functions import norm_pi, hom, loc
 from functions.simubot import simubot
 
 
@@ -26,8 +25,8 @@ k2 = -0.20
 
 v = 1
 w_max = np.deg2rad(10)
-dc_lat = 10 # Objetive parameter
-dc_front = 5 # To stop
+dc_lat = 10  # Objetive parameter
+dc_front = 5  # To stop
 x_map_size = 50
 y_map_size = 20
 
@@ -36,16 +35,16 @@ robot = [0, 13, np.deg2rad(30)]
 
 # graph initialization
 plt.ion()
-f, (ax1, ax2, ax3) = plt.subplots(3, 1, num='ej4')
-plt.plot([0, x_map_size, x_map_size],[0, 0, y_map_size])
+f, (ax1, ax2) = plt.subplots(2, 1, num='ej4 velocities')
+plt.figure('ej4 map')
+plt.plot([0, x_map_size, x_map_size], [0, 0, y_map_size])
 plt.gca().set_aspect(True)
 plt.show(block=False)
-
 
 vs = []
 ws = []
 
-d = robot[1] / np.cos(robot[2]) # Distance
+d = robot[1] / np.cos(robot[2])  # Distance
 while True:
 
 

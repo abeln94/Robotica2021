@@ -5,8 +5,6 @@ from functions.dibrobot import dibrobot
 from functions.functions import norm_pi, hom, loc, plotLocVector
 from functions.simubot import simubot
 
-from classes.Map import Map
-
 ##########################################################################
 # CONSTANTS
 ##########################################################################
@@ -55,15 +53,16 @@ def showStatus(locWxR, locWxM):
 ##########################################################################
 
 # G goal, R robot => Coordenadas del robot con respecto al goal
-WxR = hom(np.array([0,0,0]))
-WxM = hom(np.array([500,500,np.pi/2]))
+WxR = hom(np.array([0, 0, 0]))
+WxM = hom(np.array([500, 500, np.pi / 2]))
 
-circularMotion = [100, -0.01] # v/w = R, R = 10000 for left or -10000 for right
-assert circularMotion[0]/circularMotion[1] == -10000
+circularMotion = [100, -0.01]  # v/w = R, R = 10000 for left or -10000 for right
+assert circularMotion[0] / circularMotion[1] == -10000
 
 # graph initialization
 plt.ion()
-f, (ax1, ax2, ax3) = plt.subplots(3, 1, num='ej3')
+f, (ax1, ax2) = plt.subplots(2, 1, num='ej3 velocities')
+plt.figure('ej3 map')
 plt.gca().set_aspect(True)
 plt.show(block=False)
 
@@ -73,7 +72,7 @@ ws = []
 ##############################
 dibrobot(loc(WxR), 'blue', 1)
 dibrobot(loc(WxM), 'red', 1)
-showStatus(loc(WxR),loc(WxM))
+showStatus(loc(WxR), loc(WxM))
 ##############################
 while not areEqual(loc(WxR), loc(WxM)):
     # Simulate the movil's motion

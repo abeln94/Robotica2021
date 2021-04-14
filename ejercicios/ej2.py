@@ -19,7 +19,8 @@ for a, b in zip(points[:-1], points[1:]):
 
 # graph initialization
 plt.ion()
-f, (ax1, ax2, ax3) = plt.subplots(3, 1, num='ej2')
+f, (ax1, ax2) = plt.subplots(2, 1, num='ej2 velocities')
+plt.figure('ej2 map')
 plt.plot([p[0] for p in points], [p[1] for p in points], '*', color='red')
 plt.gca().set_aspect(True)
 plt.show(block=False)
@@ -41,7 +42,8 @@ while True:
 
     # calculate velocities
     v = 0.34 * p
-    w = 1.28 * a + 1.28 / 2 * b
+    w = 1.28 * a + 1.56 * b
+    # w = 1.28 * a + 1.28 / 2 * b
 
     # plot velocities
     for data, next, label, ax in [(vs, v, 'v', ax1), (ws, w, 'w', ax2)]:
@@ -52,7 +54,7 @@ while True:
 
     # update robot
     dibrobot(robot, 'green', 0.01)
-    robot = simubot([v, w], np.array(robot), 0.75)
+    robot = simubot([v, w], np.array(robot), 0.5)
     dibrobot(robot, 'blue', 0.01)
 
     # refresh map
