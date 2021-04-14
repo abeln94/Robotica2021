@@ -11,14 +11,17 @@ from classes.Map import Map
 # CONSTANTS
 ##########################################################################
 # Control constants
-K_RO    = 1
-K_BETA  = 1.8
-K_ALPHA = 1.8
+K_RO    = 0.2
+K_BETA  = 0.5
+K_ALPHA = 0.4
 assert K_RO > 0 and K_BETA > 0 and K_ALPHA - K_RO > 0
 
-# Speed constants
-V_MAX = 17
-W_MAX = np.pi/4
+# Speed constants (length in milimeters)
+V_MAX = 3000 # m/s
+W_MAX = 3    # rad/s
+
+# Map-related constants
+MAP_SIZE = 10000000
 
 ##########################################################################
 # AUXILIAR FUNCTIONS
@@ -35,11 +38,11 @@ def getSpeed(ro, alpha, beta):
     v = K_RO * ro
     w = K_ALPHA * alpha + K_BETA * beta
     # Speed saturation
-    if v > V_MAX: v = V_MAX
-    if w > W_MAX: w = W_MAX
+    v = min(v, V_MAX) if v > 0 else max(v, -V_MAX)
+    w = min(w, W_MAX) if w > 0 else max(w, -W_MAX)
     return v, w
 
-def areEqual(u, v, allowedError = 1):
+def areEqual(u, v, allowedError = 300):
     return all([abs(dif) <= allowedError for dif in u - v])
 
 ####################################
@@ -56,10 +59,10 @@ def showStatus(locWxR, locWxM):
 
 # G goal, R robot => Coordenadas del robot con respecto al goal
 WxR = hom(np.array([0,0,0]))
-WxM = hom(np.array([30,30,np.pi/2]))
+WxM = hom(np.array([500,500,np.pi/2]))
 
-circularMotion = [15, -0.15] # v/w = R, R = 100 for left or -100 for right
-assert circularMotion[0]/circularMotion[1] == -100
+circularMotion = [100, -0.01] # v/w = R, R = 10000 for left or -10000 for right
+assert circularMotion[0]/circularMotion[1] == -10000
 
 picture = Map()
 picture.update(loc(WxR))
