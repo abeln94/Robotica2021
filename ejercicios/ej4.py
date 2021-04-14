@@ -5,7 +5,7 @@ from functions.dibrobot import dibrobot
 from functions.simubot import simubot
 
 # configuration
-LEFT = False  # if true use the left wall, if false use the right one
+LEFT = True  # if true use the left wall, if false use the right one
 
 
 def sensor(robot):
@@ -19,7 +19,7 @@ def sensor(robot):
 
     d = robot[1] / np.cos(angle)
     if LEFT:
-        d = y_map_size - d
+        d = (y_map_size -robot[1]) / np.cos(-angle)
 
     return min(d_max, (max(d_min, d)))
 
@@ -36,7 +36,7 @@ x_map_size = 50
 y_map_size = 30
 
 # robot initialization
-robot = [0, 13, np.deg2rad(30)]
+robot = [0, 17, np.deg2rad(-30)]
 
 # graph initialization
 plt.ion()
