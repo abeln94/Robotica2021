@@ -22,6 +22,7 @@ W_MAX = 3    # rad/s
 # AUXILIAR FUNCTIONS
 ##########################################################################
 
+# Implements cartesian to polar coordinates conversion
 def cartesian2polar(cartesianLocation):
     x, y, th = cartesianLocation
     ro = np.sqrt(x**2 + y**2)
@@ -29,6 +30,8 @@ def cartesian2polar(cartesianLocation):
     alpha = beta - th
     return np.array([ro, beta, alpha])
 
+# Calculates the speed basing on the distance and the orientation 
+# to the objective
 def getSpeed(ro, alpha, beta):
     v = K_RO * ro
     w = K_ALPHA * alpha + K_BETA * beta
@@ -37,6 +40,8 @@ def getSpeed(ro, alpha, beta):
     w = min(w, W_MAX) if w > 0 else max(w, -W_MAX)
     return v, w
 
+# Returns whether u and v, location vectors, are considered to be 
+# equals or not, given that error margin
 def areEqual(u, v, allowedError = 200):
     return all([abs(dif) <= allowedError for dif in u - v])
 
