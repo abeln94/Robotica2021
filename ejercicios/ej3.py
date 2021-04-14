@@ -11,7 +11,7 @@ from classes.Map import Map
 # CONSTANTS
 ##########################################################################
 # Control constants
-K_RO    = 0.2
+K_RO    = 0.3
 K_BETA  = 0.5
 K_ALPHA = 0.4
 assert K_RO > 0 and K_BETA > 0 and K_ALPHA - K_RO > 0
@@ -39,7 +39,7 @@ def getSpeed(ro, alpha, beta):
     w = min(w, W_MAX) if w > 0 else max(w, -W_MAX)
     return v, w
 
-def areEqual(u, v, allowedError = 300):
+def areEqual(u, v, allowedError = 200):
     return all([abs(dif) <= allowedError for dif in u - v])
 
 ####################################
