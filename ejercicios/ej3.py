@@ -20,9 +20,6 @@ assert K_RO > 0 and K_BETA > 0 and K_ALPHA - K_RO > 0
 V_MAX = 3000 # m/s
 W_MAX = 3    # rad/s
 
-# Map-related constants
-MAP_SIZE = 10000000
-
 ##########################################################################
 # AUXILIAR FUNCTIONS
 ##########################################################################
@@ -64,9 +61,18 @@ WxM = hom(np.array([500,500,np.pi/2]))
 circularMotion = [100, -0.01] # v/w = R, R = 10000 for left or -10000 for right
 assert circularMotion[0]/circularMotion[1] == -10000
 
-picture = Map()
-picture.update(loc(WxR))
+# graph initialization
+plt.ion()
+f, (ax1, ax2, ax3) = plt.subplots(3, 1, num='ej3')
+plt.gca().set_aspect(True)
+plt.show(block=False)
+
+vs = []
+ws = []
+
 ##############################
+dibrobot(loc(WxR), 'blue', 1)
+dibrobot(loc(WxM), 'red', 1)
 showStatus(loc(WxR),loc(WxM))
 ##############################
 while not areEqual(loc(WxR), loc(WxM)):
@@ -78,10 +84,23 @@ while not areEqual(loc(WxR), loc(WxM)):
     v, w = getSpeed(*MpR)
     # Simulate the robot's motion
     WxR = hom(simubot([v,w], loc(WxR), 1))
-    picture.update(loc(WxR))
     ##############################
+    # plot velocities
+    for data, next, label, ax in [(vs, v, 'v', ax1), (ws, w, 'w', ax2)]:
+        data.append(next)
+        ax.clear()
+        ax.set_ylabel(label)
+        ax.plot(range(len(data)), data)
+
+    dibrobot(loc(WxR), 'blue', 1)
+    dibrobot(loc(WxM), 'red', 1)
+
+    # refresh map
+    plt.gcf().canvas.draw()
+    plt.gcf().canvas.flush_events()
+
     print("----------------------------------------------")
     showStatus(loc(WxR),loc(WxM))
     ##############################
 
-picture.block()
+plt.show(block=True)
