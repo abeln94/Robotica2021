@@ -4,6 +4,9 @@ import numpy as np
 from functions.dibrobot import dibrobot
 from functions.simubot import simubot
 
+# configuration
+LEFT = False  # if true use the left wall, if false use the right one
+
 
 def sensor(robot):
     # Estimated sonar restrictions
@@ -15,20 +18,22 @@ def sensor(robot):
     angle = min(angle_max, robot[2]) if robot[2] > 0 else max(-angle_max, robot[2])
 
     d = robot[1] / np.cos(angle)
+    if LEFT:
+        d = y_map_size - d
 
-    return min(d_max,(max(d_min, d)))
+    return min(d_max, (max(d_min, d)))
 
 
 # Parameters
-k1 = 0.015
-k2 = -0.20
+k1 = -0.015 if LEFT else 0.015
+k2 = 0.20 if LEFT else -0.20
 
 v = 1
 w_max = np.deg2rad(10)
 dc_lat = 10  # Objetive parameter
 dc_front = 5  # To stop
 x_map_size = 50
-y_map_size = 20
+y_map_size = 30
 
 # robot initialization
 robot = [0, 13, np.deg2rad(30)]
@@ -37,14 +42,15 @@ robot = [0, 13, np.deg2rad(30)]
 plt.ion()
 f, (ax1, ax2) = plt.subplots(2, 1, num='ej4 velocities')
 plt.figure('ej4 map')
-plt.plot([0, x_map_size, x_map_size], [0, 0, y_map_size])
+plt.plot([0, x_map_size, x_map_size, 0], [0, 0, y_map_size, y_map_size])
+plt.plot([0, x_map_size], [y_map_size - dc_lat if LEFT else dc_lat] * 2, '--r')
 plt.gca().set_aspect(True)
 plt.show(block=False)
 
 vs = []
 ws = []
 
-d = robot[1] / np.cos(robot[2])  # Distance
+d = sensor(robot)  # Distance
 while True:
 
 
