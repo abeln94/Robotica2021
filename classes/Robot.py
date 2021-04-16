@@ -20,13 +20,13 @@ from functions.simubot import simubot
 
 try:
     import brickpi3  # import the BrickPi3 drivers
-except:
+except ImportError:
     import simulation.simbrickpi3 as brickpi3
 
 try:
     import picamera  # import the picamera
     from picamera.array import PiRGBArray
-except:
+except ImportError:
     import simulation.simpicamera as picamera
     from simulation.simpicamera import PiRGBArray
 

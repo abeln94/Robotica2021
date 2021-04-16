@@ -4,7 +4,7 @@ import matplotlib.ticker as plticker
 from functions.dibrobot import dibrobot
 
 PADDING = 500  # padding of the plot
-GRID = 120 * 3  # grid distance (length of the square tiles)
+GRID = 400  # 120 * 3  # grid distance (length of the square tiles)
 loc = plticker.MultipleLocator(base=GRID)
 
 

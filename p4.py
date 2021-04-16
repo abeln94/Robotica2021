@@ -1,4 +1,5 @@
 import os
+import time
 
 import matplotlib
 
@@ -37,6 +38,8 @@ if __name__ == "__main__":
         robot = Robot([*myMap._cell2pos(*initial_position), 0])
         robot.startOdometry()
 
+        time.sleep(3)
+
         # 3. perform trajectory
         # get path
         path = myMap.planPath(*initial_position, *target_position)
@@ -64,7 +67,7 @@ if __name__ == "__main__":
                 current_index += 1
 
         robot.setSpeed(0, 0)
-        myMap.drawMapWithRobotLocations([robot.readOdometry()], True)
+        myMap.drawMapWithRobotLocations([robot.readOdometry()])
 
     finally:
         # wrap up and close stuff before exiting
