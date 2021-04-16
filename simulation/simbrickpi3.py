@@ -141,7 +141,7 @@ class _Ultrasonic:
 class _Light:
     @staticmethod
     def init(port, data):
-        data[port] = 512
+        data[port] = 1750
 
     @staticmethod
     def update(port, data, dT):
@@ -156,13 +156,13 @@ class _Light:
         return [[
             sg.Text(port + ": Light:"),
             sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "#"),
-            sg.Slider(range=(0, 1023), default_value=data[port], orientation='horizontal', key=port),
+            sg.Slider(range=(0, 3500), default_value=data[port], orientation='horizontal', key=port),
         ]]
 
     @staticmethod
     def updateUI(event, values, window, port, data):
         graph = window[port + '#']
-        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(int(_Light.read(port, data) / 1023 * 255)))
+        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(int(_Light.read(port, data) / 3500 * 255)))
 
         if port in values:
             data[port] = values[port]
@@ -180,6 +180,7 @@ class BrickPi3:
         TOUCH = _Touch
         NXT_ULTRASONIC = _Ultrasonic
         NXT_LIGHT_ON = _Light
+        NXT_LIGHT_OFF = _Light
 
     def __init__(self):
         m = Manager()

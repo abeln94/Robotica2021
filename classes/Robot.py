@@ -420,4 +420,4 @@ class Robot:
         Uses the light sensor to get the amount of light
         :return: the amount of light from 0 (dark, no light) to 1 (bright, full light)
         """
-        return self.BP.get_sensor(self.SENSOR_LIGHT) / 1023
+        return self.BP.get_sensor(self.SENSOR_LIGHT) / 3500
