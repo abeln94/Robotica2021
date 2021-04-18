@@ -16,6 +16,45 @@ Cfg.add_argument("-m", "--mapfile", help="path to find map file", default="mapa1
 Cfg.add_argument("-start", "--startCell", help="Cell where the robot starts", default=(0, 0), nargs=2, type=int)
 Cfg.add_argument("-end", "--endCell", help="Cell where the robot ends", default=(-1, -1), nargs=2, type=int)
 
+
+def traverseLabyrinth(end, map, robot):
+    """
+    Traverses the labyrinth from the current position to the end cell
+    Detects and avoids unexpected walls
+    The robot must be inside the labyrinth when this function is called
+
+    :param end: cell coordinates of the destination
+    :param map: the MapLib class
+    :param robot: the Robot class
+    :return: when the robot is at the end cell
+    :raise Exception: if the labyrinth cannot be solved
+    """
+    # get path
+    path = map.planPath(*map._pos2cell(*robot.readOdometry()[0:2]), *end)
+    current_index = 0
+    while current_index < len(path) - 1:
+        # while not at the last cell, go to the next
+        next_pos = map._cell2pos(*(path[current_index + 1]))
+
+        if robot.detectObstacle(*next_pos):
+            # there is an obstacle, can't go there directly
+
+            # delete the 3 front connections (a wall extends to the corners too)
+            current_cell = path[current_index]
+            neighbour = map.getNeighbour(norm_pi(robot.th.value))
+            map.deleteConnection(*current_cell, (neighbour - 1) % 8)
+            map.deleteConnection(*current_cell, neighbour)
+            map.deleteConnection(*current_cell, (neighbour + 1) % 8)
+
+            # get the new path
+            path = map.planPath(*current_cell, *end)
+            current_index = 0
+        else:
+            # no obstacle, go
+            robot.go(*next_pos)
+            current_index += 1
+
+
 robot = None
 
 if __name__ == "__main__":
@@ -41,30 +80,7 @@ if __name__ == "__main__":
         time.sleep(3)
 
         # 3. perform trajectory
-        # get path
-        path = myMap.planPath(*initial_position, *target_position)
-        current_index = 0
-        while current_index < len(path) - 1:
-            # while not at the last cell, go to the next
-            next_pos = myMap._cell2pos(*(path[current_index + 1]))
-
-            if robot.detectObstacle(*next_pos):
-                # there is an obstacle, can't go there directly
-
-                # delete the 3 front connections (a wall extends to the corners too)
-                current_cell = path[current_index]
-                neighbour = myMap.getNeighbour(norm_pi(robot.th.value))
-                myMap.deleteConnection(*current_cell, (neighbour - 1) % 8)
-                myMap.deleteConnection(*current_cell, neighbour)
-                myMap.deleteConnection(*current_cell, (neighbour + 1) % 8)
-
-                # get the new path
-                path = myMap.planPath(*current_cell, *target_position)
-                current_index = 0
-            else:
-                # no obstacle, go
-                robot.go(*next_pos)
-                current_index += 1
+        traverseLabyrinth(target_position, myMap, robot)
 
         robot.setSpeed(0, 0)
         myMap.drawMapWithRobotLocations([robot.readOdometry()])

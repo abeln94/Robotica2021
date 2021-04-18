@@ -162,7 +162,7 @@ class _Light:
     @staticmethod
     def updateUI(event, values, window, port, data):
         graph = window[port + '#']
-        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(int(_Light.read(port, data) / 3500 * 255)))
+        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(255 - int(_Light.read(port, data) / 3500 * 255)))
 
         if port in values:
             data[port] = values[port]

@@ -352,7 +352,7 @@ class Robot:
             if dist < radius:
                 # inside the circle, stop
                 self.setSpeed(0, 0)
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 return
 
             # calculate velocity (all the constants were found by try&error)
@@ -382,7 +382,7 @@ class Robot:
             if abs(dth) < arc:
                 # inside the arc, stop
                 self.setSpeed(0, 0)
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 return
 
             # calculate velocity (all the constants were found by try&error)
@@ -420,4 +420,4 @@ class Robot:
         Uses the light sensor to get the amount of light
         :return: the amount of light from 0 (dark, no light) to 1 (bright, full light)
         """
-        return self.BP.get_sensor(self.SENSOR_LIGHT) / 3500
+        return 1 - self.BP.get_sensor(self.SENSOR_LIGHT) / 3500
