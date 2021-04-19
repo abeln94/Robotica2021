@@ -21,11 +21,12 @@ if __name__ == "__main__":
         myMap = Map2D(Cfg.FOLDER_MAPS + 'mapa0.txt')
         myMap.sizeCell = GRID  # hardcoded because it should not be in the file!!!!
 
-        # init Robot and launch updateOdometry thread()
+        # init Robot
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
         robot.startOdometry()
 
-        time.sleep(3)
+        # press button to start
+        robot.waitButtonPress()
 
         # detect color
         leftSide = robot.getLight() >= 0.5
@@ -44,10 +45,13 @@ if __name__ == "__main__":
         robot.go(*myMap._cell2pos(enter, 2))
 
         # traverse labyrinth
+        robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (1 if leftSide else -1))
         traverseLabyrinth((exit, 2), myMap, robot)
 
         # exit labyrinth
+        robot.onMarker(y=GRID * 3 + Cfg.LIGHT_OFFSET)
         robot.go(*myMap._cell2pos(exit, 3))
+        robot.onMarker()
         robot.go(*myMap._cell2pos(1, 3.5))
 
         # look for ball

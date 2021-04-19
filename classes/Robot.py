@@ -55,12 +55,13 @@ class Robot:
         self.MOTOR_LEFT = self.BP.PORT_B
         self.MOTOR_RIGHT = self.BP.PORT_C
         self.SENSOR_ULTRASONIC = self.BP.PORT_1
+        self.SENSOR_BUTTON = self.BP.PORT_2
         self.SENSOR_LIGHT = self.BP.PORT_3
 
         # Configure sensors, for example a touch sensor.
         self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
-        # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder of all motors
         for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
@@ -83,9 +84,14 @@ class Robot:
         self.x = Value('d', init_position[0], lock=self.lock_odometry)
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
-        self.wd = Value('d', 0.0, lock=self.lock_odometry)
-        self.wi = Value('d', 0.0, lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
+
+        # odometry command values
+        self.wd = Value('d', 0.0)
+        self.wi = Value('d', 0.0)
+        self.marker_x = Value('d', -1.0)
+        self.marker_y = Value('d', -1.0)
+        self.marker_th = Value('d', -1.0)
 
     def setSpeed(self, v, w):
         """ 
@@ -196,6 +202,13 @@ class Robot:
                 x += ds * np.cos(th + dth / 2)
                 y += ds * np.sin(th + dth / 2)
                 th = norm_pi(th + dth)
+
+            # detect marker
+            if self.getLight() < 0.4:  # dark
+                print("marker detected")
+                if self.marker_x.value >= 0: x = self.marker_x.value
+                if self.marker_y.value >= 0: y = self.marker_y.value
+                if self.marker_th.value >= 0: th = self.marker_th.value
 
             # update
             with self.lock_odometry:
@@ -420,4 +433,14 @@ class Robot:
         Uses the light sensor to get the amount of light
         :return: the amount of light from 0 (dark, no light) to 1 (bright, full light)
         """
-        return 1 - self.BP.get_sensor(self.SENSOR_LIGHT) / 3500
+        return 1 - self.BP.get_sensor(self.SENSOR_LIGHT) / 4000
+
+    def waitButtonPress(self):
+        periodic = Periodic()
+        while periodic(not self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for press
+        while periodic(self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for release
+
+    def onMarker(self, x=-1, y=-1, th=-1):
+        self.marker_x.value = x
+        self.marker_y.value = y
+        self.marker_th.value = th
