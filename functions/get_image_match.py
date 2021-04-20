@@ -7,9 +7,6 @@ from classes import Cfg
 #---------------------------------------------------------------------------------------------------
 # CONFIGURATION
 
-# sample_matching debug's mode equivalent is enabled if cam argument is given
-Cfg.add_argument("-cam", "--camera", help="Show the camera in the robot", action="store_true")
-
 # ASCI codes to interact with windows when debug
 ESC = 27
 
@@ -58,9 +55,8 @@ def match_images(img1_bgr, img2_bgr):
 
     # Show matches if requested
     if Cfg.camera:
-        img_tmp = cv2.drawMatches(img1,kp1,img2,kp2,good,None)    
+        img_tmp = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None)    
         cv2.imshow("All matches", img_tmp)
-        cv2.waitKey(0)
 
     if len(good) > MIN_MATCH_COUNT:
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
