@@ -49,7 +49,7 @@ class PiCamera:
         img = None
         while not ok:
             ok, img = self.videoCapture.read()
-        return img
+        return cv2.flip(img, -1)  # to rotate 180
 
     def capture(self, array, format="bgr", use_video_port=True):
         assert use_video_port and format == "bgr"

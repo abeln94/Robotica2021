@@ -141,7 +141,7 @@ class _Ultrasonic:
 class _Light:
     @staticmethod
     def init(port, data):
-        data[port] = 1750
+        data[port] = 2000
 
     @staticmethod
     def update(port, data, dT):
@@ -156,13 +156,13 @@ class _Light:
         return [[
             sg.Text(port + ": Light:"),
             sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "#"),
-            sg.Slider(range=(0, 3500), default_value=data[port], orientation='horizontal', key=port),
+            sg.Slider(range=(0, 4000), default_value=data[port], orientation='horizontal', key=port),
         ]]
 
     @staticmethod
     def updateUI(event, values, window, port, data):
         graph = window[port + '#']
-        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(int(_Light.read(port, data) / 3500 * 255)))
+        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(255 - int(_Light.read(port, data) / 4000 * 255)))
 
         if port in values:
             data[port] = values[port]
@@ -242,7 +242,7 @@ class BrickPi3:
         createdPorts = []  # already initialized ports
 
         # Create the Window
-        window = sg.Window('Robot simulator controller', [[]], size=(512, 200))
+        window = sg.Window('Robot simulator controller', [[]], size=(512, 300))
 
         while not self.finished.value:
             event, values = window.read(timeout=0)  # ui magic

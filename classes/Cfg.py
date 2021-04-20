@@ -14,6 +14,7 @@ FOLDER_MAPS = "./maps/"
 # Fixed parameters
 ROBOT_L = 117  # distance between robot wheels
 ROBOT_r = 26.7  # radius of robots wheels
+LIGHT_OFFSET = 95  # x offset of the light sensor
 LIN_VEL = 150  # stable velocity for linear motion (mm/s)
 ANG_VEL = np.deg2rad(30)  # stable velocity for angular motion (rad/s)
 CAMERA_WIDTH = 320  # camera width to obtain (px)

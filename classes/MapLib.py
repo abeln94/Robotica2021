@@ -4,12 +4,14 @@ from __future__ import division  # ''
 from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
 
 import os
-import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from classes import Cfg
+
+Cfg.add_argument("-pm", "--plotMap", help="Plot internal map weights", action="store_true")
+Cfg.add_argument("-fm", "--logMap", help="Log map into a file", default=False)
 
 
 class Map2D:
@@ -36,9 +38,6 @@ class Map2D:
         # params to visualize
         self.mapLineStyle = 'r-'
         self.costValueStyle = 'g*'
-        self.verbose = True
-        # set to False to stop displaying plots interactively (and maybe just save the screenshots)
-        # self.verbose = False
         self.current_ax = None
 
         # variables about map params
@@ -54,6 +53,13 @@ class Map2D:
             print("Map %s loaded ok" % map_description_file)
         else:
             print("Map %s NOT loaded" % map_description_file)
+
+        if Cfg.plotMap:
+            # create a new figure and set it as current axis
+            plt.figure('map')
+            plt.plot([], [])
+            plt.show(block=False)
+            self.drawMap()
 
     # from python docs: https://docs.python.org/3/tutorial/classes.html#private-variables
     # “Private” instance variables that cannot be accessed except from inside an object don’t exist in Python.
@@ -96,6 +102,7 @@ class Map2D:
         \t connectionMatrix is a numpy array \
         \t Function will return False if something went wrong loading the map file.
         """
+        verbose = True
         try:
             # FILL GLOBAL VARIABLES dimX dimY cellSize
             loadingOk = False
@@ -104,7 +111,7 @@ class Map2D:
             # 1. special case for first line. initialize dimX dimY cellSize
             header = mapF.readline()  # next()
             tmp = header.split()  # any whitespace string is a separator and empty strings are removed from the result
-            if self.verbose:
+            if verbose:
                 print("Header line: %s " % header)
             parsed_header = [int(c) for c in tmp]
             # expected to have three numbers: sizeX sizeY sizeCell_in_mm
@@ -124,7 +131,7 @@ class Map2D:
                 current_row = (self.connectionMatrix.shape[1] - 1) - indx
                 # Split numbers in the line. Any whitespace string is a separator and empty strings are removed from the result
                 tmp = line.split()
-                if self.verbose:
+                if verbose:
                     print("Line for map row %d: %s " % (current_row, line))
                 parsed_line = [int(c) for c in tmp]
 
@@ -336,12 +343,11 @@ class Map2D:
         return True
 
     def drawMapWithRobotLocations(self,
-                                  robotPosVectors=[[0, 0, 0], [600, 600, 3.14]],
-                                  saveSnapshot=True):
+                                  robotPosVectors=[[0, 0, 0], [600, 600, 3.14]]):
         """ Overloaded version of drawMap to include robot positions """
-        return self.drawMap(robotPosVectors=robotPosVectors, saveSnapshot=saveSnapshot)
+        return self.drawMap(robotPosVectors=robotPosVectors)
 
-    def drawMap(self, robotPosVectors=None, saveSnapshot=False):
+    def drawMap(self, robotPosVectors=None):
         """
         Generates a plot with currently loaded map status
 
@@ -349,12 +355,9 @@ class Map2D:
         if verbose, it displays the plot
         if saveSnapshot: saves a figure as mapstatus_currenttimestamp_FIGNUM.png
         """
-        # self.verbose = True
-        self.verbose = False
-
-        # create a new figure and set it as current axis
-        current_fig = plt.figure()
-        self.current_ax = current_fig.add_subplot(111)
+        # reset
+        plt.gcf().clear()
+        self.current_ax = plt.gca()
 
         self._drawGrid()
 
@@ -368,22 +371,17 @@ class Map2D:
             # plot last robot position with solid green line
             self._drawRobot(loc_x_y_th=loc, robotPlotStyle='g-')
 
-        if saveSnapshot:
-            ts = str(time.time())
-            snapshot_name = Cfg.FOLDER_IMAGES + "mapstatus_" + ts + "_F" + str(current_fig.number) + ".png"
+        if Cfg.logMap:
+            snapshot_name = Cfg.FOLDER_IMAGES + Cfg.logMap
             os.makedirs(os.path.dirname(snapshot_name), exist_ok=True)
             print("saving %s " % snapshot_name)
             plt.savefig(snapshot_name)
 
-        if self.verbose:
-            current_fig.set_visible(True)
-            current_fig.show()
-            print("Press ENTER in the plot window to continue ... ")
-            current_fig.waitforbuttonpress()
-        else:
-            current_fig.set_visible(False)
+        # draw
+        plt.gcf().canvas.draw()
+        plt.gcf().canvas.flush_events()
 
-        return current_fig
+        return plt.gcf()
 
     def findPath(self, point_ini, point_end):
         """ overloaded call to planPath (x_ini,  y_ini, x_end, y_end) """
@@ -452,6 +450,9 @@ class Map2D:
 
             if len(currentPath) > 1000:
                 raise Exception("Infinite loop")
+
+        if Cfg.plotMap:
+            self.drawMap()
 
         # Make sure self.currentPath is a 2D numpy array
         self.currentPath = np.array(currentPath)

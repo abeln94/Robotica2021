@@ -4,8 +4,9 @@ import matplotlib.ticker as plticker
 from functions.dibrobot import dibrobot
 
 PADDING = 500  # padding of the plot
-GRID = 120 * 3  # grid distance (length of the square tiles)
-loc = plticker.MultipleLocator(base=GRID)
+GRID = 400  # 120 * 3  # grid distance (length of the square tiles)
+locX = plticker.MultipleLocator(base=GRID)
+locY = plticker.MultipleLocator(base=GRID)  # must be a different object from locX
 
 
 class Map:
@@ -44,8 +45,8 @@ class Map:
     def drawPath(self, x, y):
         """ Show a full list of coordinates on the map """
         # display grid
-        plt.gca().xaxis.set_major_locator(loc)
-        plt.gca().yaxis.set_major_locator(loc)
+        plt.gca().xaxis.set_major_locator(locX)
+        plt.gca().yaxis.set_major_locator(locY)
         plt.grid()
 
         # display path
