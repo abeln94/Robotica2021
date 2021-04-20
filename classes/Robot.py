@@ -324,13 +324,9 @@ class Robot:
                 time.sleep(MOVEMENT_TIME)
 
         # 2. Then catch the ball
-        self.catch()
-
-    def catch(self):
-        """ Closes the robot claw """
         ANGLE = 90  # degrees
         TIME = 3  # seconds
-        ADVANCE = 15  # mm
+        ADVANCE = 30  # mm (more or less)
 
         # sanity check
         if self.BP.get_motor_encoder(self.MOTOR_CLAW) > ANGLE / 2:

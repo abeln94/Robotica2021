@@ -88,7 +88,7 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
         # Show mask and blobs found
         im_with_keypoints = cv2.drawKeypoints(img_BGR, keypoints, np.array([]), (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-        cv2.imshow("Detected Regions", np.hstack([im_with_keypoints, regions]))
+        cv2.imshow("Detected Regions", cv2.flip(np.hstack([regions, im_with_keypoints]), -1))
         cv2.waitKey(1)
 
     return keypoints
