@@ -19,6 +19,10 @@ class PiRGBArray:
     def __init__(self, cam, size):
         self.size = size
         self.array = None
+    
+    def truncate(self, value=0):
+        # https://picamera.readthedocs.io/en/release-1.10/api_array.html#pirgbarray
+        self.array = None
 
 
 class PiCamera:
