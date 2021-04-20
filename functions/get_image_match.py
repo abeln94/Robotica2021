@@ -85,8 +85,9 @@ def match_images(img1_bgr, img2_bgr):
             img3 = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None,**draw_params)
             cv2.imshow("INLIERS", img3)
         # ROBUST matches found - np.sum(matchesMask) (out of len(good)) --> OBJECT FOUND"
-        xCenter = sum(dst,0)[0][0] / len(dst)
-        yCenter = sum(dst,0)[0][1] / len(dst)
+        sumOfColumns = sum(dst,0)[0]
+        xCenter = sumOfColumns[0] / len(dst)
+        yCenter = sumOfColumns[1] / len(dst)
         return True, (xCenter / Cfg.CAMERA_WIDTH, yCenter / Cfg.CAMERA_HEIGHT)
     else:
         # Not enough initial matches are found - len(good) (required MIN_MATCH_COUNT)"
