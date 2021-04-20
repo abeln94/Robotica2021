@@ -21,8 +21,8 @@ MIN_MATCH_OBJECTFOUND=15    # after robust check, to consider object-found
 
 def match_images(img1_bgr, img2_bgr):
     """
-    Returns whether img1_bgr is contained in img2_bgr and if it is, returns the 
-    2D coordinates where the blob found is
+    Returns whether img1_bgr is contained into img2_bgr, and if it is, returns the 
+    2D coordinates where the blob is found
     :param img1_bgr: image to find into img2_bgr
     :param img2_bgr: a given image
     """

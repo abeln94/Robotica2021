@@ -435,7 +435,7 @@ class Robot:
     def detectImage(self, imgage_bgr):
         """
         Returns wheter the given image is detected or not into the current camera's capture, 
-        and if it is, returns the image's coordinates of the match
+        and if it is, returns the matched blobs's coordinates
         """
         # Return the result of invoking find_image
         return match_images(imgage_bgr, self.capture_image())
