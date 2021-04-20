@@ -1,6 +1,5 @@
 import cv2
 
-from classes.Periodic import Periodic
 from classes.Robot import Robot
 
 robot = None
@@ -18,8 +17,7 @@ if __name__ == "__main__":
 
         # 2. 
         print("Press ESC to quit")
-        periodic = Periodic(1)
-        while periodic(cv2.waitKey(1) != 27):
+        while cv2.waitKey(1) != 27:
             found, coordinates = robot.detectImage(image)
             print("Returned (", found, ", ", coordinates, ")")
 
