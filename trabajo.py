@@ -32,7 +32,7 @@ if __name__ == "__main__":
         leftSide = robot.getLight() >= 0.5
 
         # perform S
-        T = 20
+        T = 5
         for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
             cx, cy = myMap._cell2pos(1, c)
             for t in range(T):
