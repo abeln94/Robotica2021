@@ -87,7 +87,7 @@ def match_images(img1_bgr, img2_bgr):
         # ROBUST matches found - np.sum(matchesMask) (out of len(good)) --> OBJECT FOUND"
         xCenter = sum(dst,0)[0][0] / len(dst)
         yCenter = sum(dst,0)[0][1] / len(dst)
-        return True, (xCenter, yCenter)
+        return True, (xCenter / Cfg.CAMERA_WIDTH, yCenter / Cfg.CAMERA_HEIGHT)
     else:
         # Not enough initial matches are found - len(good) (required MIN_MATCH_COUNT)"
         return NOT_FOUND
