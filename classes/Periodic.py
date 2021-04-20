@@ -44,7 +44,11 @@ class Periodic:
             else:
                 # next call, wait
                 delay = self.delay - self.delta.update(time.clock())
-                if delay > 0: time.sleep(delay)
+                if delay > 0:
+                    time.sleep(delay)
+
+                # prepare for next iteration
+                self.delta.update(time.clock())
 
         else:
             # reset itself on exit
