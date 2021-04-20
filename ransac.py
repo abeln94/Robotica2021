@@ -21,8 +21,8 @@ if __name__ == "__main__":
         print("Press ESC to quit")
         stop = False
         while not stop:
-            found = robot.detectImage(image)
-            print("Returned (", found, ", ", None, ")")
+            found, coordinates = robot.detectImage(image)
+            print("Returned (", found, ", ", coordinates, ")")
             if found: # Wait for press key
                 cv2.waitKey(0)
             time.sleep(1)

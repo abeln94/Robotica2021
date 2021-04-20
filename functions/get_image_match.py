@@ -27,6 +27,9 @@ def match_images(img1_bgr, img2_bgr):
     :param img2_bgr: a given image
     """
 
+    # If figure not found, this pair is returned
+    NOT_FOUND = False, None
+
     # Feature extractor uses grayscale images
     img1 = cv2.cvtColor(img1_bgr, cv2.COLOR_BGR2GRAY)
     img2 = cv2.cvtColor(img2_bgr, cv2.COLOR_BGR2GRAY)
@@ -43,10 +46,10 @@ def match_images(img1_bgr, img2_bgr):
 
     if des1 is None or des2 is None:
         # WARNING: empty detection?
-        return False
+        return NOT_FOUND
     if len(des1) < MIN_MATCH_COUNT or len(des2) < MIN_MATCH_COUNT:
         # WARNING: not enough FEATURES (im1: len(des1), im2: len(des2))
-        return False
+        return NOT_FOUND
 
     # If binary features are used
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -58,6 +61,7 @@ def match_images(img1_bgr, img2_bgr):
         img_tmp = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None)    
         cv2.imshow("All matches", img_tmp)
 
+    # If enough matches found, figure is considered to be recognized
     if len(good) > MIN_MATCH_COUNT:
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
@@ -66,25 +70,24 @@ def match_images(img1_bgr, img2_bgr):
         num_robust_matches = np.sum(matchesMask)
         if num_robust_matches < MIN_MATCH_OBJECTFOUND:
             # NOT enough ROBUST matches found - num_robust_matches (required MIN_MATCH_OBJECTFOUND)
-            return False
+            return NOT_FOUND
         h,w = img1.shape
         pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts,H_21)
         img2_res = cv2.polylines(img2_bgr, [np.int32(dst)], True, 
                                  color=(255,255,255), thickness=3)
+        # Show matches if requested
+        if Cfg.camera:
+            draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+                            singlePointColor = None,
+                            matchesMask = matchesMask, # draw only inliers
+                            flags = 2)
+            img3 = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None,**draw_params)
+            cv2.imshow("INLIERS", img3)
         # ROBUST matches found - np.sum(matchesMask) (out of len(good)) --> OBJECT FOUND"
-        found = True
+        xCenter = sum(dst,0)[0][0] / len(dst)
+        yCenter = sum(dst,0)[0][1] / len(dst)
+        return True, (xCenter, yCenter)
     else:
         # Not enough initial matches are found - len(good) (required MIN_MATCH_COUNT)"
-        matchesMask = None
-        found = False
-
-    if Cfg.camera:
-        draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                           singlePointColor = None,
-                           matchesMask = matchesMask, # draw only inliers
-                           flags = 2)
-        img3 = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None,**draw_params)
-        cv2.imshow("INLIERS", img3)
-
-    return found
+        return NOT_FOUND
