@@ -4,7 +4,7 @@ import numpy as np
 
 from classes import Cfg
 
-Cfg.add_argument("-cam", "--camera", help="Show the camera in the robot", action="store_true")
+Cfg.add_argument("-blobs", "--color_blobs", help="Show the camera in the robot", action="store_true")
 
 # Setup default values for SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
@@ -79,7 +79,7 @@ def get_color_blobs(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     keypoints = detector.detect(mask)
     # keypoints = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
 
-    if Cfg.camera:
+    if Cfg.color_blobs:
         regions = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB)
 
         for kp in keypoints:

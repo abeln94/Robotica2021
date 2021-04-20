@@ -1,10 +1,13 @@
 # Standard imports
 import cv2
 import numpy as np
+
 # Project imports
 from classes import Cfg
 
-#---------------------------------------------------------------------------------------------------
+Cfg.add_argument("-match", "--image_match", help="Show the camera in the robot", action="store_true")
+
+# ---------------------------------------------------------------------------------------------------
 # CONFIGURATION
 
 # ASCI codes to interact with windows when debug
@@ -57,8 +60,8 @@ def match_images(img1_bgr, img2_bgr):
     good = sorted(matches, key = lambda x:x.distance)
 
     # Show matches if requested
-    if Cfg.camera:
-        img_tmp = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None)    
+    if Cfg.image_match:
+        img_tmp = cv2.drawMatches(img1_bgr, kp1, img2_bgr, kp2, good, None)
         cv2.imshow("All matches", img_tmp)
 
     # If enough matches found, figure is considered to be recognized
@@ -77,12 +80,12 @@ def match_images(img1_bgr, img2_bgr):
         img2_res = cv2.polylines(img2_bgr, [np.int32(dst)], True, 
                                  color=(255,255,255), thickness=3)
         # Show matches if requested
-        if Cfg.camera:
-            draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                            singlePointColor = None,
-                            matchesMask = matchesMask, # draw only inliers
-                            flags = 2)
-            img3 = cv2.drawMatches(img1_bgr,kp1,img2_bgr,kp2,good,None,**draw_params)
+        if Cfg.image_match:
+            draw_params = dict(matchColor=(0, 255, 0),  # draw matches in green color
+                               singlePointColor=None,
+                               matchesMask=matchesMask,  # draw only inliers
+                               flags=2)
+            img3 = cv2.drawMatches(img1_bgr, kp1, img2_bgr, kp2, good, None, **draw_params)
             cv2.imshow("INLIERS", img3)
         # ROBUST matches found - np.sum(matchesMask) (out of len(good)) --> OBJECT FOUND"
         sumOfColumns = sum(dst,0)[0]

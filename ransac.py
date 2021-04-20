@@ -1,7 +1,6 @@
 import cv2
-import time
-import sys
-from classes import Cfg
+
+from classes.Periodic import Periodic
 from classes.Robot import Robot
 
 robot = None
@@ -19,15 +18,10 @@ if __name__ == "__main__":
 
         # 2. 
         print("Press ESC to quit")
-        stop = False
-        while not stop:
+        periodic = Periodic(1)
+        while periodic(cv2.waitKey(1) != 27):
             found, coordinates = robot.detectImage(image)
             print("Returned (", found, ", ", coordinates, ")")
-            if found: # Wait for press key
-                cv2.waitKey(0)
-            time.sleep(1)
-            if cv2.waitKey(1) == 27:
-                stop = True
 
     finally:
         # wrap up and close stuff before exiting
