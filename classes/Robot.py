@@ -406,7 +406,7 @@ class Robot:
         :return: the distance of the obstacle in front of the robot in mm
         """
         # return distance
-        return self.BP.get_sensor(self.SENSOR_ULTRASONIC) * 10
+        return (self.BP.get_sensor(self.SENSOR_ULTRASONIC) + 5) * 10
 
     def detectObstacle(self, x_dest, y_dest):
         """
