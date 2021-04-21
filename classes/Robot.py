@@ -171,6 +171,8 @@ class Robot:
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
         swap = False
         time_save = time.time()
+        n = 0
+        gyro_data_mean = 0
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -221,6 +223,10 @@ class Robot:
             time_save = time.time()
             print("--------------- GYRO DATA: " + str(gyro_data))
             print("--------------- GYRO DATA CENTERED: " + str(gyro_data - GYRO_DEFAULT))
+
+            n += 1
+            gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
+            print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
 
             gyro_speed = (gyro_data - GYRO_DEFAULT) * GYRO2DEG
             # print("--------------- GYRO SPEED (rad/seg): " + str(gyro_speed))
