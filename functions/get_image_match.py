@@ -78,8 +78,8 @@ def match_images(image, capture):
         h, w = img.shape
         pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         box_corners = cv2.perspectiveTransform(pts, H_21)
-        # cap_res = cv2.polylines(capture, [np.int32(box_corners)], True,
-        #                          color=(255, 255, 255), thickness=3)
+        cv2.polylines(capture, [np.int32(box_corners)], True,
+                      color=(255, 255, 255), thickness=3)
 
         # Show matches if requested
         if Cfg.image_match:
