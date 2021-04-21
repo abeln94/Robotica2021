@@ -63,7 +63,7 @@ class Robot:
         self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
         self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
-        self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
+        self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
         
         # reset encoder of all motors
         for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
@@ -145,7 +145,7 @@ class Robot:
 
     def readAng(self):
         with self.lock_odometry:
-            return self.ang.Value
+            return self.ang.value
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
@@ -216,7 +216,7 @@ class Robot:
             GYRO_DEFAULT = 0 # TODO
             GYRO2DEG = 0 # TODO: O.25 ?
 
-            gyro_data = BP.get_sensor(self.SENSOR_GYRO)
+            gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
             time_interval = time.time() - time_save
             time_save = time.time()
             print("--------------- GYRO DATA: " + str(gyro_data))
