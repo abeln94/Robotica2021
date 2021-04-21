@@ -19,6 +19,10 @@ class PiRGBArray:
     def __init__(self, cam, size):
         self.size = size
         self.array = None
+    
+    def truncate(self, value=0):
+        # https://picamera.readthedocs.io/en/release-1.10/api_array.html#pirgbarray
+        self.array = None
 
 
 class PiCamera:
@@ -45,7 +49,7 @@ class PiCamera:
         img = None
         while not ok:
             ok, img = self.videoCapture.read()
-        return cv2.flip(img, -1)  # to rotate 180
+        return img # cv2.flip(img, -1)  # to rotate 180
 
     def capture(self, array, format="bgr", use_video_port=True):
         assert use_video_port and format == "bgr"

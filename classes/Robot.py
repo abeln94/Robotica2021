@@ -15,6 +15,7 @@ from classes.Map import Map
 from classes.Periodic import Periodic
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
+from functions.get_image_match import match_images
 from functions.math import sigmoid, logistic
 from functions.simubot import simubot
 
@@ -430,6 +431,14 @@ class Robot:
         :return: the amount of light from 0 (dark, no light) to 1 (bright, full light)
         """
         return 1 - self.BP.get_sensor(self.SENSOR_LIGHT) / 4000
+
+    def detectImage(self, imgage_bgr):
+        """
+        Returns wheter the given image is detected or not into the current camera's capture, 
+        and if it is, returns the matched blobs's coordinates
+        """
+        # Return the result of invoking find_image
+        return match_images(imgage_bgr, self.capture_image())
 
     def waitButtonPress(self):
         periodic = Periodic()
