@@ -58,17 +58,17 @@ def match_images(image, capture):
     # If binary features are used
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     matches = bf.match(desImg, desCap)
-    goodKeypoints = sorted(matches, key=lambda x: x.distance)
+    goodMatches = sorted(matches, key=lambda x: x.distance)
 
     # Show matches if requested
     if Cfg.image_match:
-        img_tmp = cv2.drawMatches(image, kpImg, capture, kpCap, goodKeypoints, None)
+        img_tmp = cv2.drawMatches(image, kpImg, capture, kpCap, goodMatches, None)
         cv2.imshow("Matches", img_tmp)
 
     # If enough matches found, figure is considered to be recognized
-    if len(goodKeypoints) > MIN_MATCH_COUNT:
-        img_pts = np.float32([kpImg[m.queryIdx].pt for m in goodKeypoints]).reshape(-1, 1, 2)
-        cap_pts = np.float32([kpCap[m.trainIdx].pt for m in goodKeypoints]).reshape(-1, 1, 2)
+    if len(goodMatches) > MIN_MATCH_COUNT:
+        img_pts = np.float32([kpImg[m.queryIdx].pt for m in goodMatches]).reshape(-1, 1, 2)
+        cap_pts = np.float32([kpCap[m.trainIdx].pt for m in goodMatches]).reshape(-1, 1, 2)
         H_21, mask = cv2.findHomography(img_pts, cap_pts, cv2.RANSAC, 3.0)
         matchesMask = mask.ravel().tolist()
         num_robust_matches = np.sum(matchesMask)
@@ -87,13 +87,13 @@ def match_images(image, capture):
                                singlePointColor=None,
                                matchesMask=matchesMask,  # draw only inliers
                                flags=2)
-            img3 = cv2.drawMatches(image, kpImg, capture, kpCap, goodKeypoints, None, **draw_params)
+            img3 = cv2.drawMatches(image, kpImg, capture, kpCap, goodMatches, None, **draw_params)
             cv2.imshow("Matches", img3)
-        # ROBUST matches found - np.sum(matchesMask) (out of len(goodKeypoints)) --> OBJECT FOUND"
+        # ROBUST matches found - np.sum(matchesMask) (out of len(goodMatches)) --> OBJECT FOUND"
         sumOfColumns = sum(box_corners, 0)[0]
         xCenter = sumOfColumns[0] / len(box_corners)
         yCenter = sumOfColumns[1] / len(box_corners)
         return True, (xCenter / Cfg.CAMERA_WIDTH, yCenter / Cfg.CAMERA_HEIGHT)
     else:
-        # Not enough initial matches are found - len(goodKeypoints) (required MIN_MATCH_COUNT)"
+        # Not enough initial matches are found - len(goodMatches) (required MIN_MATCH_COUNT)"
         return NOT_FOUND

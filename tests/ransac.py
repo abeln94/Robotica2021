@@ -1,4 +1,5 @@
 import cv2
+import time
 
 from classes.Robot import Robot
 
@@ -20,6 +21,7 @@ if __name__ == "__main__":
         while cv2.waitKey(1) != 27:
             found, coordinates = robot.detectImage(image)
             print("Returned (", found, ", ", coordinates, ")")
+            time.sleep(0.5)
 
     finally:
         # wrap up and close stuff before exiting
