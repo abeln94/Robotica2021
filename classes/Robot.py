@@ -41,6 +41,7 @@ Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", 
 GYRO_DEFAULT = 2372
 GYRO2DEG = 0.24
 
+
 class Robot:
     def __init__(self, init_position=None):
         """
@@ -68,7 +69,7 @@ class Robot:
         self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
-        
+
         # reset encoder of all motors
         for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
             self.BP.offset_motor_encoder(motor, self.BP.get_motor_encoder(motor))
@@ -149,8 +150,7 @@ class Robot:
 
     def readAng(self):
         """ Returns current angle in rads, calculated with the gyro sensor """
-        with self.lock_odometry:
-            return np.deg2rad((self.ang.value + 180) % 360 -180)
+        return norm_pi(self.ang.value)
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
@@ -222,10 +222,9 @@ class Robot:
             time_interval = time.time() - time_save
             time_save = time.time()
 
-            gyro_speed = (GYRO_DEFAULT - gyro_data) * GYRO2DEG
+            gyro_speed = np.deg2rad((GYRO_DEFAULT - gyro_data) * GYRO2DEG)
 
             ang += gyro_speed * time_interval
-
 
             # detect marker
             if self.getLight() < 0.4:  # dark
@@ -253,7 +252,7 @@ class Robot:
                 self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
             # display
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), ang))
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(ang)))
 
             if Cfg.plot:
                 map.update([x, y, th])
