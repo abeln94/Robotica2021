@@ -224,6 +224,10 @@ class Robot:
             print("--------------- GYRO DATA: " + str(gyro_data))
             print("--------------- GYRO DATA CENTERED: " + str(gyro_data - GYRO_DEFAULT))
 
+            n += 1
+            gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
+            print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
+
             gyro_speed = (gyro_data - GYRO_DEFAULT) * GYRO2DEG
             # print("--------------- GYRO SPEED (rad/seg): " + str(gyro_speed))
             ang += gyro_speed * time_interval
