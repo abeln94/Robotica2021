@@ -1,5 +1,3 @@
-import time
-
 import cv2
 
 from classes import Cfg
@@ -25,7 +23,7 @@ if __name__ == "__main__":
 
         # 2. 
         print("Press ESC to quit")
-        while cv2.waitKey(1) != 27:
+        while cv2.waitKey(1000) != 27:
             foundOur, coordinatesOur = robot.detectImage(our)
             foundOther, coordinatesOther = robot.detectImage(other)
 
@@ -37,7 +35,6 @@ if __name__ == "__main__":
             else:
                 print('not found', foundOur, foundOther)
 
-            time.sleep(1)
 
     finally:
         # wrap up and close stuff before exiting
