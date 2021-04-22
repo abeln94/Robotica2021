@@ -37,6 +37,9 @@ Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", acti
 Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 
+# GYRO constants
+GYRO_DEFAULT = 2372
+GYRO2DEG = 0.24
 
 class Robot:
     def __init__(self, init_position=None):
@@ -58,12 +61,14 @@ class Robot:
         self.SENSOR_ULTRASONIC = self.BP.PORT_1
         self.SENSOR_BUTTON = self.BP.PORT_2
         self.SENSOR_LIGHT = self.BP.PORT_3
+        self.SENSOR_GYRO = self.BP.PORT_4
 
         # Configure sensors, for example a touch sensor.
         self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
         self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
-
+        self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+        
         # reset encoder of all motors
         for motor in (self.MOTOR_CLAW, self.MOTOR_LEFT, self.MOTOR_RIGHT):
             self.BP.offset_motor_encoder(motor, self.BP.get_motor_encoder(motor))
@@ -85,6 +90,7 @@ class Robot:
         self.x = Value('d', init_position[0], lock=self.lock_odometry)
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
+        self.ang = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
         # odometry command values
@@ -141,6 +147,11 @@ class Robot:
         with self.lock_odometry:
             return self.x.value, self.y.value, self.th.value
 
+    def readAng(self):
+        """ Returns current angle in rads, calculated with the gyro sensor """
+        with self.lock_odometry:
+            return np.deg2rad((self.ang.value + 180) % 360 -180)
+
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
@@ -158,11 +169,13 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
+        ang = self.readAng()
         wi = self.wi.value
         wd = self.wd.value
         leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
         swap = False
+        time_save = time.time()
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -204,6 +217,16 @@ class Robot:
                 y += ds * np.sin(th + dth / 2)
                 th = norm_pi(th + dth)
 
+            # update ang with gyro
+            gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
+            time_interval = time.time() - time_save
+            time_save = time.time()
+
+            gyro_speed = (GYRO_DEFAULT - gyro_data) * GYRO2DEG
+
+            ang += gyro_speed * time_interval
+
+
             # detect marker
             if self.getLight() < 0.4:  # dark
                 print("marker detected")
@@ -216,6 +239,7 @@ class Robot:
                 self.x.value = x
                 self.y.value = y
                 self.th.value = th
+                self.ang.value = ang
 
             # change velocity
             wi = wi * Cfg.smoothness + self.wi.value * (1 - Cfg.smoothness)
