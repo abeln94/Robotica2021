@@ -253,7 +253,7 @@ class Robot:
                 self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
             # display
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), ang))
 
             if Cfg.plot:
                 map.update([x, y, th])
@@ -266,7 +266,7 @@ class Robot:
 
             ######## UPDATE UNTIL HERE with your code ########
 
-        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), ang))
+        print("Stopping odometry")
         if Cfg.log:
             logFile.close()
 
