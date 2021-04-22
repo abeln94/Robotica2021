@@ -14,6 +14,7 @@ from p4 import traverseLabyrinth
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
+Cfg.add_argument("-s", "--S_as_arcs", help="do s as arcs", action="store_true")
 
 # images
 IMAGE_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
@@ -40,17 +41,29 @@ if __name__ == "__main__":
 
         # detect color
         leftSide = robot.getLight() >= 0.5
+        enter, exit = (0, 2) if leftSide else (2, 0)
 
         # perform S
-        T = 10
-        for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
-            cx, cy = myMap._cell2pos(1, c)
-            for t in range(T):
-                angle = np.pi * t / (T - 1)
-                robot.go(cx - side * GRID * np.sin(angle), cy + GRID * np.cos(angle))
+        if Cfg.S_as_arcs:
+            # as arcs
+            T = 7
+            for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
+                cx, cy = myMap._cell2pos(1, c)
+                for t in range(T):
+                    angle = np.pi * t / (T - 1)
+                    robot.go(cx - side * GRID * np.sin(angle), cy + GRID * np.cos(angle))
+        else:
+            # as squares
+            robot.go(*myMap._cell2pos(enter, 7))
+            robot.go(*myMap._cell2pos(enter, 6))
+            robot.go(*myMap._cell2pos(enter, 5))
+            robot.go(*myMap._cell2pos(1, 5))
+            robot.go(*myMap._cell2pos(exit, 5))
+            robot.go(*myMap._cell2pos(exit, 4))
+            robot.go(*myMap._cell2pos(exit, 3))
+            robot.go(*myMap._cell2pos(1, 3))
 
         # enter labyrinth
-        enter, exit = (0, 2) if leftSide else (2, 0)
         robot.go(*myMap._cell2pos(enter, 3))
         robot.go(*myMap._cell2pos(enter, 2))
 
