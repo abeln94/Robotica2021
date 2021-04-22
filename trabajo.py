@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import matplotlib
 import numpy as np
@@ -29,10 +31,12 @@ if __name__ == "__main__":
 
         # init Robot
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
-        robot.startOdometry()
 
         # press button to start
         robot.waitButtonPress()
+
+        # start odometry
+        robot.startOdometry()
 
         # detect color
         leftSide = robot.getLight() >= 0.5
@@ -69,12 +73,16 @@ if __name__ == "__main__":
 
         # detect image
         periodic = Periodic(1)
+        rotateLeft = 1
         while periodic():
             foundOur, coordinatesOur = robot.detectImage(IMAGE_OUR)
             foundOther, coordinatesOther = robot.detectImage(IMAGE_OTHER)
             if foundOur and foundOther:
                 leftExit = coordinatesOur[0] > coordinatesOther[0]  # the camera is inverted
                 break
+            else:
+                robot.setSpeed(0, np.deg2rad(10) * rotateLeft)
+                rotateLeft = 1 - rotateLeft
 
         # exit lab
         if leftExit:

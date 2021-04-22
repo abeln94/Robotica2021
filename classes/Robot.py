@@ -38,7 +38,7 @@ Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="sto
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 
 # GYRO constants
-GYRO_DEFAULT = 2372
+GYRO_DEFAULT = 2371.1
 GYRO2DEG = 0.24
 
 
