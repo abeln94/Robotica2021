@@ -91,7 +91,6 @@ class Robot:
         self.x = Value('d', init_position[0], lock=self.lock_odometry)
         self.y = Value('d', init_position[1], lock=self.lock_odometry)
         self.th = Value('d', init_position[2], lock=self.lock_odometry)
-        self.ang = Value('d', init_position[2], lock=self.lock_odometry)
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
         # odometry command values
@@ -148,10 +147,6 @@ class Robot:
         with self.lock_odometry:
             return self.x.value, self.y.value, self.th.value
 
-    def readAng(self):
-        """ Returns current angle in rads, calculated with the gyro sensor """
-        return norm_pi(self.ang.value)
-
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
@@ -169,7 +164,7 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
-        ang = self.readAng()
+        old_th = th
         wi = self.wi.value
         wd = self.wd.value
         leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
@@ -204,7 +199,7 @@ class Robot:
 
                 v = Cfg.ROBOT_r * (wL + wR) / 2
                 w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
-                x, y, th = simubot([v, w], np.array([x, y, th]), dT)
+                x, y, old_th = simubot([v, w], np.array([x, y, th]), dT)
 
             else:
                 # inexact, fast
@@ -215,7 +210,7 @@ class Robot:
                 dth = (sR - sL) / Cfg.ROBOT_L
                 x += ds * np.cos(th + dth / 2)
                 y += ds * np.sin(th + dth / 2)
-                th = norm_pi(th + dth)
+                old_th = norm_pi(th + dth)
 
             # update ang with gyro
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
@@ -224,7 +219,7 @@ class Robot:
 
             gyro_speed = np.deg2rad((GYRO_DEFAULT - gyro_data) * GYRO2DEG)
 
-            ang += gyro_speed * time_interval
+            th += gyro_speed * time_interval
 
             # detect marker
             if self.getLight() < 0.4:  # dark
@@ -238,7 +233,6 @@ class Robot:
                 self.x.value = x
                 self.y.value = y
                 self.th.value = th
-                self.ang.value = ang
 
             # change velocity
             wi = wi * Cfg.smoothness + self.wi.value * (1 - Cfg.smoothness)
@@ -252,7 +246,7 @@ class Robot:
                 self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
             # display
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(ang)))
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(old_th)))
 
             if Cfg.plot:
                 map.update([x, y, th])
