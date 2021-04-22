@@ -215,22 +215,23 @@ class Robot:
                 th = norm_pi(th + dth)
 
             # update ang with gyro
-            GYRO_DEFAULT = 2372 # TODO
-            GYRO2DEG = 0 # TODO: O.25 ?
+            GYRO_DEFAULT = 2372
+            GYRO2DEG = 0.25
 
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
             time_interval = time.time() - time_save
             time_save = time.time()
-            print("--------------- GYRO DATA: " + str(gyro_data))
-            print("--------------- GYRO DATA CENTERED: " + str(gyro_data - GYRO_DEFAULT))
+            #print("--------------- GYRO DATA: " + str(gyro_data))
+            #print("--------------- GYRO DATA CENTERED: " + str(GYRO_DEFAULT - gyro_data))
 
-            n += 1
-            gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
-            print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
+            #n += 1
+            #gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
+            #print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
 
             gyro_speed = (gyro_data - GYRO_DEFAULT) * GYRO2DEG
             # print("--------------- GYRO SPEED (rad/seg): " + str(gyro_speed))
             ang += gyro_speed * time_interval
+            print(ang)
 
             # detect marker
             if self.getLight() < 0.4:  # dark

@@ -25,8 +25,6 @@ if __name__ == "__main__":
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
         robot.startOdometry()
 
-        # press button to start
-        robot.waitButtonPress()
 
         # spin and wait
         robot.setSpeed(0, np.deg2rad(45))
