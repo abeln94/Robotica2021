@@ -249,7 +249,7 @@ class Robot:
     def stopOdometry(self):
         """ Stop the odometry thread """
         self.finished.value = True
-        self.p.join()
+        if self.p is not None: self.p.join()
         self.BP.reset_all()
         self.cam.close()
         cv2.destroyAllWindows()

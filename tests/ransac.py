@@ -16,8 +16,8 @@ if __name__ == "__main__":
         robot = Robot()
 
         # 1. 
-        image_R2D2 = cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR)
-        image_BB8 = cv2.imread("images/BB8_s.png", cv2.IMREAD_COLOR)
+        image_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
+        image_BB8 = cv2.flip(cv2.imread("images/BB8_s.png", cv2.IMREAD_COLOR), -1)
 
         our, other = (image_R2D2, image_BB8) if not Cfg.bb8 else (image_BB8, image_R2D2)
 
