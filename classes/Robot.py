@@ -216,7 +216,7 @@ class Robot:
 
             # update ang with gyro
             GYRO_DEFAULT = 2372
-            GYRO2DEG = 0.25
+            GYRO2DEG = 0.24
 
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
             time_interval = time.time() - time_save
@@ -228,7 +228,7 @@ class Robot:
             #gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
             #print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
 
-            gyro_speed = (gyro_data - GYRO_DEFAULT) * GYRO2DEG
+            gyro_speed = (GYRO_DEFAULT - gyro_data) * GYRO2DEG
             # print("--------------- GYRO SPEED (rad/seg): " + str(gyro_speed))
             ang += gyro_speed * time_interval
             print(ang)

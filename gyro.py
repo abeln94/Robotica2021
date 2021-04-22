@@ -22,13 +22,13 @@ if __name__ == "__main__":
         myMap.sizeCell = GRID  # hardcoded because it should not be in the file!!!!
 
         # init Robot
-        robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
+        robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(0)])
         robot.startOdometry()
 
 
         # spin and wait
-        robot.setSpeed(0, np.deg2rad(45))
-        time.sleep(10)
+        robot.setSpeed(0, np.deg2rad(-30))
+        time.sleep(12)
 
     finally:
         # wrap up and close stuff before exiting
