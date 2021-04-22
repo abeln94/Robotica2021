@@ -36,6 +36,9 @@ Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", acti
 Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 
+# GYRO constants
+GYRO_DEFAULT = 2372
+GYRO2DEG = 0.24
 
 class Robot:
     def __init__(self, init_position=None):
@@ -144,8 +147,9 @@ class Robot:
             return self.x.value, self.y.value, self.th.value
 
     def readAng(self):
+        """ Returns current angle in rads, calculated with the gyro sensor """
         with self.lock_odometry:
-            return self.ang.value
+            return np.deg2rad((self.ang.value + 180) % 360 -180)
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
@@ -171,8 +175,6 @@ class Robot:
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
         swap = False
         time_save = time.time()
-        n = 0
-        gyro_data_mean = 0
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -215,23 +217,14 @@ class Robot:
                 th = norm_pi(th + dth)
 
             # update ang with gyro
-            GYRO_DEFAULT = 2372
-            GYRO2DEG = 0.24
-
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
             time_interval = time.time() - time_save
             time_save = time.time()
-            #print("--------------- GYRO DATA: " + str(gyro_data))
-            #print("--------------- GYRO DATA CENTERED: " + str(GYRO_DEFAULT - gyro_data))
-
-            #n += 1
-            #gyro_data_mean = gyro_data_mean * (n-1) / n + gyro_data / n
-            #print("--------------- GYRO DATA MEAN: " + str(gyro_data_mean))
 
             gyro_speed = (GYRO_DEFAULT - gyro_data) * GYRO2DEG
-            # print("--------------- GYRO SPEED (rad/seg): " + str(gyro_speed))
+
             ang += gyro_speed * time_interval
-            print(ang)
+
 
             # detect marker
             if self.getLight() < 0.4:  # dark
