@@ -266,7 +266,7 @@ class Robot:
 
             ######## UPDATE UNTIL HERE with your code ########
 
-        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f} ({:.2f}º)".format(x, y, th, np.rad2deg(th)))
+        print("Stopping odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, ang={:.2f}º".format(x, y, np.rad2deg(th), ang))
         if Cfg.log:
             logFile.close()
 
