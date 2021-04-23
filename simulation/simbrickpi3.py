@@ -163,7 +163,33 @@ class _Light:
     def updateUI(event, values, window, port, data):
         graph = window[port + '#']
         graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(255 - int(_Light.read(port, data) / 4000 * 255)))
+        if port in values:
+            data[port] = values[port]
 
+
+class _Custom:  # currently gyro
+    @staticmethod
+    def init(port, data):
+        data[port] = 0
+
+    @staticmethod
+    def update(port, data, dT):
+        pass
+
+    @staticmethod
+    def read(port, data):
+        return (data[port],)
+
+    @staticmethod
+    def initUI(port, data):
+        return [[
+            sg.Text(port + ": Custom:"),
+            sg.Slider(range=(0, 4000), default_value=data[port], orientation='horizontal', key=port),
+        ]]
+
+    @staticmethod
+    def updateUI(event, values, window, port, data):
+        window[port].Update(value=data[port])
         if port in values:
             data[port] = values[port]
 
@@ -172,6 +198,7 @@ class BrickPi3:
     PORT_1 = "PORT_1"
     PORT_2 = "PORT_2"
     PORT_3 = "PORT_3"
+    PORT_4 = "PORT_4"
     PORT_A = "PORT_A"
     PORT_B = "PORT_B"
     PORT_C = "PORT_C"
@@ -181,6 +208,10 @@ class BrickPi3:
         NXT_ULTRASONIC = _Ultrasonic
         NXT_LIGHT_ON = _Light
         NXT_LIGHT_OFF = _Light
+        CUSTOM = _Custom
+
+    class SENSOR_CUSTOM:
+        PIN1_ADC = "pin1"
 
     def __init__(self):
         m = Manager()
@@ -194,7 +225,7 @@ class BrickPi3:
 
     ########## general ##########
 
-    def set_sensor_type(self, port, type):
+    def set_sensor_type(self, port, type, _=None):
         self.ports[port] = type
         type.init(port, self.data)
 
@@ -261,3 +292,11 @@ class BrickPi3:
 
                 # update
                 type.updateUI(event, values, window, port, self.data)
+
+                # driver
+
+                # set gyro depending on wheels
+                leftWheel = self.data[self.PORT_B + _Motor._dps]
+                rightWheel = self.data[self.PORT_C + _Motor._dps]
+                w = leftWheel - rightWheel
+                self.data[self.PORT_4] = 2371 + w  # TODO: find a better equation
