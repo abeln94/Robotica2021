@@ -14,7 +14,7 @@ from p4 import traverseLabyrinth
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
-Cfg.add_argument("-s", "--S_as_arcs", help="do s as arcs", action="store_true")
+Cfg.add_argument("-arc", "--S_as_arcs", help="do s as arcs", action="store_true")
 
 # images
 IMAGE_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
