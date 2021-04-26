@@ -74,8 +74,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
     current_index = 0
     while current_index < len(path) - 1:
         # while not at the last cell, go to the next
-        next_pos = map._cell2pos(*(path[current_index + 1]))
-
+        
         # Look at position and update neighbour
         next_neighbor = map._cell(path[current_index], path[current_index + 1])
         robot.rotate(- ((next_neighbor - neigbour) % 8) * np.pi / 4) # as neghbours are 0, 2, 4 or 8, multiplying by pi/4 it's actually rotating pi/2
