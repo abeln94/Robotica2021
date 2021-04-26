@@ -41,6 +41,8 @@ if __name__ == "__main__":
 
         # detect color
         leftSide = robot.getLight() >= 0.5
+        if(leftSide): print("leftSide")
+        if(not leftSide): print("rightSide")
         enter, exit = (0, 2) if leftSide else (2, 0)
 
         # perform S
@@ -62,6 +64,7 @@ if __name__ == "__main__":
             # robot.go(*myMap._cell2pos(exit, 4))
             # robot.go(*myMap._cell2pos(exit, 3))
             # robot.go(*myMap._cell2pos(1, 3))
+            """
             robot.rotate(-np.pi / 2)
             robot.advance(GRID)
             robot.rotate(np.pi / 2)
@@ -72,7 +75,7 @@ if __name__ == "__main__":
             robot.advance(2 * GRID)
             robot.rotate(-np.pi / 2)
             robot.advance(GRID)
-
+            """
 
         # enter labyrinth
         #robot.go(*myMap._cell2pos(enter, 3))
@@ -84,7 +87,7 @@ if __name__ == "__main__":
         # traverse labyrinth
         robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (1 if leftSide else -1))
         #traverseLabyrinth((exit, 2), myMap, robot)
-        traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
+        traverseLabyrinthFine((enter, 0), (exit, 0), 2, myMap, robot)
 
         exit()
 

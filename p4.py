@@ -71,6 +71,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
     """
     # get path
     path = map.planPath(*begin, *end)
+    print(path)
     current_index = 0
     while current_index < len(path) - 1:
         # while not at the last cell, go to the next
