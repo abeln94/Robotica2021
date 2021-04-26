@@ -70,7 +70,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
     :raise Exception: if the labyrinth cannot be solved
     """
     # get path
-    path = map.planPath(*map._pos2cell(*begin, *end))
+    path = map.planPath(*begin, *end)
     current_index = 0
     while current_index < len(path) - 1:
         # while not at the last cell, go to the next
