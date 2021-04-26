@@ -183,6 +183,8 @@ class Robot:
         while periodic(not self.finished.value):
 
             # get values
+            self.BP.set_motor_dps(self.MOTOR_RIGHT, 0)
+            self.BP.set_motor_dps(self.MOTOR_RIGHT, 0)
             if swap:
                 dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
                 dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
@@ -234,16 +236,10 @@ class Robot:
                 self.y.value = y
                 self.th.value = th
 
-            # change velocity
-            wi = wi * Cfg.smoothness + self.wi.value * (1 - Cfg.smoothness)
-            wd = wd * Cfg.smoothness + self.wd.value * (1 - Cfg.smoothness)
-
             if swap:
-                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
-                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
+                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(self.wd.value))
             else:
-                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
-                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
+                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(self.wi.value))
 
             # display
             print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(old_th)))
@@ -469,19 +465,19 @@ class Robot:
 
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
-        if(best_dist < 1.5 * GRID):
+        if (best_dist < 1.5 * GRID):
             # Give direction
             self.setSpeed(0, np.deg2rad(5))
             detected = False
             wrong_init_dir = -1
             periodic = Periodic()
-            while(periodic()):
+            while (periodic()):
                 new_dist = self.getObstacleDistance()
                 print(new_dist)
-                if new_dist < best_dist: # Lado bueno
+                if new_dist < best_dist:  # Lado bueno
                     wrong_init_dir = 0
                     best_dist = new_dist
-                    #best_th = self.th
+                    # best_th = self.th
 
                 elif new_dist > best_dist and wrong_init_dir == -1:  # Lado malo
                     wrong_init_dir = 1
@@ -492,14 +488,13 @@ class Robot:
                 elif new_dist > best_dist and wrong_init_dir == 1:  # WTF
                     print("WARNING: updateThOnWall can't detect the best Th")
                     break
-                
-                elif new_dist > best_dist and wrong_init_dir == 0: # Fin
+
+                elif new_dist > best_dist and wrong_init_dir == 0:  # Fin
                     print("Best Th detected")
-                    #self.marker_th.value = th # Round angle
+                    # self.marker_th.value = th # Round angle
                     self.setSpeed(0, 0)
                     break
 
 
-        else: # Too far
+        else:  # Too far
             print("Too far to update odometry with Ultrasonic")
-
