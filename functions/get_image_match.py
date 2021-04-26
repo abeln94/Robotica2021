@@ -42,8 +42,8 @@ def match_images(image, capture):
     # CURRENT RASPBERRY opencv version is 3.4.13
     # Initiate BRISK detector --> you could use any other detector, including NON binary features (SIFT, SURF)
     # but this is the best performing one in this version
-    detector = cv2.BRISK_create()
-    binary_features = True # True if detector = ORB, AKAZE, BRISK, and False otherwise
+    detector = cv2.SIFT_create()
+    binary_features = False # True if detector = ORB, AKAZE, BRISK, and False otherwise
 
     # find the keypoints and corresponding descriptors
     kpImg, desImg = detector.detectAndCompute(img, None)
