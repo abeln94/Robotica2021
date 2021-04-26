@@ -78,7 +78,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
         
         # Look at position and update neighbour
         next_neighbor = map._cell(path[current_index], path[current_index + 1].tolist())
-        robot.rotate(- ((next_neighbor - neighbour) % 8) * np.pi / 4) # as neghbours are 0, 2, 4 or 8, multiplying by pi/4 it's actually rotating pi/2
+        robot.rotate(- norm_pi((next_neighbor - neighbour) % 8) * np.pi / 4) # as neghbours are 0, 2, 4 or 8, multiplying by pi/4 it's actually rotating pi/2
         neighbour = next_neighbor
         if robot.getObstacleDistance() < GRID:
             # there is an obstacle, can't go there directly
@@ -97,7 +97,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
             robot.advance(GRID)
             current_index += 1
     # We need the robot to look pos 4
-    robot.rotate(- ((4 - neighbour) % 8) * np.pi / 4)
+    robot.rotate(- norm_pi((4 - neighbour) % 8) * np.pi / 4)
 
 robot = None
 
