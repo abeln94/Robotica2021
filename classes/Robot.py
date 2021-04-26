@@ -42,6 +42,8 @@ Cfg.add_argument("-gyro", help="Use the gyroscope for rotation", action="store_t
 GYRO_DEFAULT = 2371.1
 GYRO2DEG = 0.24
 
+FRICTION = 1.01
+
 
 class Robot:
     def __init__(self, init_position=None):
@@ -339,11 +341,13 @@ class Robot:
         self.setSpeed(0, 0)
 
     def rotate(self, th):
+        th = th * FRICTION
         self.setSpeed(0, Cfg.ANG_VEL * np.sign(th))
         time.sleep(abs(th) / Cfg.ANG_VEL)
         self.setSpeed(0, 0)
 
     def advance(self, dist):
+        dist = dist * FRICTION
         self.setSpeed(Cfg.LIN_VEL, 0)
         time.sleep(dist / Cfg.LIN_VEL)
         self.setSpeed(0, 0)
