@@ -11,7 +11,7 @@ import numpy as np
 
 from classes import Cfg
 from classes.DeltaVal import DeltaVal
-from classes.Map import Map
+from classes.Map import Map, GRID
 from classes.Periodic import Periodic
 from functions.functions import norm_pi
 from functions.get_color_blobs import get_blob, position_reached
@@ -469,7 +469,7 @@ class Robot:
 
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
-        if(best_dist < 1.5 * Map.GRID):
+        if(best_dist < 1.5 * GRID):
             # Give direction
             self.setSpeed(0, np.deg2rad(5))
             detected = False
