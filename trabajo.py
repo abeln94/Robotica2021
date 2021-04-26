@@ -71,7 +71,7 @@ if __name__ == "__main__":
             robot.rotate(-np.pi / 2)
             robot.advance(2 * GRID)
             robot.rotate(-np.pi / 2)
-            robot.advance(2 * GRID)
+            robot.advance(GRID)
 
 
         # enter labyrinth
