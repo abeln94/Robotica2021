@@ -476,6 +476,7 @@ class Robot:
             wrong_init_dir = -1
             while(not detected):
                 new_dist = self.getObstacleDistance()
+                print(new_dist)
                 if new_dist < best_dist: # Lado bueno
                     wrong_init_dir = 0
                     best_dist = new_dist
@@ -493,7 +494,7 @@ class Robot:
                 elif new_dist > best_dist and wrong_init_dir == 0: # Fin
                     print("Best Th detected")
                     #self.marker_th.value = th # Round angle
-                    self.setSpeed(0, np.deg2rad(0))
+                    self.setSpeed(0, 0)
                     detected = True
 
 
