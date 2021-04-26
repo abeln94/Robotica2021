@@ -97,7 +97,7 @@ def traverseLabyrinthFine(begin, end, neighbour, map, robot):
             robot.advance(GRID)
             current_index += 1
     # We need the robot to look pos 4
-    robot.rotate(- norm_pi((4 - neighbour) % 8) * np.pi / 4)
+    robot.rotate(- norm_pi(((4 - neighbour) % 8) * np.pi / 4))
 
 robot = None
 
