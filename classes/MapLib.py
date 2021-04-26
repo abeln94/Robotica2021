@@ -190,7 +190,7 @@ class Map2D:
         TODO: make this more efficient (something similar to _neighbour)
         """
         for i in range(0,8):
-            if self._neighbour(*thisCell, i) == destCell:
+            if self._neighbour(*thisCell, i) == destCell.tolist():
                 return i # relation encountered
         return -1 # They arent neighbours
 
