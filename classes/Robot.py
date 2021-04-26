@@ -469,7 +469,7 @@ class Robot:
 
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
-        if(best_dist < 1.5 * map.GRID):
+        if(best_dist < 1.5 * Map.GRID):
             # Give direction
             self.setSpeed(0, np.deg2rad(5))
             detected = False
@@ -493,6 +493,7 @@ class Robot:
                 elif new_dist > best_dist and wrong_init_dir == 0: # Fin
                     print("Best Th detected")
                     self.marker_th.value = th # Round angle
+                    self.setSpeed(0, np.deg2rad(0))
                     detected = True
 
 
