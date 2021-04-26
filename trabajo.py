@@ -9,7 +9,7 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
-from p4 import traverseLabyrinth
+from p4 import traverseLabyrinthFine
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -73,15 +73,20 @@ if __name__ == "__main__":
             robot.rotate(np.pi / 2)
             robot.advance(2 * GRID)
 
-        exit()
 
         # enter labyrinth
-        robot.go(*myMap._cell2pos(enter, 3))
-        robot.go(*myMap._cell2pos(enter, 2))
+        #robot.go(*myMap._cell2pos(enter, 3))
+        #robot.go(*myMap._cell2pos(enter, 2))
+        robot.advance(GRID)
+        robot.rotate(np.pi / 2)
+        robot.advance(GRID)
 
         # traverse labyrinth
         robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (1 if leftSide else -1))
-        traverseLabyrinth((exit, 2), myMap, robot)
+        #traverseLabyrinth((exit, 2), myMap, robot)
+        traverseLabyrinthFine((0, 0), (exit, 2), 2, myMap, robot)
+
+        exit()
 
         # exit labyrinth
         robot.onMarker(y=GRID * 3 + Cfg.LIGHT_OFFSET)

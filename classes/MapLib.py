@@ -166,6 +166,9 @@ class Map2D:
         return self._neighbour(connX, connY, numNeigh)
 
     def _neighbour(self, cellX, cellY, numNeigh):
+        """
+        Returns the cell which corresponds to numNeigh
+        """
         p = [cellX, cellY]
 
         result = {
@@ -180,6 +183,16 @@ class Map2D:
         }
 
         return result[numNeigh](p)
+
+    def _cell(self, thisCell, destCell):
+        """
+        Returns the neighbour which corresponds to destCell
+        TODO: make this more efficient (something similar to _neighbour)
+        """
+        for i in range(0,8):
+            if self._neighbour(*thisCell, i) == destCell:
+                return i # relation encountered
+        return -1 # They arent neighbours
 
     def _pos2cell(self, x_mm, y_mm):
         """ Convert from robot odometry coordinates (in mm) to cell coordinates """

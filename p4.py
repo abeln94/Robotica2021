@@ -54,6 +54,48 @@ def traverseLabyrinth(end, map, robot):
             robot.go(*next_pos)
             current_index += 1
 
+def traverseLabyrinthFine(begin, end, neighbour, map, robot):
+    """
+    Traverses the labyrinth from the current position to the end cell
+    Detects and avoids unexpected walls
+    The robot must be inside the labyrinth when this function is called
+
+    :param begin: cell coordinates of the starting
+    :param end: cell coordinates of the destination
+    :param neighbour: robot's orientation as neighbours value
+    :param map: the MapLib class
+    :param robot: the Robot class
+    :return: when the robot is at the end cell
+    :raise Exception: if the labyrinth cannot be solved
+    """
+    # get path
+    path = map.planPath(*map._pos2cell(*begin, *end)
+    current_index = 0
+    while current_index < len(path) - 1:
+        # while not at the last cell, go to the next
+        next_pos = map._cell2pos(*(path[current_index + 1]))
+
+        # Look at position and update neighbour
+        next_neighbor = map._cell(path[current_index], path[current_index + 1])
+        robot.rotate(- ((next_neighbor - neigbour) % 8) * np.pi / 4) # as neghbours are 0, 2, 4 or 8, multiplying by pi/4 it's actually rotating pi/2
+        neigbour = next_neighbor
+        if robot.getObstacleDistance() < GRID:
+            # there is an obstacle, can't go there directly
+
+            # delete the 3 front connections (a wall extends to the corners too)
+            current_cell = path[current_index]
+            map.deleteConnection(*current_cell, (neighbour - 1) % 8)
+            map.deleteConnection(*current_cell, neighbour)
+            map.deleteConnection(*current_cell, (neighbour + 1) % 8)
+
+            # get the new path
+            path = map.planPath(*current_cell, *end)
+            current_index = 0
+        else:
+            # no obstacle, go
+            robot.advance(GRID)
+            current_index += 1
+
 
 robot = None
 
