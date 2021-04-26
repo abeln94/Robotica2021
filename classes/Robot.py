@@ -148,9 +148,10 @@ class Robot:
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
-        self.finished.value = False
+        self.finished.value = True
         self.p = Process(target=self.updateOdometry)
         self.p.start()
+        while self.finished.value: pass
         print("PID: ", self.p.pid)
 
     def updateOdometry(self):
@@ -171,6 +172,9 @@ class Robot:
             os.makedirs(os.path.dirname(fileName), exist_ok=True)
             logFile = open(fileName, "w")
             logFile.write("Timestamp, X, Y, Theta\n")
+
+        # ready
+        self.finished.value = False
 
         # loop
         periodic = Periodic(Cfg.updatePeriod)
@@ -332,6 +336,16 @@ class Robot:
         self.setSpeed(ADVANCE / TIME, 0)
         time.sleep(TIME)
         self.BP.set_motor_dps(self.MOTOR_CLAW, 0)
+        self.setSpeed(0, 0)
+
+    def rotate(self, th):
+        self.setSpeed(0, Cfg.ANG_VEL * np.sign(th))
+        time.sleep(abs(th) / Cfg.ANG_VEL)
+        self.setSpeed(0, 0)
+
+    def advance(self, dist):
+        self.setSpeed(Cfg.LIN_VEL, 0)
+        time.sleep(dist / Cfg.LIN_VEL)
         self.setSpeed(0, 0)
 
     def go(self, x_goal, y_goal, radius=10):
