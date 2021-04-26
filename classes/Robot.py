@@ -36,6 +36,7 @@ Cfg.add_argument("-u", "--updatePeriod", help="Update period in seconds", type=f
 Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", action="store_true")
 Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
+Cfg.add_argument("-gyro", help="Use the gyroscope for rotation", action="store_true")
 
 # GYRO constants
 GYRO_DEFAULT = 2371.1
@@ -94,15 +95,13 @@ class Robot:
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
         # odometry command values
-        self.wd = Value('d', 0.0)
-        self.wi = Value('d', 0.0)
         self.marker_x = Value('d', -1.0)
         self.marker_y = Value('d', -1.0)
         self.marker_th = Value('d', -1.0)
 
     def setSpeed(self, v, w):
-        """ 
-        Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s) 
+        """
+        Sets the speed of the robot to v linear motion (mm/s) and w angular motion (rad/s)
         :param v: linear velocity
         :param w: angular velocity
         """
@@ -112,8 +111,8 @@ class Robot:
         wd = v / Cfg.ROBOT_r + w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
         wi = v / Cfg.ROBOT_r - w * Cfg.ROBOT_L / 2 / Cfg.ROBOT_r
 
-        self.wd.value = wd
-        self.wi.value = wi
+        self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(wi))
+        self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(wd))
 
     def readSpeed(self, readTime=0.1):
         """
@@ -164,13 +163,8 @@ class Robot:
 
         # init variables
         x, y, th = self.readOdometry()
-        old_th = th
-        wi = self.wi.value
-        wd = self.wd.value
         leftEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_LEFT))
         rightEncoder = DeltaVal(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
-        swap = False
-        time_save = time.time()
 
         if Cfg.log:
             fileName = Cfg.FOLDER_LOGS + Cfg.log
@@ -183,14 +177,8 @@ class Robot:
         while periodic(not self.finished.value):
 
             # get values
-            self.BP.set_motor_dps(self.MOTOR_RIGHT, 0)
-            self.BP.set_motor_dps(self.MOTOR_RIGHT, 0)
-            if swap:
-                dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
-                dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
-            else:
-                dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
-                dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
+            dL = leftEncoder.update(self.BP.get_motor_encoder(self.MOTOR_LEFT))
+            dR = rightEncoder.update(self.BP.get_motor_encoder(self.MOTOR_RIGHT))
 
             # compute updates
             if Cfg.exact:
@@ -201,7 +189,7 @@ class Robot:
 
                 v = Cfg.ROBOT_r * (wL + wR) / 2
                 w = Cfg.ROBOT_r * (wR - wL) / Cfg.ROBOT_L
-                x, y, old_th = simubot([v, w], np.array([x, y, th]), dT)
+                x, y, odo_th = simubot([v, w], np.array([x, y, th]), dT)
 
             else:
                 # inexact, fast
@@ -212,16 +200,15 @@ class Robot:
                 dth = (sR - sL) / Cfg.ROBOT_L
                 x += ds * np.cos(th + dth / 2)
                 y += ds * np.sin(th + dth / 2)
-                old_th = norm_pi(th + dth)
+                odo_th = norm_pi(th + dth)
 
             # update ang with gyro
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
-            time_interval = time.time() - time_save
-            time_save = time.time()
-
             gyro_speed = np.deg2rad((GYRO_DEFAULT - gyro_data) * GYRO2DEG)
+            gyro_th = th + gyro_speed * periodic.delay
 
-            th += gyro_speed * time_interval
+            # final udpate
+            th = gyro_th if Cfg.gyro else odo_th
 
             # detect marker
             if self.getLight() < 0.4:  # dark
@@ -236,13 +223,8 @@ class Robot:
                 self.y.value = y
                 self.th.value = th
 
-            if swap:
-                self.BP.set_motor_dps(self.MOTOR_RIGHT, np.rad2deg(self.wd.value))
-            else:
-                self.BP.set_motor_dps(self.MOTOR_LEFT, np.rad2deg(self.wi.value))
-
             # display
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(old_th)))
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(odo_th)))
 
             if Cfg.plot:
                 map.update([x, y, th])
@@ -250,8 +232,6 @@ class Robot:
             # save LOG
             if Cfg.log:
                 logFile.write("{}, {}, {}, {}\n".format(periodic.time, x, y, th))
-
-            swap = not swap
 
             ######## UPDATE UNTIL HERE with your code ########
 
