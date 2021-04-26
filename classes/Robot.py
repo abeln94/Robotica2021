@@ -475,7 +475,7 @@ class Robot:
             detected = False
             wrong_init_dir = -1
             periodic = Periodic()
-            while(Periodic(not detected)):
+            while(Periodic()):
                 new_dist = self.getObstacleDistance()
                 print(new_dist)
                 if new_dist < best_dist: # Lado bueno
@@ -497,7 +497,7 @@ class Robot:
                     print("Best Th detected")
                     #self.marker_th.value = th # Round angle
                     self.setSpeed(0, 0)
-                    detected = True
+                    break
 
 
         else: # Too far
