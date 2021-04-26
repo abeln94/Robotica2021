@@ -40,7 +40,7 @@ if __name__ == "__main__":
         robot.startOdometry()
 
         # detect color
-        leftSide = robot.getLight() >= 0.5
+        leftSide = robot.getLight() <= 0.5
         if(leftSide): print("leftSide")
         if(not leftSide): print("rightSide")
         enter, exit = (0, 2) if leftSide else (2, 0)
