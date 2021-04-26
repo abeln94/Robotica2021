@@ -484,6 +484,7 @@ class Robot:
 
                 elif new_dist > best_dist and wrong_init_dir == -1:  # Lado malo
                     wrong_init_dir = 1
+                    best_dist = new_dist
                     # Cambiar direccion
                     self.setSpeed(0, np.deg2rad(-5))
 
