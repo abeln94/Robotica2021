@@ -475,7 +475,7 @@ class Robot:
             detected = False
             wrong_init_dir = -1
             periodic = Periodic()
-            while(Periodic()):
+            while(periodic()):
                 new_dist = self.getObstacleDistance()
                 print(new_dist)
                 if new_dist < best_dist: # Lado bueno
