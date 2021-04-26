@@ -466,3 +466,36 @@ class Robot:
         self.marker_x.value = x
         self.marker_y.value = y
         self.marker_th.value = th
+
+    def updateThOnWall(self):
+        best_dist = self.getObstacleDistance()
+        if(best_dist < 1.5 * map.GRID):
+            # Give direction
+            self.setSpeed(0, np.deg2rad(5))
+            detected = False
+            wrong_init_dir = -1
+            while(not detected):
+                new_dist = self.getObstacleDistance()
+                if new_dist < best_dist: # Lado bueno
+                    wrong_init_dir = 0
+                    best_dist = new_dist
+                    best_th = self.th
+
+                elif new_dist > best_dist and wrong_init_dir == -1:  # Lado malo
+                    wrong_init_dir = 1
+                    # Cambiar direccion
+                    self.setSpeed(0, np.deg2rad(-5))
+
+                elif new_dist > best_dist and wrong_init_dir == 1:  # WTF
+                    print("WARNING: updateThOnWall can't detect the best Th")
+                    break
+                
+                elif new_dist > best_dist and wrong_init_dir == 0: # Fin
+                    print("Best Th detected")
+                    self.marker_th.value = th # Round angle
+                    detected = True
+
+
+        else: # Too far
+            print("Too far to update odometry with Ultrasonic")
+
