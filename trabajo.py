@@ -84,7 +84,7 @@ if __name__ == "__main__":
         # traverse labyrinth
         robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (1 if leftSide else -1))
         #traverseLabyrinth((exit, 2), myMap, robot)
-        traverseLabyrinthFine((0, 0), (exit, 2), 2, myMap, robot)
+        traverseLabyrinthFine((enter, 0), (exit, 0), 2, myMap, robot)
 
         exit()
 
