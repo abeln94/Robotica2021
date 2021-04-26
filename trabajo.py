@@ -41,8 +41,7 @@ if __name__ == "__main__":
 
         # detect color
         leftSide = robot.getLight() <= 0.5
-        if(leftSide): print("leftSide")
-        if(not leftSide): print("rightSide")
+        sideMul = 1 if leftSide else -1
         enter, exit = (2, 0) if leftSide else (0, 2)
 
         # perform S
@@ -64,40 +63,40 @@ if __name__ == "__main__":
             # robot.go(*myMap._cell2pos(exit, 4))
             # robot.go(*myMap._cell2pos(exit, 3))
             # robot.go(*myMap._cell2pos(1, 3))
-            """
-            robot.rotate(-np.pi / 2)
+            robot.rotate(np.pi / 2 * sideMul)
             robot.advance(GRID)
-            robot.rotate(np.pi / 2)
+            robot.rotate(-np.pi / 2 * sideMul)
             robot.advance(2 * GRID)
-            robot.rotate(np.pi / 2)
+            robot.rotate(-np.pi / 2 * sideMul)
             robot.advance(2 * GRID)
-            robot.rotate(-np.pi / 2)
+            robot.rotate(np.pi / 2 * sideMul)
             robot.advance(2 * GRID)
-            robot.rotate(-np.pi / 2)
+            robot.rotate(np.pi / 2 * sideMul)
             robot.advance(GRID)
-            """
 
         # enter labyrinth
         #robot.go(*myMap._cell2pos(enter, 3))
         #robot.go(*myMap._cell2pos(enter, 2))
         robot.advance(GRID)
-        robot.rotate(np.pi / 2)
+        robot.rotate(-np.pi / 2* sideMul)
         robot.advance(GRID)
 
         # traverse labyrinth
-        robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (1 if leftSide else -1))
+        robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (-1 if leftSide else 1))
         #traverseLabyrinth((exit, 2), myMap, robot)
         traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
 
-        exit()
 
         # exit labyrinth
         robot.onMarker(y=GRID * 3 + Cfg.LIGHT_OFFSET)
-        robot.go(*myMap._cell2pos(exit, 3))
+        #robot.go(*myMap._cell2pos(exit, 3))
+        robot.advance(GRID)
         robot.onMarker()
-        robot.go(*myMap._cell2pos(1, 3.5))
 
         # look for ball
+        robot.rotate(-np.pi / 2 * sideMul)
+        robot.advance(GRID)
+        robot.rotate(np.pi / 2 * sideMul)
         robot.trackObject()
 
         # position looking at the images
