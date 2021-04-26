@@ -43,7 +43,7 @@ if __name__ == "__main__":
         leftSide = robot.getLight() <= 0.5
         if(leftSide): print("leftSide")
         if(not leftSide): print("rightSide")
-        enter, exit = (0, 2) if leftSide else (2, 0)
+        enter, exit = (2, 0) if leftSide else (0, 2)
 
         # perform S
         if Cfg.S_as_arcs:
