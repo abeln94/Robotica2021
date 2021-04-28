@@ -215,9 +215,9 @@ class Robot:
 
             # final udpate
             #th = gyro_th if Cfg.gyro else odo_th
-            print(np.grad2deg(gyro_speed))
+            print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
             th = norm_pi(th + gyro_speed * periodic.delay) \
-                if gyro_speed > np.deg2rad(10) or gyro_speed < np.deg2rad(-10)\
+                if gyro_speed > np.deg2rad(15) or gyro_speed < np.deg2rad(-15)\
                 else norm_pi(th + dth)
 
             # detect marker
