@@ -75,21 +75,20 @@ if __name__ == "__main__":
             robot.advance(GRID)
 
         # enter labyrinth
-        #robot.go(*myMap._cell2pos(enter, 3))
-        #robot.go(*myMap._cell2pos(enter, 2))
+        # robot.go(*myMap._cell2pos(enter, 3))
+        # robot.go(*myMap._cell2pos(enter, 2))
         robot.advance(GRID)
-        robot.rotate(-np.pi / 2* sideMul)
+        robot.rotate(-np.pi / 2 * sideMul)
         robot.advance(GRID)
 
         # traverse labyrinth
         robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (-1 if leftSide else 1))
-        #traverseLabyrinth((exit, 2), myMap, robot)
+        # traverseLabyrinth((exit, 2), myMap, robot)
         traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
-
 
         # exit labyrinth
         robot.onMarker(y=GRID * 3 + Cfg.LIGHT_OFFSET)
-        #robot.go(*myMap._cell2pos(exit, 3))
+        # robot.go(*myMap._cell2pos(exit, 3))
         robot.advance(GRID)
         robot.onMarker()
 
