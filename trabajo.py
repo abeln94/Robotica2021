@@ -87,7 +87,7 @@ if __name__ == "__main__":
         traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
 
         # exit labyrinth
-        robot.onMarker(y=GRID * 3 + Cfg.LIGHT_OFFSET)
+        robot.onMarker(x=GRID * (exit + 0.5), y=GRID * 3 + Cfg.LIGHT_OFFSET, th=np.deg2rad(90))
         # robot.go(*myMap._cell2pos(exit, 3))
         robot.advance(GRID)
         robot.onMarker()

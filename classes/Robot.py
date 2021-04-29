@@ -469,6 +469,12 @@ class Robot:
         self.marker_y.value = y
         self.marker_th.value = th
 
+    def forceOdometry(self, x, y, th):
+        self.force.value = True
+        self.force_x.value = x
+        self.force_y.value = y
+        self.force_th.value = th
+
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
         if (best_dist < 1.5 * GRID):
@@ -500,7 +506,6 @@ class Robot:
                     # self.marker_th.value = th # Round angle
                     self.setSpeed(0, 0)
                     break
-
 
         else:  # Too far
             print("Too far to update odometry with Ultrasonic")
