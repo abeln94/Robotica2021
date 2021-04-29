@@ -90,6 +90,12 @@ if __name__ == "__main__":
         robot.rotate(np.pi / 2 * sideMul)
         robot.trackObject()
 
+        # recolocate odometry
+        robot.lookAt(robot.x - 1, robot.y)
+        robot.onMarker(x=robot.getObstacleDistance(), now=True)
+        robot.rotate(np.deg2rad(-90))
+        robot.onMarker(y=robot.getObstacleDistance(), now=True)
+
         # position looking at the images
         robot.go(*myMap._cell2pos(0.5, 6))
         robot.lookAt(*myMap._cell2pos(0.5, 7))

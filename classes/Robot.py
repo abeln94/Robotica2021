@@ -99,9 +99,10 @@ class Robot:
         self.finished = Value('b', True, lock=self.lock_odometry)  # boolean to show if odometry updates are finished
 
         # odometry command values
-        self.marker_x = Value('d', -1.0)
-        self.marker_y = Value('d', -1.0)
-        self.marker_th = Value('d', -1.0)
+        self.marker_x = Value('d', -999.0)
+        self.marker_y = Value('d', -999.0)
+        self.marker_th = Value('d', -999.0)
+        self.marker_now = Value('b', False)
 
     def setSpeed(self, v, w):
         """
@@ -226,11 +227,12 @@ class Robot:
                 th = odo_th
 
             # detect marker
-            if self.getLight() < 0.4:  # dark
+            if self.getLight() < 0.4 or self.marker_now.value:  # dark
                 print("marker detected")
-                if self.marker_x.value >= 0: x = self.marker_x.value
-                if self.marker_y.value >= 0: y = self.marker_y.value
-                if self.marker_th.value >= 0: th = self.marker_th.value
+                if self.marker_x.value > -999: x = self.marker_x.value
+                if self.marker_y.value > -999: y = self.marker_y.value
+                if self.marker_th.value > -999: th = self.marker_th.value
+                self.marker_now.value = False
 
             # update
             with self.lock_odometry:
@@ -472,10 +474,11 @@ class Robot:
         while periodic(not self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for press
         while periodic(self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for release
 
-    def onMarker(self, x=-1, y=-1, th=-1):
+    def onMarker(self, x=-999, y=-999, th=-999, now=False):
         self.marker_x.value = x
         self.marker_y.value = y
         self.marker_th.value = th
+        self.marker_now.value = now
 
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
