@@ -211,14 +211,14 @@ class Robot:
             # update ang with gyro
             gyro_data = self.BP.get_sensor(self.SENSOR_GYRO)[0]
             gyro_speed = np.deg2rad((GYRO_DEFAULT - gyro_data) * GYRO2DEG)
-            gyro_th = th + gyro_speed * periodic.delay
+            gyro_th = norm_pi(th + gyro_speed * periodic.delay)
 
             # final udpate
             #th = gyro_th if Cfg.gyro else odo_th
-            print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
-            th = norm_pi(th + gyro_speed * periodic.delay) \
-                if gyro_speed > np.deg2rad(15) or gyro_speed < np.deg2rad(-15)\
-                else norm_pi(th + dth)
+            #print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
+            th = gyro_th \
+                if abs(gyro_speed) > np.deg2rad(20)\
+                else odo_th
 
             # detect marker
             if self.getLight() < 0.4:  # dark
