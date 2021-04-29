@@ -44,7 +44,7 @@ if __name__ == "__main__":
         sideMul = 1 if leftSide else -1
         enter, exit = (2, 0) if leftSide else (0, 2)
 
-        if Cfg.skip:
+        if not Cfg.skip:
 
             # perform S
             if Cfg.S_as_arcs:
