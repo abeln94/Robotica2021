@@ -91,7 +91,8 @@ if __name__ == "__main__":
         robot.trackObject()
 
         # recolocate odometry
-        robot.lookAt(robot.x - 1, robot.y)
+        x, y, _ = robot.readOdometry()
+        robot.lookAt(x - 1, y)
         robot.onMarker(x=robot.getObstacleDistance(), now=True)
         robot.rotate(np.deg2rad(-90))
         robot.onMarker(y=robot.getObstacleDistance(), now=True)
