@@ -15,7 +15,7 @@ matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3
 
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
 Cfg.add_argument("-arc", "--S_as_arcs", help="do s as arcs", action="store_true")
-
+Cfg.add_argument("-skip", help="start at the end of the labyrinth", action="store_true")
 # images
 IMAGE_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
 IMAGE_BB8 = cv2.flip(cv2.imread("images/BB8_s.png", cv2.IMREAD_COLOR), -1)
@@ -44,47 +44,39 @@ if __name__ == "__main__":
         sideMul = 1 if leftSide else -1
         enter, exit = (2, 0) if leftSide else (0, 2)
 
-        # perform S
-        if Cfg.S_as_arcs:
-            # as arcs
-            T = 7
-            for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
-                cx, cy = myMap._cell2pos(1, c)
-                for t in range(T):
-                    angle = np.pi * t / (T - 1)
-                    robot.go(cx - side * GRID * np.sin(angle), cy + GRID * np.cos(angle))
-        else:
-            # as squares
-            # robot.go(*myMap._cell2pos(enter, 7))
-            # robot.go(*myMap._cell2pos(enter, 6))
-            # robot.go(*myMap._cell2pos(enter, 5))
-            # robot.go(*myMap._cell2pos(1, 5))
-            # robot.go(*myMap._cell2pos(exit, 5))
-            # robot.go(*myMap._cell2pos(exit, 4))
-            # robot.go(*myMap._cell2pos(exit, 3))
-            # robot.go(*myMap._cell2pos(1, 3))
-            robot.rotate(np.pi / 2 * sideMul)
+        if Cfg.skip:
+
+            # perform S
+            if Cfg.S_as_arcs:
+                # as arcs
+                T = 7
+                for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
+                    cx, cy = myMap._cell2pos(1, c)
+                    for t in range(T):
+                        angle = np.pi * t / (T - 1)
+                        robot.go(cx - side * GRID * np.sin(angle), cy + GRID * np.cos(angle))
+            else:
+                # as squares
+                robot.rotate(np.pi / 2 * sideMul)
+                robot.advance(GRID)
+                robot.rotate(-np.pi / 2 * sideMul)
+                robot.advance(2 * GRID)
+                robot.rotate(-np.pi / 2 * sideMul)
+                robot.advance(2 * GRID)
+                robot.rotate(np.pi / 2 * sideMul)
+                robot.advance(2 * GRID)
+                robot.rotate(np.pi / 2 * sideMul)
+                robot.advance(GRID)
+
+            # enter labyrinth
             robot.advance(GRID)
             robot.rotate(-np.pi / 2 * sideMul)
-            robot.advance(2 * GRID)
-            robot.rotate(-np.pi / 2 * sideMul)
-            robot.advance(2 * GRID)
-            robot.rotate(np.pi / 2 * sideMul)
-            robot.advance(2 * GRID)
-            robot.rotate(np.pi / 2 * sideMul)
             robot.advance(GRID)
 
-        # enter labyrinth
-        # robot.go(*myMap._cell2pos(enter, 3))
-        # robot.go(*myMap._cell2pos(enter, 2))
-        robot.advance(GRID)
-        robot.rotate(-np.pi / 2 * sideMul)
-        robot.advance(GRID)
-
-        # traverse labyrinth
-        robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (-1 if leftSide else 1))
-        # traverseLabyrinth((exit, 2), myMap, robot)
-        traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
+            # traverse labyrinth
+            robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (-1 if leftSide else 1))
+            # traverseLabyrinth((exit, 2), myMap, robot)
+            traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
 
         # exit labyrinth
         robot.onMarker(x=GRID * (exit + 0.5), y=GRID * 3 + Cfg.LIGHT_OFFSET, th=np.deg2rad(90))
