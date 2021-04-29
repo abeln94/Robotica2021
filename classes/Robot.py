@@ -37,12 +37,13 @@ Cfg.add_argument("-e", "--exact", help="Use the exact method for odometry", acti
 Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="store_true")
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 Cfg.add_argument("-gyro", help="Use the gyroscope for rotation", action="store_true")
+Cfg.add_argument("-mix", help="Mix the gyroscope and odometry for rotation", action="store_true")
 
 # GYRO constants
 GYRO_DEFAULT = 2371.1
 GYRO2DEG = 0.24
 
-FRICTION = 1.01
+FRICTION = 1.005
 
 
 class Robot:
@@ -214,11 +215,14 @@ class Robot:
             gyro_th = norm_pi(th + gyro_speed * periodic.delay)
 
             # final udpate
-            # th = gyro_th if Cfg.gyro else odo_th
-            # print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
-            th = gyro_th \
-                if abs(gyro_speed) > np.deg2rad(20) \
-                else odo_th
+            if Cfg.gyro:
+                th = gyro_th
+            elif Cfg.mix:
+                th = gyro_th \
+                    if abs(gyro_speed) > np.deg2rad(20) \
+                    else odo_th
+            else:
+                th = odo_th
 
             # detect marker
             if self.getLight() < 0.4:  # dark
