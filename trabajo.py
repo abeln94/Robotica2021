@@ -85,11 +85,11 @@ if __name__ == "__main__":
         robot.advance(GRID)
         robot.onMarker()
 
-        # # look for ball
-        # robot.rotate(-np.pi / 2 * sideMul)
-        # robot.advance(GRID)
-        # robot.rotate(np.pi / 2 * sideMul)
-        # robot.trackObject()
+        # look for ball
+        robot.rotate(-np.pi / 2 * sideMul)
+        robot.advance(GRID)
+        robot.rotate(np.pi / 2 * sideMul)
+        robot.trackObject()
 
         # recolocate odometry
         x, y, th = robot.readOdometry()
