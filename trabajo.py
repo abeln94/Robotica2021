@@ -9,6 +9,7 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
+from functions.functions import norm_pi
 from p4 import traverseLabyrinthFine
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -84,18 +85,18 @@ if __name__ == "__main__":
         robot.advance(GRID)
         robot.onMarker()
 
-        # look for ball
-        robot.rotate(-np.pi / 2 * sideMul)
-        robot.advance(GRID)
-        robot.rotate(np.pi / 2 * sideMul)
-        robot.trackObject()
+        # # look for ball
+        # robot.rotate(-np.pi / 2 * sideMul)
+        # robot.advance(GRID)
+        # robot.rotate(np.pi / 2 * sideMul)
+        # robot.trackObject()
 
         # recolocate odometry
-        x, y, _ = robot.readOdometry()
-        robot.lookAt(x - 1, y)
+        x, y, th = robot.readOdometry()
+        robot.rotate(norm_pi(np.deg2rad(180) - th))
         robot.onMarker(x=robot.getObstacleDistance(), now=True)
         robot.rotate(np.deg2rad(-90))
-        robot.onMarker(y=robot.getObstacleDistance(), now=True)
+        robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
 
         # position looking at the images
         robot.go(*myMap._cell2pos(0.5, 6))
