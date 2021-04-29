@@ -278,7 +278,7 @@ class Robot:
         found = False
 
         # 1. Loop running the tracking until target (centroid position and size) reached
-        periodic = Periodic(0.2)
+        periodic = Periodic()
         while periodic(not found):
 
             # 1.1. search the most promising blob ..
@@ -303,7 +303,7 @@ class Robot:
                     angular_speed = sigmoid(x - targetPosition[0], 6) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
                     linear_speed = logistic(y - targetPosition[1], 12, 0.35) * Cfg.LIN_VEL
-                    if abs(angular_speed) > 0.1:
+                    if abs(angular_speed) > 0.2:
                         self.setSpeed(0, angular_speed)
                     else:
                         self.setSpeed(linear_speed, 0)
