@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 break
             else:
                 robot.setSpeed(0, np.deg2rad(10) * rotateLeft)
-                rotateLeft = 1 - rotateLeft
+                rotateLeft = 2 - rotateLeft
 
         # exit lab
         if leftExit:

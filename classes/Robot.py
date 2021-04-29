@@ -214,10 +214,10 @@ class Robot:
             gyro_th = norm_pi(th + gyro_speed * periodic.delay)
 
             # final udpate
-            #th = gyro_th if Cfg.gyro else odo_th
-            #print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
+            # th = gyro_th if Cfg.gyro else odo_th
+            # print("GYRO SPEED= " + str(np.rad2deg(gyro_speed)))
             th = gyro_th \
-                if abs(gyro_speed) > np.deg2rad(20)\
+                if abs(gyro_speed) > np.deg2rad(20) \
                 else odo_th
 
             # detect marker
@@ -278,7 +278,8 @@ class Robot:
         found = False
 
         # 1. Loop running the tracking until target (centroid position and size) reached
-        while not found:
+        periodic = Periodic(0.2)
+        while periodic(not found):
 
             # 1.1. search the most promising blob ..
             img = self.capture_image()
@@ -302,7 +303,10 @@ class Robot:
                     angular_speed = sigmoid(x - targetPosition[0], 6) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
                     linear_speed = logistic(y - targetPosition[1], 12, 0.35) * Cfg.LIN_VEL
-                    self.setSpeed(linear_speed, angular_speed)
+                    if abs(angular_speed) > 0.1:
+                        self.setSpeed(0, angular_speed)
+                    else:
+                        self.setSpeed(linear_speed, 0)
 
             else:
                 # 1.3 no blob found
@@ -449,7 +453,7 @@ class Robot:
 
     def detectImage(self, imgage_bgr):
         """
-        Returns wheter the given image is detected or not into the current camera's capture, 
+        Returns wheter the given image is detected or not into the current camera's capture,
         and if it is, returns the matched blobs's coordinates
         """
         # Return the result of invoking find_image
