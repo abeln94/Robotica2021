@@ -38,6 +38,7 @@ Cfg.add_argument("-p", "--plot", help="Show a plot with the values", action="sto
 Cfg.add_argument("-s", "--smoothness", help="Velocity update smoothness [0,1)", type=float, default=0.4)
 Cfg.add_argument("-gyro", help="Use the gyroscope for rotation", action="store_true")
 Cfg.add_argument("-mix", help="Mix the gyroscope and odometry for rotation", action="store_true")
+Cfg.add_argument("-ball", help="Catch ball by alternate way", action="store_true")
 
 # GYRO constants
 GYRO_DEFAULT = 2371.1
@@ -307,10 +308,13 @@ class Robot:
                     angular_speed = sigmoid(x - targetPosition[0], 6) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
                     linear_speed = logistic(y - targetPosition[1], 12, 0.35) * Cfg.LIN_VEL
-                    if abs(angular_speed) > 0.2:
-                        self.setSpeed(0, angular_speed)
+                    if Cfg.ball:
+                        if abs(angular_speed) > 0.2:
+                            self.setSpeed(0, angular_speed)
+                        else:
+                            self.setSpeed(linear_speed, angular_speed)
                     else:
-                        self.setSpeed(linear_speed, 0)
+                        self.setSpeed(linear_speed, angular_speed)
 
             else:
                 # 1.3 no blob found
@@ -472,12 +476,6 @@ class Robot:
         self.marker_x.value = x
         self.marker_y.value = y
         self.marker_th.value = th
-
-    def forceOdometry(self, x, y, th):
-        self.force.value = True
-        self.force_x.value = x
-        self.force_y.value = y
-        self.force_th.value = th
 
     def updateThOnWall(self):
         best_dist = self.getObstacleDistance()
