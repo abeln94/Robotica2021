@@ -35,7 +35,7 @@ if __name__ == "__main__":
                 foundOur, coordinatesOur = match_images(our, capture)
             
             if foundOur and foundOther:
-                if coordinatesOur[0] < coordinatesOther[0]:  # the camera is inverted
+                if coordinatesOur[0] > coordinatesOther[0]:  # the camera is inverted
                     print('Our is at the left')
                 else:
                     print('Our is at the right')
