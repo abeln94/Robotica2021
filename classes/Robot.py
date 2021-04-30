@@ -482,14 +482,16 @@ class Robot:
         self.marker_now.value = now
 
     def updateOdOnWall(self):
+        INIT = -45
+        ROTATION = 5
         if self.getObstacleDistance() < 1.5 * GRID:
             # We assume robot looking a front wall
-            ang, best_ang = -30, -30
+            ang, best_ang = INIT, INIT
             self.rotate(np.deg2rad(best_ang))
             best_dist = 2 * GRID
-            while ang <= 30:
-                ang += 10
-                self.rotate(np.deg2rad(10))
+            while ang <= -INIT:
+                ang += ROTATION
+                self.rotate(np.deg2rad(ROTATION))
                 new_dist = 0
                 for i in range(5):
                     new_dist += self.getObstacleDistance() / 5
@@ -500,7 +502,7 @@ class Robot:
 
                 print(new_dist)
 
-            self.rotate(-np.deg2rad(30 - best_ang))
+            self.rotate(-np.deg2rad(-INIT - best_ang))
 
         else:  # Too far
             print("Too far to update odometry with Ultrasonic")
