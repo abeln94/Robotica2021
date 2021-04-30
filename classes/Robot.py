@@ -483,7 +483,7 @@ class Robot:
 
     def updateOdOnWall(self):
         INIT = -60
-        ROTATION = 5
+        ROTATION = 2.5
         # We assume robot looking a front wall
         ang, best_ang = INIT, INIT
         self.rotate(np.deg2rad(best_ang))
