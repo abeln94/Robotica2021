@@ -481,37 +481,28 @@ class Robot:
         self.marker_th.value = th
         self.marker_now.value = now
 
-    def updateThOnWall(self):
-        best_dist = self.getObstacleDistance()
-        if (best_dist < 1.5 * GRID):
-            # Give direction
-            self.setSpeed(0, np.deg2rad(5))
-            detected = False
-            wrong_init_dir = -1
+    def updateOdOnWall(self):
+        if self.getObstacleDistance() < 1.5 * GRID:
+            # We assume robot looking a front wall
+            ang, best_ang = -30, -30
+            self.rotate(-np.deg2rad(best_ang))
             periodic = Periodic()
+            best_dist = 2 * GRID
             while (periodic()):
-                new_dist = self.getObstacleDistance()
+                ang += 10
+                self.rotate(np.deg2rad(10))
+                new_dist = 0
+                for i in range(5):
+                    new_dist += self.getObstacleDistance() / 5
+
+                if new_dist < best_dist:
+                    best_dist = new_dist
+                    best_ang = ang
+
                 print(new_dist)
-                if new_dist < best_dist:  # Lado bueno
-                    wrong_init_dir = 0
-                    best_dist = new_dist
-                    # best_th = self.th
 
-                elif new_dist > best_dist and wrong_init_dir == -1:  # Lado malo
-                    wrong_init_dir = 1
-                    best_dist = new_dist
-                    # Cambiar direccion
-                    self.setSpeed(0, np.deg2rad(-5))
+            self.rotate(-(30 - best_ang))
 
-                elif new_dist > best_dist and wrong_init_dir == 1:  # WTF
-                    print("WARNING: updateThOnWall can't detect the best Th")
-                    break
-
-                elif new_dist > best_dist and wrong_init_dir == 0:  # Fin
-                    print("Best Th detected")
-                    # self.marker_th.value = th # Round angle
-                    self.setSpeed(0, 0)
-                    break
 
         else:  # Too far
             print("Too far to update odometry with Ultrasonic")
