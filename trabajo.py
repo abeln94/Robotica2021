@@ -17,6 +17,7 @@ matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
 Cfg.add_argument("-arc", "--S_as_arcs", help="do s as arcs", action="store_true")
 Cfg.add_argument("-skip", help="start at the end of the labyrinth", action="store_true")
+
 # images
 IMAGE_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
 IMAGE_BB8 = cv2.flip(cv2.imread("images/BB8_s.png", cv2.IMREAD_COLOR), -1)
@@ -111,7 +112,7 @@ if __name__ == "__main__":
         robot.onMarker(x=x, th=th, now=True)
 
         robot.rotate(norm_pi(np.deg2rad(90) - th))
-        robot.onMarker(y=robot.getObstacleDistance(), now=True)
+        robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
 
         # position looking at the images
         robot.go(*myMap._cell2pos(0.5, 6))
