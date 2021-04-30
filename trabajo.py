@@ -92,11 +92,26 @@ if __name__ == "__main__":
         robot.trackObject()
 
         # recolocate odometry
-        x, y, th = robot.readOdometry()
+        _, _, th = robot.readOdometry()
         robot.rotate(norm_pi(np.deg2rad(180) - th))
-        robot.onMarker(x=robot.getObstacleDistance(), now=True)
-        robot.rotate(np.deg2rad(-90))
-        robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
+        distance = robot.getObstacleDistance() - 150
+        if distance > 0:
+            robot.advance(distance)
+        ANG = np.deg2rad(10)
+        robot.rotate(ANG / 2)
+        distL = robot.getObstacleDistance()
+        robot.rotate(-ANG)
+        distR = robot.getObstacleDistance()
+
+        wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
+        angR = np.arcsin(distR * np.sin(ANG) / wallLength)
+        semiAng = np.deg2rad(90) - angR
+        th = np.deg2rad(180) - semiAng
+        x = distR * np.cos(semiAng)
+        robot.onMarker(x=x, th=th, now=True)
+
+        robot.rotate(norm_pi(np.deg2rad(90) - th))
+        robot.onMarker(y=robot.getObstacleDistance(), now=True)
 
         # position looking at the images
         robot.go(*myMap._cell2pos(0.5, 6))
