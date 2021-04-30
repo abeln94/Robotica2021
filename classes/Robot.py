@@ -500,8 +500,7 @@ class Robot:
 
                 print(new_dist)
 
-            self.rotate(-(30 - best_ang))
-
+            self.rotate(-np.deg2rad(30 - best_ang))
 
         else:  # Too far
             print("Too far to update odometry with Ultrasonic")
