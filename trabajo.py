@@ -9,6 +9,7 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
+from functions.functions import norm_pi
 from p4 import traverseLabyrinthFine
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -42,6 +43,7 @@ if __name__ == "__main__":
 
         if not Cfg.skip:
             # detect color
+            """
             leftSide = robot.getLight() <= 0.5
             sideMul = 1 if leftSide else -1
             enter, exit = (2, 0) if leftSide else (0, 2)
@@ -89,31 +91,35 @@ if __name__ == "__main__":
             robot.advance(GRID)
             robot.rotate(np.pi / 2 * sideMul)
             robot.trackObject()
+            """
 
-            # # recolocate odometry
-            # _, _, th = robot.readOdometry()
-            # robot.rotate(norm_pi(np.deg2rad(180) - th))
-            # distance = robot.getObstacleDistance() - GRID / 2
-            # if distance > 0:
-            #     robot.advance(distance)
-            # ANG = np.deg2rad(25)
-            # robot.rotate(ANG / 2)
-            # distL = robot.getObstacleDistance()
-            # robot.rotate(-ANG)
-            # distR = robot.getObstacleDistance()
-            #
-            # wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
-            # angR = np.arcsin(distR * np.sin(ANG) / wallLength)
-            # semiAng = np.deg2rad(90) - angR
-            # th = np.deg2rad(180) - semiAng
-            # x = distR * np.cos(semiAng)
-            # robot.onMarker(x=x, th=th, now=True)
-            #
-            # robot.rotate(norm_pi(np.deg2rad(90) - th))
-            # distance = robot.getObstacleDistance() - GRID * 2.5
-            # if distance > 0:
-            #     robot.advance(distance)
-            # robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
+            # recolocate odometry
+            _, _, th = robot.readOdometry()
+            robot.rotate(norm_pi(np.deg2rad(180) - th))
+            distance = robot.getObstacleDistance() - GRID / 2
+            if distance > 0:
+                robot.advance(distance)
+            ANG = np.deg2rad(25)
+            robot.rotate(ANG / 2)
+            distL = robot.getObstacleDistance()
+            robot.rotate(-ANG)
+            distR = robot.getObstacleDistance()
+
+            wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
+            angR = np.arcsin(distR * np.sin(ANG) / wallLength)
+            semiAng = np.deg2rad(90) - angR
+            th = np.deg2rad(180) - semiAng
+            x = distR * np.cos(semiAng)
+            print(x)
+            print(angR)
+            robot.onMarker(x=x, th=th, now=True)
+
+            robot.rotate(norm_pi(np.deg2rad(90) - th))
+            distance = robot.getObstacleDistance() - GRID * 2.5
+
+            if distance > 0:
+                robot.advance(distance)
+            robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
         else:
             robot.onMarker(*myMap._cell2pos(1, 4), np.deg2rad(90), now=True)
 
