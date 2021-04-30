@@ -482,7 +482,7 @@ class Robot:
         self.marker_now.value = now
 
     def updateOdOnWall(self):
-        INIT = -45
+        INIT = -60
         ROTATION = 5
         # We assume robot looking a front wall
         ang, best_ang = INIT, INIT
