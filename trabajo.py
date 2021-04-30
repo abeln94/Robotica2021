@@ -135,7 +135,7 @@ if __name__ == "__main__":
                 break
             else:
                 robot.rotate(np.deg2rad(5) * rotation)
-                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
+                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 2)
 
         robot.go(*myMap._cell2pos(0.5, 6.75))
         dist = robot.updateOdOnWall()
