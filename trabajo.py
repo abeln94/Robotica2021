@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
         robot.go(*myMap._cell2pos(0.5, 6.75))
         dist = robot.updateOdOnWall()
-        robot.advance(dist - GRID/2)
+        print(dist - GRID/2)
 
         # exit lab
         # if leftExit:
