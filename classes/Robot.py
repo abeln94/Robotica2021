@@ -232,7 +232,7 @@ class Robot:
                 if self.marker_x.value > -999: x = self.marker_x.value
                 if self.marker_y.value > -999: y = self.marker_y.value
                 if self.marker_th.value > -999: th = self.marker_th.value
-                self.marker_now.value = False
+                self.onMarker()
 
             # update
             with self.lock_odometry:
