@@ -36,7 +36,7 @@ if __name__ == "__main__":
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
 
         # press button to start
-        robot.waitButtonPress()
+        # robot.waitButtonPress()
 
         # start odometry
         robot.startOdometry()
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
             # recolocate odometry
             _, _, th = robot.readOdometry()
-            robot.rotate(norm_pi(np.deg2rad(180) - th))
+            # robot.rotate(norm_pi(np.deg2rad(180) - th))
             distance = robot.getObstacleDistance() - GRID / 2
             if distance > 0:
                 robot.advance(distance)
