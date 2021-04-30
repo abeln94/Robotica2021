@@ -142,12 +142,12 @@ if __name__ == "__main__":
         robot.advance(dist - GRID/2)
 
         # exit lab
-        if leftExit:
-            robot.go(*myMap._cell2pos(0, 7))
-            robot.go(*myMap._cell2pos(-1, 7))
-        else:
-            robot.go(*myMap._cell2pos(2, 7))
-            robot.go(*myMap._cell2pos(2, 8))
+        # if leftExit:
+        #     robot.go(*myMap._cell2pos(0, 7))
+        #     robot.go(*myMap._cell2pos(-1, 7))
+        # else:
+        #     robot.go(*myMap._cell2pos(2, 7))
+        #     robot.go(*myMap._cell2pos(2, 8))
 
         time.sleep(3)
 
