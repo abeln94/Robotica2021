@@ -137,7 +137,7 @@ if __name__ == "__main__":
                 robot.rotate(np.deg2rad(5) * rotation)
                 rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
 
-        robot.go(*myMap._cell2pos(0.5, 7.75))
+        robot.go(*myMap._cell2pos(0.5, 6.75))
         dist = robot.updateOdOnWall()
         robot.advance(dist - GRID/2)
 
