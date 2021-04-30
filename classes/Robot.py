@@ -242,7 +242,8 @@ class Robot:
                 self.th.value = th
 
             # display
-            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th), np.rad2deg(odo_th)))
+            print("Updated odometry ... X={:.2f}, Y={:.2f}, th={:.2f}º, old_th={:.2f}º".format(x, y, np.rad2deg(th),
+                                                                                               np.rad2deg(odo_th)))
 
             if Cfg.plot:
                 map.update([x, y, th])
@@ -397,7 +398,8 @@ class Robot:
 
             # calculate velocity (all the constants were found by try&error)
             w = sigmoid(dth, 3) * Cfg.ANG_VEL
-            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL * pow(np.cos(dth / 2), 50)  # the last factor allows advancing only if the necessary rotation is low
+            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL * pow(np.cos(dth / 2),
+                                                            50)  # the last factor allows advancing only if the necessary rotation is low
 
             # move
             self.setSpeed(v, w)
@@ -481,14 +483,13 @@ class Robot:
         self.marker_th.value = th
         self.marker_now.value = now
 
-    def updateOdOnWall(self):
-        INIT = -60
+    def updateOdOnWall(self, ANG=60,):
         ROTATION = 2.5
         # We assume robot looking a front wall
-        ang, best_ang = INIT, INIT
+        ang, best_ang = -ANG, -ANG
         self.rotate(np.deg2rad(best_ang))
         best_dist = 2 * GRID
-        while ang <= -INIT:
+        while ang <= ANG:
             ang += ROTATION
             self.rotate(np.deg2rad(ROTATION))
             new_dist = 0
@@ -499,8 +500,7 @@ class Robot:
                 best_dist = new_dist
                 best_ang = ang
 
-            print(new_dist)
 
-        self.rotate(-np.deg2rad(-INIT - best_ang))
-
-
+        #self.onMarker(0, 0, new_th, True)
+        self.rotate(-np.deg2rad(ANG - best_ang))
+        return new_dist

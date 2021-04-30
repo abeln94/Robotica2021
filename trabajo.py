@@ -43,7 +43,6 @@ if __name__ == "__main__":
 
         if not Cfg.skip:
             # detect color
-            """
             leftSide = robot.getLight() <= 0.5
             sideMul = 1 if leftSide else -1
             enter, exit = (2, 0) if leftSide else (0, 2)
@@ -91,35 +90,33 @@ if __name__ == "__main__":
             robot.advance(GRID)
             robot.rotate(np.pi / 2 * sideMul)
             robot.trackObject()
-            """
 
-            # recolocate odometry
-            _, _, th = robot.readOdometry()
-            # robot.rotate(norm_pi(np.deg2rad(180) - th))
-            distance = robot.getObstacleDistance() - GRID / 2
-            if distance > 0:
-                robot.advance(distance)
-            ANG = np.deg2rad(25)
-            robot.rotate(ANG / 2)
-            distL = robot.getObstacleDistance()
-            robot.rotate(-ANG)
-            distR = robot.getObstacleDistance()
+            # # recolocate odometry
+            # _, _, th = robot.readOdometry()
+            # # robot.rotate(norm_pi(np.deg2rad(180) - th))
+            # distance = robot.getObstacleDistance() - GRID / 2
+            # if distance > 0:
+            #     robot.advance(distance)
+            # ANG = np.deg2rad(25)
+            # robot.rotate(ANG / 2)
+            # distL = robot.getObstacleDistance()
+            # robot.rotate(-ANG)
+            # distR = robot.getObstacleDistance()
+            #
+            # wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
+            # angR = np.arcsin(distR * np.sin(ANG) / wallLength)
+            # semiAng = np.deg2rad(90) - angR
+            # th = np.deg2rad(180) - semiAng
+            # x = distR * np.cos(semiAng)
+            # print(x)
+            # print(angR)
+            # robot.onMarker(x=x, th=th, now=True)
+            # robot.rotate(norm_pi(np.deg2rad(90) - th))
+            # distance = robot.getObstacleDistance() - GRID * 2.5
+            # if distance > 0:
+            #     robot.advance(distance)
+            # robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
 
-            wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
-            angR = np.arcsin(distR * np.sin(ANG) / wallLength)
-            semiAng = np.deg2rad(90) - angR
-            th = np.deg2rad(180) - semiAng
-            x = distR * np.cos(semiAng)
-            print(x)
-            print(angR)
-            robot.onMarker(x=x, th=th, now=True)
-
-            robot.rotate(norm_pi(np.deg2rad(90) - th))
-            distance = robot.getObstacleDistance() - GRID * 2.5
-
-            if distance > 0:
-                robot.advance(distance)
-            robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
         else:
             robot.onMarker(*myMap._cell2pos(1, 4), np.deg2rad(90), now=True)
 
@@ -139,6 +136,10 @@ if __name__ == "__main__":
             else:
                 robot.rotate(np.deg2rad(5) * rotation)
                 rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
+
+        robot.go(*myMap._cell2pos(0.5, 7.75))
+        dist = robot.updateOdOnWall()
+        robot.advance(dist - GRID/2)
 
         # exit lab
         if leftExit:
