@@ -115,7 +115,7 @@ if __name__ == "__main__":
             #     robot.advance(distance)
             # robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
         else:
-            robot.onMarker(*myMap._cell2pos(4, 3), np.deg2rad(90))
+            robot.onMarker(*myMap._cell2pos(1, 4), np.deg2rad(90), now=True)
 
         # position looking at the images
         robot.go(*myMap._cell2pos(0.5, 6))
