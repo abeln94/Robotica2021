@@ -95,10 +95,10 @@ if __name__ == "__main__":
         # recolocate odometry
         _, _, th = robot.readOdometry()
         robot.rotate(norm_pi(np.deg2rad(180) - th))
-        distance = robot.getObstacleDistance() - 150
+        distance = robot.getObstacleDistance() - GRID / 2
         if distance > 0:
             robot.advance(distance)
-        ANG = np.deg2rad(10)
+        ANG = np.deg2rad(25)
         robot.rotate(ANG / 2)
         distL = robot.getObstacleDistance()
         robot.rotate(-ANG)
@@ -112,6 +112,9 @@ if __name__ == "__main__":
         robot.onMarker(x=x, th=th, now=True)
 
         robot.rotate(norm_pi(np.deg2rad(90) - th))
+        distance = robot.getObstacleDistance() - GRID * 2.5
+        if distance > 0:
+            robot.advance(distance)
         robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
 
         # position looking at the images
@@ -120,7 +123,7 @@ if __name__ == "__main__":
 
         # detect image
         periodic = Periodic(1)
-        rotateLeft = 1
+        rotation = 1
         while periodic():
             foundOur, coordinatesOur = robot.detectImage(IMAGE_OUR)
             foundOther, coordinatesOther = robot.detectImage(IMAGE_OTHER)
@@ -128,8 +131,8 @@ if __name__ == "__main__":
                 leftExit = coordinatesOur[0] > coordinatesOther[0]  # the camera is inverted
                 break
             else:
-                robot.setSpeed(0, np.deg2rad(10) * rotateLeft)
-                rotateLeft = 2 - rotateLeft
+                robot.setSpeed(0, np.deg2rad(5) * rotation)
+                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
 
         # exit lab
         if leftExit:
