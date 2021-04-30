@@ -485,10 +485,9 @@ class Robot:
         if self.getObstacleDistance() < 1.5 * GRID:
             # We assume robot looking a front wall
             ang, best_ang = -30, -30
-            self.rotate(-np.deg2rad(best_ang))
-            periodic = Periodic()
+            self.rotate(np.deg2rad(best_ang))
             best_dist = 2 * GRID
-            while (periodic()):
+            while ang <= 30:
                 ang += 10
                 self.rotate(np.deg2rad(10))
                 new_dist = 0
