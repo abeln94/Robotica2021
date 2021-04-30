@@ -70,8 +70,9 @@ class Robot:
         self.SENSOR_GYRO = self.BP.PORT_4
 
         # Configure sensors, for example a touch sensor.
-        self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-        self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
+        self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.EV3_ULTRASONIC_CM)
+        # self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        # self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
