@@ -9,13 +9,13 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
-from p4 import traverseLabyrinthFine
+from p4 import traverseLabyrinthFine, traverseLabyrinth
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
-Cfg.add_argument("-arc", "--S_as_arcs", help="do s as arcs", action="store_true")
 Cfg.add_argument("-skip", help="start at the end of the labyrinth", action="store_true")
+Cfg.add_argument("-odo", help="Use the odometry for movement", action="store_true")
 
 # images
 IMAGE_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
@@ -34,6 +34,15 @@ if __name__ == "__main__":
         # init Robot
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
 
+
+        def go(x, y):
+            robot.go(*myMap._cell2pos(x, y))
+
+
+        def lookAt(x, y):
+            robot.lookAt(*myMap._cell2pos(x, y))
+
+
         # press button to start
         robot.waitButtonPress()
 
@@ -47,17 +56,17 @@ if __name__ == "__main__":
 
         if not Cfg.skip:
 
-            # perform S
-            if Cfg.S_as_arcs:
-                # as arcs
-                T = 7
-                for side, c in ((1 if leftSide else -1, 6), (-1 if leftSide else 1, 4)):
-                    cx, cy = myMap._cell2pos(1, c)
-                    for t in range(T):
-                        angle = np.pi * t / (T - 1)
-                        robot.go(cx - side * GRID * np.sin(angle), cy + GRID * np.cos(angle))
+            # perform S as squares
+            if Cfg.odo:
+                go(enter, 7)
+                go(enter, 6)
+                go(enter, 5)
+                go(1, 5)
+                go(exit, 5)
+                go(exit, 4)
+                go(exit, 3)
+                go(1, 3)
             else:
-                # as squares
                 robot.rotate(np.pi / 2 * sideMul)
                 robot.advance(GRID)
                 robot.rotate(-np.pi / 2 * sideMul)
@@ -70,25 +79,37 @@ if __name__ == "__main__":
                 robot.advance(GRID)
 
             # enter labyrinth
-            robot.advance(GRID)
-            robot.rotate(-np.pi / 2 * sideMul)
-            robot.advance(GRID)
+            if Cfg.odo:
+                go(enter, 3)
+                go(enter, 2)
+            else:
+                robot.advance(GRID)
+                robot.rotate(-np.pi / 2 * sideMul)
+                robot.advance(GRID)
 
             # traverse labyrinth
             robot.onMarker(x=GRID + Cfg.LIGHT_OFFSET * (-1 if leftSide else 1))
-            # traverseLabyrinth((exit, 2), myMap, robot)
-            traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
+            if Cfg.odo:
+                traverseLabyrinth((exit, 2), myMap, robot)
+            else:
+                traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
 
         # exit labyrinth
         robot.onMarker(x=GRID * (exit + 0.5), y=GRID * 3 + Cfg.LIGHT_OFFSET, th=np.deg2rad(90))
-        # robot.go(*myMap._cell2pos(exit, 3))
-        robot.advance(GRID)
+        if Cfg.odo:
+            robot.go(*myMap._cell2pos(exit, 3))
+        else:
+            robot.advance(GRID)
         robot.onMarker()
 
         # look for ball
-        robot.rotate(-np.pi / 2 * sideMul)
-        robot.advance(GRID)
-        robot.rotate(np.pi / 2 * sideMul)
+        if Cfg.odo:
+            go(1, 3)
+            lookAt(1, 4)
+        else:
+            robot.rotate(-np.pi / 2 * sideMul)
+            robot.advance(GRID)
+            robot.rotate(np.pi / 2 * sideMul)
         robot.trackObject()
 
         # # recolocate odometry
@@ -107,8 +128,8 @@ if __name__ == "__main__":
         # robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
 
         # position looking at the images
-        robot.go(*myMap._cell2pos(0.5, 6))
-        robot.lookAt(*myMap._cell2pos(0.5, 7))
+        go(0.5, 6)
+        lookAt(0.5, 7)
 
         # detect image
         periodic = Periodic(1)
@@ -126,31 +147,25 @@ if __name__ == "__main__":
         # dist = robot.updateOdOnWall(30)
         # robot.advance(dist - GRID * 0.5)
 
-        robot.go(*myMap._cell2pos(0.5, 7))
+        go(0.5, 7)
         dist = robot.updateOdOnWall(45)
-        if dist > GRID/2:
-            robot.advance(dist - GRID/2)
+        if dist > GRID / 2:
+            robot.advance(dist - GRID / 2)
 
         robot.rotate(np.deg2rad(-90))
 
         dist = robot.getObstacleDistance()
-        if dist > GRID/2:
-            robot.advance(dist - GRID/2)
+        if dist > GRID / 2:
+            robot.advance(dist - GRID / 2)
 
         robot.updateOdOnWall(45)
 
         if leftExit:
             robot.rotate(np.deg2rad(-180))
             robot.advance(3 * GRID)
-            # robot.rotate(np.deg2rad(90))
-            # robot.advance(GRID * 1.5)
         else:
             robot.rotate(np.deg2rad(90))
             robot.advance(GRID)
-            # robot.rotate(np.deg2rad(-90))
-            # robot.advance(robot.getObstacleDistance() - GRID * 0.5)
-            # robot.rotate(np.deg2rad(90))
-            # robot.advance(GRID)
 
         time.sleep(3)
 
