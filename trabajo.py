@@ -9,7 +9,6 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
-from functions.functions import norm_pi
 from p4 import traverseLabyrinthFine
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -92,28 +91,28 @@ if __name__ == "__main__":
         robot.rotate(np.pi / 2 * sideMul)
         robot.trackObject()
 
-        # recolocate odometry
-        _, _, th = robot.readOdometry()
-        robot.rotate(norm_pi(np.deg2rad(180) - th))
-        robot.advance(robot.getObstacleDistance() - GRID)
-        dist = robot.updateOdOnWall()
-        robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
+        # # recolocate odometry
+        # _, _, th = robot.readOdometry()
+        # robot.rotate(norm_pi(np.deg2rad(180) - th))
+        # robot.advance(robot.getObstacleDistance() - GRID)
+        # dist = robot.updateOdOnWall()
+        # robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
+        #
+        # # robot.advance(dist - GRID)
+        # robot.rotate(np.deg2rad(-90))
+        #
+        # robot.advance(robot.getObstacleDistance() - GRID * 1.5)
+        # dist = robot.updateOdOnWall(ANG=30)
+        #
+        # robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
 
-        # robot.advance(dist - GRID)
-        robot.rotate(np.deg2rad(-90))
-
-        robot.advance(robot.getObstacleDistance() - GRID * 1.5)
-        dist = robot.updateOdOnWall(ANG=30)
-
-        robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
-
-        # # position looking at the images
-        # robot.go(*myMap._cell2pos(0.5, 6))
-        # robot.lookAt(*myMap._cell2pos(0.5, 7))
+        # position looking at the images
+        robot.go(*myMap._cell2pos(0.5, 6))
+        robot.lookAt(*myMap._cell2pos(0.5, 7))
 
         # detect image
+        robot.rotate(-30)
         periodic = Periodic(1)
-        rotation = 1
         while periodic():
             foundOur, coordinatesOur = robot.detectImage(IMAGE_OUR)
             foundOther, coordinatesOther = robot.detectImage(IMAGE_OTHER)
@@ -121,8 +120,7 @@ if __name__ == "__main__":
                 leftExit = coordinatesOur[0] > coordinatesOther[0]  # the camera is inverted
                 break
             else:
-                robot.rotate(np.deg2rad(5) * rotation)
-                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
+                robot.rotate(np.deg2rad(5))
 
         # exit lab
         if leftExit:
