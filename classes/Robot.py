@@ -368,7 +368,7 @@ class Robot:
 
     def advance(self, dist):
         dist = dist * FRICTION
-        self.setSpeed(Cfg.LIN_VEL, 0)
+        self.setSpeed(Cfg.LIN_VEL * np.sign(dist), 0)
         time.sleep(abs(dist) / Cfg.LIN_VEL)
         self.setSpeed(0, 0)
 
