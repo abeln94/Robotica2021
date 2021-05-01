@@ -346,7 +346,7 @@ class Robot:
         # 2. Then catch the ball
         ANGLE = 90  # degrees
         TIME = 3  # seconds
-        ADVANCE = 40  # mm (more or less)
+        ADVANCE = 45  # mm (more or less)
 
         # sanity check
         if self.BP.get_motor_encoder(self.MOTOR_CLAW) > ANGLE / 2:
