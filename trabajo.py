@@ -103,7 +103,7 @@ if __name__ == "__main__":
         robot.rotate(np.deg2rad(-90))
 
         robot.advance(robot.getObstacleDistance() - GRID * 1.5)
-        dist = robot.updateOdOnWall()
+        dist = robot.updateOdOnWall(ANG=30)
 
         robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
                 break
             else:
                 robot.rotate(np.deg2rad(5) * rotation)
-                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 2)
+                rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 1)
 
         # exit lab
         if leftExit:
