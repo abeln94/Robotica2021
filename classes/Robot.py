@@ -503,4 +503,4 @@ class Robot:
 
         # self.onMarker(0, 0, new_th, True)
         self.rotate(-np.deg2rad(ANG - best_ang))
-        return new_dist
+        return best_dist

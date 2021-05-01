@@ -9,6 +9,7 @@ from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Periodic import Periodic
 from classes.Robot import Robot
+from functions.functions import norm_pi
 from p4 import traverseLabyrinthFine
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -91,24 +92,24 @@ if __name__ == "__main__":
         robot.rotate(np.pi / 2 * sideMul)
         robot.trackObject()
 
-        # # recolocate odometry
-        # _, _, th = robot.readOdometry()
-        # robot.rotate(norm_pi(np.deg2rad(180) - th))
-        # robot.advance(robot.getObstacleDistance() - GRID)
-        # dist = robot.updateOdOnWall()
-        # robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
-        #
-        # # robot.advance(dist - GRID)
-        # robot.rotate(np.deg2rad(-90))
-        #
-        # robot.advance(robot.getObstacleDistance() - GRID * 1.5)
-        # dist = robot.updateOdOnWall(ANG=30)
-        #
-        # robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
+        # recolocate odometry
+        _, _, th = robot.readOdometry()
+        robot.rotate(norm_pi(np.deg2rad(180) - th))
+        robot.advance(robot.getObstacleDistance() - GRID)
+        dist = robot.updateOdOnWall()
+        robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
 
-        # position looking at the images
-        robot.go(*myMap._cell2pos(0.5, 6))
-        robot.lookAt(*myMap._cell2pos(0.5, 7))
+        robot.advance(dist - GRID)
+        robot.rotate(np.deg2rad(-90))
+
+        robot.advance(robot.getObstacleDistance() - GRID * 1.5)
+        dist = robot.updateOdOnWall(ANG=30)
+
+        robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
+
+        # # position looking at the images
+        # robot.go(*myMap._cell2pos(0.5, 6))
+        # robot.lookAt(*myMap._cell2pos(0.5, 7))
 
         # detect image
         robot.rotate(np.deg2rad(-30))
@@ -122,13 +123,22 @@ if __name__ == "__main__":
             else:
                 robot.rotate(np.deg2rad(5))
 
+        dist = robot.updateOdOnWall(30)
+        robot.advance(dist - GRID * 0.5)
+
         # exit lab
         if leftExit:
-            robot.go(*myMap._cell2pos(0, 7))
-            robot.go(*myMap._cell2pos(-1, 7))
+            # robot.go(*myMap._cell2pos(0, 7))
+            # robot.go(*myMap._cell2pos(-1, 7))
+            robot.rotate(np.deg2rad(90))
+            robot.advance(GRID * 1.5)
         else:
-            robot.go(*myMap._cell2pos(2, 7))
-            robot.go(*myMap._cell2pos(2, 8))
+            # robot.go(*myMap._cell2pos(2, 7))
+            # robot.go(*myMap._cell2pos(2, 8))
+            robot.rotate(np.deg2rad(-90))
+            robot.advance(robot.getObstacleDistance() - GRID * 0.5)
+            robot.rotate(np.deg2rad(90))
+            robot.advance(GRID)
 
         time.sleep(3)
 
