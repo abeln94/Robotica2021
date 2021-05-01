@@ -67,6 +67,9 @@ if __name__ == "__main__":
 
         # Initialize Odometry. Default value will be 0,0,0
         robot = Robot()
+        # start odometry
+        robot.startOdometry()
+        time.sleep(5)
 
         # 1. 
         image_R2D2 = cv2.flip(cv2.imread("images/R2-D2_s.png", cv2.IMREAD_COLOR), -1)
