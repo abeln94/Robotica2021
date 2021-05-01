@@ -309,7 +309,7 @@ class Robot:
 
                 else:
                     # 1.4 angular movement to get a proper orientation to the target
-                    angular_speed = sigmoid(x - targetPosition[0], 6) * Cfg.ANG_VEL
+                    angular_speed = sigmoid(x - targetPosition[0], 8) * Cfg.ANG_VEL
                     # 1.5 linear movement to get closer the target
                     linear_speed = logistic(y - targetPosition[1], 8, 0.30) * Cfg.LIN_VEL
                     if Cfg.ball:
@@ -346,7 +346,7 @@ class Robot:
         # 2. Then catch the ball
         ANGLE = 90  # degrees
         TIME = 3  # seconds
-        ADVANCE = 30  # mm (more or less)
+        ADVANCE = 40  # mm (more or less)
 
         # sanity check
         if self.BP.get_motor_encoder(self.MOTOR_CLAW) > ANGLE / 2:
