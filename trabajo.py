@@ -126,7 +126,19 @@ if __name__ == "__main__":
         # dist = robot.updateOdOnWall(30)
         # robot.advance(dist - GRID * 0.5)
 
+        robot.go(*myMap._cell2pos(0.5, 7))
+        dist = robot.updateOdOnWall(45)
+        if dist > GRID/2:
+            robot.advance(dist - GRID/2)
+
+        robot.rotate(np.deg2rad(-90))
+
+        dist = robot.detectObstacle()
+        if dist > GRID/2:
+            robot.advance(dist - GRID/2)
+
         # exit lab
+        """
         if leftExit:
             robot.go(*myMap._cell2pos(0, 7))
             robot.go(*myMap._cell2pos(-1, 7))
@@ -139,7 +151,7 @@ if __name__ == "__main__":
             # robot.advance(robot.getObstacleDistance() - GRID * 0.5)
             # robot.rotate(np.deg2rad(90))
             # robot.advance(GRID)
-
+        """
         time.sleep(3)
 
     finally:
