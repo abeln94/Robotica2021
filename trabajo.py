@@ -95,6 +95,7 @@ if __name__ == "__main__":
         # recolocate odometry
         _, _, th = robot.readOdometry()
         robot.rotate(norm_pi(np.deg2rad(180) - th))
+        robot.advance(robot.getObstacleDistance() - GRID)
         dist = robot.updateOdOnWall()
         robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
 
