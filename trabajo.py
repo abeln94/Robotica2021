@@ -120,7 +120,7 @@ if __name__ == "__main__":
                 leftExit = coordinatesOur[0] > coordinatesOther[0]  # the camera is inverted
                 break
             else:
-                robot.setSpeed(0, np.deg2rad(10) * rotateLeft)
+                robot.setSpeed(0, np.deg2rad(7.5) * rotateLeft)
                 rotateLeft = 1 - rotateLeft
 
         # dist = robot.updateOdOnWall(30)
