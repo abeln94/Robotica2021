@@ -272,7 +272,7 @@ class Robot:
         self.cam.capture(rawCapture, format="bgr", use_video_port=True)
         return rawCapture.array
 
-    def trackObject(self, targetPosition=(0.5, 0.15)):
+    def trackObject(self, targetPosition=(0.54, 0.15)):
         """
         Track one object with indicated color until the target size and centroid are reached
         :param targetPosition: on image target coordinates value of the blob's centroid
