@@ -398,8 +398,7 @@ class Robot:
 
             # calculate velocity (all the constants were found by try&error)
             w = sigmoid(dth, 3) * Cfg.ANG_VEL
-            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL * pow(np.cos(dth / 2),
-                                                            50)  # the last factor allows advancing only if the necessary rotation is low
+            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL if w < 0.1 else 0
 
             # move
             self.setSpeed(v, w)
@@ -483,7 +482,7 @@ class Robot:
         self.marker_th.value = th
         self.marker_now.value = now
 
-    def updateOdOnWall(self, ANG=60,):
+    def updateOdOnWall(self, ANG=60, ):
         ROTATION = 2.5
         # We assume robot looking a front wall
         ang, best_ang = -ANG, -ANG
@@ -500,7 +499,6 @@ class Robot:
                 best_dist = new_dist
                 best_ang = ang
 
-
-        #self.onMarker(0, 0, new_th, True)
+        # self.onMarker(0, 0, new_th, True)
         self.rotate(-np.deg2rad(ANG - best_ang))
         return new_dist

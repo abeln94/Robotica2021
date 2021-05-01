@@ -99,7 +99,7 @@ if __name__ == "__main__":
         dist = robot.updateOdOnWall()
         robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
 
-        robot.advance(dist - GRID)
+        # robot.advance(dist - GRID)
         robot.rotate(np.deg2rad(-90))
 
         robot.advance(robot.getObstacleDistance() - GRID * 1.5)
