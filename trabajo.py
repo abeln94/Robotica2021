@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
         # detect image
         robot.rotate(np.deg2rad(-30))
-        periodic = Periodic(1)
+        periodic = Periodic()
         while periodic():
             foundOur, coordinatesOur = robot.detectImage(IMAGE_OUR)
             foundOther, coordinatesOther = robot.detectImage(IMAGE_OTHER)

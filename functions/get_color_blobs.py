@@ -134,5 +134,5 @@ def position_reached(img_BGR, rangeMin=(160, 80, 50), rangeMax=(10, 255, 255)):
     mask2 = cv2.inRange(image, rangeMin2, rangeMax2)
     mask = mask1 | mask2
 
-    PX = 50
+    PX = np.floor(Cfg.CAMERA_HEIGHT / 4.8)
     return cv2.countNonZero(mask[0:PX, :]) / Cfg.CAMERA_WIDTH / PX > 0.6

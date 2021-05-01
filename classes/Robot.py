@@ -379,6 +379,8 @@ class Robot:
         :param y_goal: y coordinate of the circle's center
         :param radius: radius of the circle
         """
+        self.lookAt(x_goal, y_goal)
+
         periodic = Periodic()
 
         while periodic():
@@ -398,7 +400,7 @@ class Robot:
 
             # calculate velocity (all the constants were found by try&error)
             w = sigmoid(dth, 3) * Cfg.ANG_VEL
-            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL if w < 0.1 else 0
+            v = logistic(dist, 0.01, 3) * Cfg.LIN_VEL
 
             # move
             self.setSpeed(v, w)
