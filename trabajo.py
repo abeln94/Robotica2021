@@ -111,7 +111,7 @@ if __name__ == "__main__":
         robot.lookAt(*myMap._cell2pos(0.5, 7))
 
         # detect image
-        robot.rotate(-30)
+        robot.rotate(np.deg2rad(-30))
         periodic = Periodic(1)
         while periodic():
             foundOur, coordinatesOur = robot.detectImage(IMAGE_OUR)
