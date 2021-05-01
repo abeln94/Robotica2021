@@ -204,6 +204,7 @@ class BrickPi3:
     PORT_C = "PORT_C"
 
     class SENSOR_TYPE:
+        EV3_ULTRASONIC_CM = _Ultrasonic
         TOUCH = _Touch
         NXT_ULTRASONIC = _Ultrasonic
         NXT_LIGHT_ON = _Light

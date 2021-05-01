@@ -72,7 +72,7 @@ class Robot:
         # Configure sensors, for example a touch sensor.
         self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.EV3_ULTRASONIC_CM)
         # self.BP.set_sensor_type(self.SENSOR_ULTRASONIC, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-        # self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
+        self.BP.set_sensor_type(self.SENSOR_BUTTON, self.BP.SENSOR_TYPE.TOUCH)
         self.BP.set_sensor_type(self.SENSOR_LIGHT, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         self.BP.set_sensor_type(self.SENSOR_GYRO, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
@@ -369,7 +369,7 @@ class Robot:
     def advance(self, dist):
         dist = dist * FRICTION
         self.setSpeed(Cfg.LIN_VEL, 0)
-        time.sleep(dist / Cfg.LIN_VEL)
+        time.sleep(abs(dist) / Cfg.LIN_VEL)
         self.setSpeed(0, 0)
 
     def go(self, x_goal, y_goal, radius=10):

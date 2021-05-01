@@ -36,16 +36,17 @@ if __name__ == "__main__":
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(-90)])
 
         # press button to start
-        # robot.waitButtonPress()
+        robot.waitButtonPress()
 
         # start odometry
         robot.startOdometry()
 
+        # detect color
+        leftSide = robot.getLight() <= 0.5
+        sideMul = 1 if leftSide else -1
+        enter, exit = (2, 0) if leftSide else (0, 2)
+
         if not Cfg.skip:
-            # detect color
-            leftSide = robot.getLight() <= 0.5
-            sideMul = 1 if leftSide else -1
-            enter, exit = (2, 0) if leftSide else (0, 2)
 
             # perform S
             if Cfg.S_as_arcs:
@@ -79,50 +80,35 @@ if __name__ == "__main__":
             # traverseLabyrinth((exit, 2), myMap, robot)
             traverseLabyrinthFine((0, enter), (0, exit), 2, myMap, robot)
 
-            # exit labyrinth
-            robot.onMarker(x=GRID * (exit + 0.5), y=GRID * 3 + Cfg.LIGHT_OFFSET, th=np.deg2rad(90))
-            # robot.go(*myMap._cell2pos(exit, 3))
-            robot.advance(GRID)
-            robot.onMarker()
+        # exit labyrinth
+        robot.onMarker(x=GRID * (exit + 0.5), y=GRID * 3 + Cfg.LIGHT_OFFSET, th=np.deg2rad(90))
+        # robot.go(*myMap._cell2pos(exit, 3))
+        robot.advance(GRID)
+        robot.onMarker()
 
-            # look for ball
-            robot.rotate(-np.pi / 2 * sideMul)
-            robot.advance(GRID)
-            robot.rotate(np.pi / 2 * sideMul)
-            robot.trackObject()
+        # look for ball
+        robot.rotate(-np.pi / 2 * sideMul)
+        robot.advance(GRID)
+        robot.rotate(np.pi / 2 * sideMul)
+        robot.trackObject()
 
-            # # recolocate odometry
-            # _, _, th = robot.readOdometry()
-            # # robot.rotate(norm_pi(np.deg2rad(180) - th))
-            # distance = robot.getObstacleDistance() - GRID / 2
-            # if distance > 0:
-            #     robot.advance(distance)
-            # ANG = np.deg2rad(25)
-            # robot.rotate(ANG / 2)
-            # distL = robot.getObstacleDistance()
-            # robot.rotate(-ANG)
-            # distR = robot.getObstacleDistance()
-            #
-            # wallLength = np.sqrt(distL ** 2 + distR ** 2 - 2 * distL * distR * np.cos(ANG))
-            # angR = np.arcsin(distR * np.sin(ANG) / wallLength)
-            # semiAng = np.deg2rad(90) - angR
-            # th = np.deg2rad(180) - semiAng
-            # x = distR * np.cos(semiAng)
-            # print(x)
-            # print(angR)
-            # robot.onMarker(x=x, th=th, now=True)
-            # robot.rotate(norm_pi(np.deg2rad(90) - th))
-            # distance = robot.getObstacleDistance() - GRID * 2.5
-            # if distance > 0:
-            #     robot.advance(distance)
-            # robot.onMarker(y=8 * GRID - robot.getObstacleDistance(), now=True)
+        # recolocate odometry
+        _, _, th = robot.readOdometry()
+        robot.rotate(norm_pi(np.deg2rad(180) - th))
+        dist = robot.updateOdOnWall()
+        robot.onMarker(x=dist, th=np.deg2rad(180), now=True)
 
-        else:
-            robot.onMarker(*myMap._cell2pos(1, 4), np.deg2rad(90), now=True)
+        robot.advance(GRID - dist)
+        robot.rotate(np.deg2rad(-90))
 
-        # position looking at the images
-        robot.go(*myMap._cell2pos(0.5, 6))
-        robot.lookAt(*myMap._cell2pos(0.5, 7))
+        robot.advance(robot.getObstacleDistance() - GRID * 1.5)
+        dist = robot.updateOdOnWall()
+
+        robot.onMarker(y=GRID * 8 - dist, th=np.deg2rad(90), now=True)
+
+        # # position looking at the images
+        # robot.go(*myMap._cell2pos(0.5, 6))
+        # robot.lookAt(*myMap._cell2pos(0.5, 7))
 
         # detect image
         periodic = Periodic(1)
@@ -137,17 +123,13 @@ if __name__ == "__main__":
                 robot.rotate(np.deg2rad(5) * rotation)
                 rotation = -1 * np.sign(rotation) * (np.abs(rotation) + 2)
 
-        robot.go(*myMap._cell2pos(0.5, 6.75))
-        dist = robot.updateOdOnWall()
-        print(dist - GRID/2)
-
         # exit lab
-        # if leftExit:
-        #     robot.go(*myMap._cell2pos(0, 7))
-        #     robot.go(*myMap._cell2pos(-1, 7))
-        # else:
-        #     robot.go(*myMap._cell2pos(2, 7))
-        #     robot.go(*myMap._cell2pos(2, 8))
+        if leftExit:
+            robot.go(*myMap._cell2pos(0, 7))
+            robot.go(*myMap._cell2pos(-1, 7))
+        else:
+            robot.go(*myMap._cell2pos(2, 7))
+            robot.go(*myMap._cell2pos(2, 8))
 
         time.sleep(3)
 
