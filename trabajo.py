@@ -147,7 +147,7 @@ if __name__ == "__main__":
         # dist = robot.updateOdOnWall(30)
         # robot.advance(dist - GRID * 0.5)
 
-        go(0.5, 7)
+        go(0.5, 6.75)
         dist = robot.updateOdOnWall(45)
         if dist > GRID / 2:
             robot.advance(dist - GRID / 2)
