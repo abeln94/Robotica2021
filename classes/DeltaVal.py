@@ -10,12 +10,10 @@ class DeltaVal:
         self.val = val
 
     def update(self, new):
+        """ Returns the difference between this 'new' parameter and the previous one """
         old = self.val
         self.val = new
         return new - old
-
-    def reset(self):
-        self.val = 0
 
 
 class SyncDeltaVal:
@@ -28,9 +26,7 @@ class SyncDeltaVal:
         self.val = Value('d', val)
 
     def update(self, new):
+        """ Returns the difference between this 'new' parameter and the previous one """
         old = self.val.value
         self.val.value = new
         return new - old
-
-    def reset(self):
-        self.val.value = 0

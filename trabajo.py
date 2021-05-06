@@ -36,10 +36,12 @@ if __name__ == "__main__":
 
 
         def go(x, y):
+            """ alias to move the robot to cell (x,y) """
             robot.go(*myMap._cell2pos(x, y))
 
 
         def lookAt(x, y):
+            """ alias to make the robot look at cell (x,y) """
             robot.lookAt(*myMap._cell2pos(x, y))
 
 

@@ -25,6 +25,7 @@ _ICON = 20  # icons size in pixels
 
 
 class _Motor:
+    """ Represents a motor """
     _encoder = "_encoder"
     _dps = "_dps"
     _offset = "_offset"
@@ -39,22 +40,27 @@ class _Motor:
 
     @staticmethod
     def read(port, data):
+        """ @:return: the motor current angle in degrees """
         return int(data[port + _Motor._encoder] - data[port + _Motor._offset])
 
     @staticmethod
     def offset_encoder(port, data, value):
+        """ sets the motor offset """
         data[port + _Motor._offset] += value
 
     @staticmethod
     def set_dps(port, data, value):
+        """ sets the motor dps (degrees per second) """
         data[port + _Motor._dps] = value
 
     @staticmethod
     def update(port, data, dT):
+        """ updates the motor value """
         data[port + _Motor._encoder] += data[port + _Motor._dps] * random.uniform(_Motor._FRICTION, 1) * dT
 
     @staticmethod
     def initUI(port, data):
+        """ a wheel indicator with buttons to rotate, and velocity indicator+buttons """
         return [[
             sg.Text(port + ": Motor:"),
             sg.RealtimeButton("<", key=port + "<"),
@@ -68,7 +74,7 @@ class _Motor:
 
     @staticmethod
     def updateUI(event, values, window, port, data):
-
+        """ updates the ui """
         graph = window[port + 'º']
         graph.DrawCircle((_ICON / 2, _ICON / 2), _ICON / 2, fill_color='white')
         angle = np.deg2rad(int(data[port + _Motor._offset]))
@@ -88,6 +94,8 @@ class _Motor:
 
 
 class _Touch:
+    """ Represents a button """
+
     @staticmethod
     def init(port, data):
         data[port] = 0
@@ -98,10 +106,12 @@ class _Touch:
 
     @staticmethod
     def read(port, data):
+        """ return the button state """
         return data[port]
 
     @staticmethod
     def initUI(port, data):
+        """ just a button """
         return [[
             sg.Text(port + ": Touch: "),
             sg.RealtimeButton("(+)", key=port),
@@ -113,8 +123,11 @@ class _Touch:
 
 
 class _Ultrasonic:
+    """ represents the ultrasonic sensor """
+
     @staticmethod
     def init(port, data):
+        """ initialization """
         data[port] = 255
 
     @staticmethod
@@ -123,10 +136,12 @@ class _Ultrasonic:
 
     @staticmethod
     def read(port, data):
+        """ return the distance to the nearest obstacle """
         return data[port]
 
     @staticmethod
     def initUI(port, data):
+        """ a slider """
         return [[
             sg.Text(port + ": Ultrasonic:"),
             sg.Slider(range=(0, 255), default_value=data[port], orientation='horizontal', key=port),
@@ -139,6 +154,8 @@ class _Ultrasonic:
 
 
 class _Light:
+    """ Represents the light sensor """
+
     @staticmethod
     def init(port, data):
         data[port] = 2000
@@ -149,10 +166,12 @@ class _Light:
 
     @staticmethod
     def read(port, data):
+        """ return the light received """
         return data[port]
 
     @staticmethod
     def initUI(port, data):
+        """ an icon indicator and a slider """
         return [[
             sg.Text(port + ": Light:"),
             sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "#"),
@@ -167,7 +186,9 @@ class _Light:
             data[port] = values[port]
 
 
-class _Custom:  # currently gyro
+class _Custom:
+    """ represents a 'raw' sensor, currently a gyro """
+
     @staticmethod
     def init(port, data):
         data[port] = 0
@@ -178,10 +199,12 @@ class _Custom:  # currently gyro
 
     @staticmethod
     def read(port, data):
+        """ retruns the raw value of the sensor """
         return (data[port],)
 
     @staticmethod
     def initUI(port, data):
+        """ a slider for the raw value """
         return [[
             sg.Text(port + ": Custom:"),
             sg.Slider(range=(0, 4000), default_value=data[port], orientation='horizontal', key=port),
@@ -294,7 +317,7 @@ class BrickPi3:
                 # update
                 type.updateUI(event, values, window, port, self.data)
 
-                # driver
+                ########## driver ##########
 
                 # set gyro depending on wheels
                 leftWheel = self.data[self.PORT_B + _Motor._dps]

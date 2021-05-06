@@ -402,6 +402,9 @@ class Map2D:
                              point_end[0], point_end[1])
 
     def closeAll(self):
+        """
+        Closes all graphs
+        """
         plt.close('all')
 
     # ############################################################

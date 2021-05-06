@@ -361,12 +361,14 @@ class Robot:
         self.setSpeed(0, 0)
 
     def rotate(self, th):
+        """ makes the robot rotate 'th' radians, based on time """
         th = th * FRICTION
         self.setSpeed(0, Cfg.ANG_VEL * np.sign(th))
         time.sleep(abs(th) / Cfg.ANG_VEL)
         self.setSpeed(0, 0)
 
     def advance(self, dist):
+        """ makes the robot advance 'dist' mm, based on time"""
         dist = dist * FRICTION
         self.setSpeed(Cfg.LIN_VEL * np.sign(dist), 0)
         time.sleep(abs(dist) / Cfg.LIN_VEL)
@@ -474,17 +476,27 @@ class Robot:
         return match_images(imgage_bgr, self.capture_image())
 
     def waitButtonPress(self):
+        """ Waits until the button is pressed&released """
         periodic = Periodic()
         while periodic(not self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for press
         while periodic(self.BP.get_sensor(self.SENSOR_BUTTON)): pass  # wait for release
 
     def onMarker(self, x=-999, y=-999, th=-999, now=False):
+        """
+        Marks the values that the odometry will be replaced with when the black mark is detected
+        Values not specified will be left untouched
+        If 'now' is true the update is instant (without waiting for the marker)
+        """
         self.marker_x.value = x
         self.marker_y.value = y
         self.marker_th.value = th
         self.marker_now.value = now
 
-    def updateOdOnWall(self, ANG=60, ):
+    def updateOdOnWall(self, ANG=60):
+        """
+        Makes the robot rotate until it is perpendicular to the wall in front
+        :param ANG: angle used for finding the wall
+        """
         ROTATION = 2.5
         # We assume robot looking a front wall
         ang, best_ang = -ANG, -ANG
