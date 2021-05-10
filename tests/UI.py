@@ -4,7 +4,9 @@ sg.theme('DarkAmber')  # Add a touch of color
 # All the stuff inside your window.
 layout = [
     [sg.Text('Some text on Row 1')],
-    [sg.Text('Some text on Row 1'), sg.Slider(range=(0, 500), default_value=222, size=(20, 15), orientation='horizontal', font=('Helvetica', 12), key="slider")]
+    [sg.Text('Some text on Row 1'),
+     sg.Slider(range=(0, 500), default_value=222, size=(20, 15), orientation='horizontal', font=('Helvetica', 12),
+               key="slider")]
 ]
 
 # Create the Window

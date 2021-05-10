@@ -22,6 +22,7 @@ def dibrobot(loc_eje, c, scale=1):
     Hec = np.array([[1, 0, descentre],
                     [0, 1, 0],
                     [0, 0, 1]])
-    extremos = np.array([trasera_izda, delantera_izda, delantera_dcha, trasera_dcha, trasera_izda, frontal_robot, trasera_dcha])
+    extremos = np.array(
+        [trasera_izda, delantera_izda, delantera_dcha, trasera_dcha, trasera_izda, frontal_robot, trasera_dcha])
     robot = np.dot(Hwe, np.dot(Hec, np.transpose(extremos)))
     plt.plot(robot[0, :], robot[1, :], c)

@@ -1,6 +1,3 @@
-import random
-import time
-
 import matplotlib
 import numpy as np
 
@@ -8,7 +5,6 @@ from classes import Cfg
 from classes.Map import GRID
 from classes.MapLib import Map2D
 from classes.Robot import Robot
-from p4 import traverseLabyrinth
 
 matplotlib.use("TkAgg")  # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -24,7 +20,6 @@ if __name__ == "__main__":
         # init Robot
         robot = Robot([*myMap._cell2pos(1, 7), np.deg2rad(0)])
         robot.startOdometry()
-
 
         # spin and wait
         robot.updateThOnWall()

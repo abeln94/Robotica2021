@@ -10,7 +10,8 @@ from functions.functions import norm_pi
 Cfg.add_argument("-l", "--length", help="Length of the linear trayectory (mm)", type=float, default=-1)  # 1000
 Cfg.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)", type=float, default=-1)  # 200
 Cfg.add_argument("-a", "--radioA", help="Radio 'a' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 100
-Cfg.add_argument("-r", "--distR", help="Distance 'r' to perform the Bicy-trajectory (mm)", type=float, default=-1)  # 500
+Cfg.add_argument("-r", "--distR", help="Distance 'r' to perform the Bicy-trajectory (mm)", type=float,
+                 default=-1)  # 500
 
 Cfg.add_argument("-no", "--noOdometry", help="Don't use odometry for movement", action="store_true")
 
@@ -169,7 +170,8 @@ def waitUntil(x=None, y=None, th=None, r=200, angle=np.pi / 8):
         rangle = abs(norm_pi(rth - th))
 
         # check
-        if (r < 0 or (rr > minr and minr <= r) or rr < r / 4) and (angle < 0 or (rangle > minAngle and minAngle <= angle) or rangle < angle / 4):
+        if (r < 0 or (rr > minr and minr <= r) or rr < r / 4) and (
+                angle < 0 or (rangle > minAngle and minAngle <= angle) or rangle < angle / 4):
             # If radius check is disabled the test passes
             # else if we are very very close, the test passes
             # else if we are now farther and the previous (closer) value was inside the required radius, the test passes

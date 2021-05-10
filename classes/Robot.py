@@ -513,6 +513,5 @@ class Robot:
                 best_dist = new_dist
                 best_ang = ang
 
-        # self.onMarker(0, 0, new_th, True)
         self.rotate(-np.deg2rad(ANG - best_ang))
         return best_dist

@@ -61,7 +61,8 @@ while True:
     img = cv2.dilate(img, cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8)))
 
     # on the color-masked, blurred and morphed image I apply the cv2.HoughCircles-method to detect circle-shaped objects
-    detected_circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20, maxRadius=200)
+    detected_circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 150, param1=100, param2=20, minRadius=20,
+                                        maxRadius=200)
     if detected_circles is not None:
         for circle in detected_circles[0, :]:
             circled_orig = cv2.circle(img, (circle[0], circle[1]), int(circle[2]), (0, 255, 0), thickness=3)

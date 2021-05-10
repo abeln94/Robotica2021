@@ -1,15 +1,16 @@
-import cv2
 import time
+
+import cv2
 import numpy as np
 
 from classes import Cfg
-from classes.Robot import Robot
-from functions.get_image_match import match_images
 from classes.Map import GRID
 from classes.Periodic import Periodic
+from classes.Robot import Robot
 
 Cfg.add_argument("-bb8", "--bb8", help="detect bb8", action="store_true")
 robot = None
+
 
 #
 def trackImages(our, other):
@@ -52,15 +53,16 @@ def trackImages(our, other):
             else:
                 # 1.3 no found
                 robot.setSpeed(0, ANGULAR_SPEED_LOST)
-        
+
         else:
             robot.setSpeed(-BACKTRACK_VELOCITY, 0)
 
         time.sleep(MOVEMENT_TIME)
         distance = robot.getObstacleDistance()
-    
+
     # Returns whether our is at the lefth position or not
-    return coordinatesOur[0] > coordinatesOther[0] 
+    return coordinatesOur[0] > coordinatesOther[0]
+
 
 if __name__ == "__main__":
     try:

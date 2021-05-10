@@ -43,7 +43,7 @@ def match_images(image, capture):
     # Initiate BRISK detector --> you could use any other detector, including NON binary features (SIFT, SURF)
     # but this is the best performing one in this version
     detector = cv2.SIFT_create()
-    binary_features = False # True if detector = ORB, AKAZE, BRISK, and False otherwise
+    binary_features = False  # True if detector = ORB, AKAZE, BRISK, and False otherwise
 
     # find the keypoints and corresponding descriptors
     kpImg, desImg = detector.detectAndCompute(img, None)
@@ -63,14 +63,14 @@ def match_images(image, capture):
         goodMatches = sorted(matches, key=lambda x: x.distance)
     else:
         FLANN_INDEX_KDTREE = 0
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks = 50)
+        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        search_params = dict(checks=50)
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(desImg, desCap, k=2)
         # store all the good matches as per Lowe's ratio test.
         goodMatches = []
-        for m,n in matches:
-            if m.distance < 0.7*n.distance:
+        for m, n in matches:
+            if m.distance < 0.7 * n.distance:
                 goodMatches.append(m)
 
     # Show matches if requested

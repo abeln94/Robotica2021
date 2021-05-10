@@ -4,7 +4,6 @@ via the new Pythonic cv2 interface.  Press <esc> to quit.
 """
 
 import cv2
-import numpy as np
 
 # Setup default values for SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
@@ -65,10 +64,10 @@ while True:
     mask = cv2.erode(img, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
     mask = cv2.dilate(img, cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8)))
 
-    keypoints = detector.detect(255-mask)
+    keypoints = detector.detect(255 - mask)
 
-    #regions = cv2.bitwise_and(img, img, mask = mask)
-    #regions = cv2.cvtColor(regions,cv2.COLOR_HSV2BGR)
+    # regions = cv2.bitwise_and(img, img, mask = mask)
+    # regions = cv2.cvtColor(regions,cv2.COLOR_HSV2BGR)
     cv2.imshow("Detected Regions", mask)
 
     """

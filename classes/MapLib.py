@@ -348,7 +348,8 @@ class Map2D:
                         [0, 1, 0],
                         [0, 0, 1]])
 
-        extremos = np.array([trasera_izda, delantera_izda, delantera_dcha, trasera_dcha, trasera_izda, frontal_robot, trasera_dcha])
+        extremos = np.array(
+            [trasera_izda, delantera_izda, delantera_dcha, trasera_dcha, trasera_izda, frontal_robot, trasera_dcha])
         robot = np.dot(Hwe, np.dot(Hec, np.transpose(extremos)))
 
         self.current_ax.plot(robot[0, :], robot[1, :], robotPlotStyle)
@@ -422,12 +423,16 @@ class Map2D:
         # first reset the cost matrix
         self._initCostMatrix()
 
-        wavefront = [((x_end, y_end), 0)]  # create the wavefront list points ((x,y),cost), and initialize with the end point
+        wavefront = [
+            ((x_end, y_end), 0)]  # create the wavefront list points ((x,y),cost), and initialize with the end point
         while len(wavefront) != 0:  # evaluate each wavefront
-            (x, y), c = wavefront.pop(0)  # get and remove the first element (will always have min-or-equal cost from all the others)
-            if self.costMatrix[x, y] < 0 and 0 <= x < self.sizeX and 0 <= y < self.sizeY:  # inside the matrix and with uninitialized cost (because if already initialized it will always be better)
+            (x, y), c = wavefront.pop(
+                0)  # get and remove the first element (will always have min-or-equal cost from all the others)
+            if self.costMatrix[
+                x, y] < 0 and 0 <= x < self.sizeX and 0 <= y < self.sizeY:  # inside the matrix and with uninitialized cost (because if already initialized it will always be better)
                 self.costMatrix[x, y] = c  # set cost
-                for neighbor in range(0, 8, 1 if USE_DIAGONALS else 2):  # and for all neighbors (diagonal neighbors are odd)
+                for neighbor in range(0, 8,
+                                      1 if USE_DIAGONALS else 2):  # and for all neighbors (diagonal neighbors are odd)
                     if self.isConnected(x, y, neighbor):  # if they are connected
                         wavefront.append((self._neighbour(x, y, neighbor), c + 1))  # add to wavefront as cost+1
 

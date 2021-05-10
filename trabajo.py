@@ -146,22 +146,20 @@ if __name__ == "__main__":
                 robot.setSpeed(0, np.deg2rad(7.5) * rotateLeft)
                 rotateLeft = 1 - rotateLeft
 
-        # dist = robot.updateOdOnWall(30)
-        # robot.advance(dist - GRID * 0.5)
-
+        # Go to image wall and updateTh
         go(0.5, 6.75)
         dist = robot.updateOdOnWall(45)
         if dist > GRID / 2:
             robot.advance(dist - GRID / 2)
 
+        # Go to right wall and update Th
         robot.rotate(np.deg2rad(-90))
-
         dist = robot.getObstacleDistance()
         if dist > GRID / 2:
             robot.advance(dist - GRID / 2)
-
         robot.updateOdOnWall(45)
 
+        # Exit
         if leftExit:
             robot.rotate(np.deg2rad(-180))
             robot.advance(3 * GRID)

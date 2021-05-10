@@ -64,7 +64,8 @@ class _Motor:
         return [[
             sg.Text(port + ": Motor:"),
             sg.RealtimeButton("<", key=port + "<"),
-            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "º"),
+            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON),
+                     key=port + "º"),
             sg.RealtimeButton(">", key=port + ">"),
             sg.VerticalSeparator(),
             sg.RealtimeButton("-", key=port + "-"),
@@ -78,9 +79,11 @@ class _Motor:
         graph = window[port + 'º']
         graph.DrawCircle((_ICON / 2, _ICON / 2), _ICON / 2, fill_color='white')
         angle = np.deg2rad(int(data[port + _Motor._offset]))
-        graph.DrawLine((_ICON / 2, _ICON / 2), (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='blue')
+        graph.DrawLine((_ICON / 2, _ICON / 2),
+                       (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='blue')
         angle = np.deg2rad(_Motor.read(port, data))
-        graph.DrawLine((_ICON / 2, _ICON / 2), (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='red')
+        graph.DrawLine((_ICON / 2, _ICON / 2),
+                       (_ICON / 2 + _ICON / 2 * np.cos(angle), _ICON / 2 + _ICON / 2 * np.sin(angle)), color='red')
 
         window[port + "dps"].update("{:.2f} dps".format(data[port + _Motor._dps]))
         if event == port + "<":
@@ -174,14 +177,16 @@ class _Light:
         """ an icon indicator and a slider """
         return [[
             sg.Text(port + ": Light:"),
-            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON), key=port + "#"),
+            sg.Graph(canvas_size=(_ICON, _ICON), graph_bottom_left=(0, 0), graph_top_right=(_ICON, _ICON),
+                     key=port + "#"),
             sg.Slider(range=(0, 4000), default_value=data[port], orientation='horizontal', key=port),
         ]]
 
     @staticmethod
     def updateUI(event, values, window, port, data):
         graph = window[port + '#']
-        graph.DrawRectangle((0, 0), (_ICON, _ICON), fill_color='#{0:02x}{0:02x}{0:02x}'.format(255 - int(_Light.read(port, data) / 4000 * 255)))
+        graph.DrawRectangle((0, 0), (_ICON, _ICON),
+                            fill_color='#{0:02x}{0:02x}{0:02x}'.format(255 - int(_Light.read(port, data) / 4000 * 255)))
         if port in values:
             data[port] = values[port]
 
